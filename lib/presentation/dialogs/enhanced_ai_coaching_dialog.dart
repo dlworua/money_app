@@ -1,0 +1,644 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/services/enhanced_ai_coach.dart';
+import '../../data/models/transaction.dart';
+import '../../data/models/budget.dart';
+import '../viewmodels/providers.dart';
+
+class EnhancedAiCoachingDialog extends ConsumerWidget {
+  const EnhancedAiCoachingDialog({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Dialog.fullscreen(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('🤖 AI 절약 코치'),
+          backgroundColor: AppTheme.primaryColor,
+          foregroundColor: Colors.white,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+          ),
+        ),
+        body: FutureBuilder<ComprehensiveInsight>(
+          future: _generateInsight(ref),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildLoadingView();
+            }
+            
+            if (snapshot.hasError) {
+              return _buildErrorView(snapshot.error.toString());
+            }
+            
+            final insight = snapshot.data!;
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(AppTheme.spaceM),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeaderCard(insight),
+                  const SizedBox(height: AppTheme.spaceM),
+                  _buildMainAnalysisCard(insight),
+                  const SizedBox(height: AppTheme.spaceM),
+                  _buildStrategiesCard(insight),
+                  const SizedBox(height: AppTheme.spaceM),
+                  _buildActionableAdviceCard(insight),
+                  if (insight.opportunities.isNotEmpty) ...[
+                    const SizedBox(height: AppTheme.spaceM),
+                    _buildOpportunitiesCard(insight),
+                  ],
+                  if (insight.predictions['available'] == true) ...[
+                    const SizedBox(height: AppTheme.spaceM),
+                    _buildPredictionsCard(insight),
+                  ],
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+  
+  Future<ComprehensiveInsight> _generateInsight(WidgetRef ref) async {
+    final state = ref.read(homeViewModelProvider);
+    final coach = EnhancedAiCoach();
+    
+    // 실제 앱에서는 실제 거래와 예산 데이터를 가져와야 합니다
+    // 지금은 데모용으로 빈 데이터를 사용합니다
+    final transactions = <Transaction>[];
+    final budgets = <Budget>[];
+    
+    // state.user가 null일 경우를 처리
+    final user = state.user;
+    if (user == null) {
+      throw Exception('사용자 정보를 찾을 수 없습니다');
+    }
+    
+    return await coach.generateComprehensiveInsight(user, transactions, budgets);
+  }
+  
+  Widget _buildLoadingView() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: AppTheme.spaceM),
+          Text(
+            '🧠 AI가 당신의 가계부를 분석하고 있어요...',
+            style: AppTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: AppTheme.spaceS),
+          Text(
+            '모든 데이터를 꼼꼼히 살펴보는 중이에요 ⚡',
+            style: AppTheme.bodyMedium,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildErrorView(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            size: 64,
+            color: AppTheme.errorColor,
+          ),
+          const SizedBox(height: AppTheme.spaceM),
+          const Text(
+            '분석 중 문제가 발생했어요',
+            style: AppTheme.headingMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppTheme.spaceS),
+          Text(
+            error,
+            style: AppTheme.bodyMedium,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderCard(ComprehensiveInsight insight) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spaceM),
+      decoration: BoxDecoration(
+        gradient: AppTheme.primaryGradient,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.elevatedShadow,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spaceS),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.psychology,
+              color: Colors.white,
+              size: 32,
+            ),
+          ),
+          const SizedBox(width: AppTheme.spaceM),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'AI 분석 완료',
+                  style: AppTheme.headingMedium.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spaceXS),
+                Text(
+                  '신뢰도: ${insight.confidenceScore.toStringAsFixed(0)}%',
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+                if (insight.spendingAnalysis['isEmpty'] != true) ...[
+                  const SizedBox(height: AppTheme.spaceXS),
+                  Text(
+                    '${insight.behaviorPatterns.length}가지 패턴 발견',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainAnalysisCard(ComprehensiveInsight insight) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spaceM),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.analytics_outlined,
+                color: AppTheme.primaryColor,
+                size: 24,
+              ),
+              const SizedBox(width: AppTheme.spaceS),
+              Text(
+                '종합 분석 결과',
+                style: AppTheme.headingSmall.copyWith(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spaceM),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppTheme.spaceM),
+            decoration: BoxDecoration(
+              color: AppTheme.backgroundColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              ),
+            ),
+            child: Text(
+              insight.personalizedMessage,
+              style: AppTheme.bodyMedium.copyWith(
+                height: 1.6,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStrategiesCard(ComprehensiveInsight insight) {
+    if (insight.strategies.isEmpty) return const SizedBox.shrink();
+    
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spaceM),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.lightbulb_outline,
+                color: AppTheme.accentColor,
+                size: 24,
+              ),
+              const SizedBox(width: AppTheme.spaceS),
+              Text(
+                '맞춤형 전략',
+                style: AppTheme.headingSmall.copyWith(
+                  color: AppTheme.accentColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spaceM),
+          ...insight.strategies.map((strategy) => Container(
+            margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
+            padding: const EdgeInsets.all(AppTheme.spaceM),
+            decoration: BoxDecoration(
+              color: AppTheme.accentColor.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.accentColor.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        strategy.title,
+                        style: AppTheme.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.accentColor,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getPriorityColor(strategy.priority),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        strategy.priority,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTheme.spaceS),
+                Text(
+                  strategy.description,
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: AppTheme.onSurfaceColor,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spaceS),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.savings_outlined,
+                      size: 16,
+                      color: AppTheme.successColor,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '예상 절약: ${_formatCurrency(strategy.expectedSaving.toDouble())}',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.successColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spaceM),
+                    Icon(
+                      Icons.schedule_outlined,
+                      size: 16,
+                      color: AppTheme.secondaryColor,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      strategy.timeframe,
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.secondaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionableAdviceCard(ComprehensiveInsight insight) {
+    if (insight.actionableAdvice.isEmpty) return const SizedBox.shrink();
+    
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spaceM),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.check_circle_outline,
+                color: AppTheme.successColor,
+                size: 24,
+              ),
+              const SizedBox(width: AppTheme.spaceS),
+              Text(
+                '실행 가능한 조언',
+                style: AppTheme.headingSmall.copyWith(
+                  color: AppTheme.successColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spaceM),
+          ...insight.actionableAdvice.take(5).map((advice) => Container(
+            margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
+            padding: const EdgeInsets.all(AppTheme.spaceM),
+            decoration: BoxDecoration(
+              color: AppTheme.successColor.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 2),
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.successColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    size: 12,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: AppTheme.spaceS),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        advice.title,
+                        style: AppTheme.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        advice.description,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.onBackgroundColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOpportunitiesCard(ComprehensiveInsight insight) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spaceM),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.trending_up_outlined,
+                color: AppTheme.warningColor,
+                size: 24,
+              ),
+              const SizedBox(width: AppTheme.spaceS),
+              Text(
+                '절약 기회',
+                style: AppTheme.headingSmall.copyWith(
+                  color: AppTheme.warningColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spaceM),
+          ...insight.opportunities.take(3).map((opportunity) => Container(
+            margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
+            padding: const EdgeInsets.all(AppTheme.spaceM),
+            decoration: BoxDecoration(
+              color: AppTheme.warningColor.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppTheme.warningColor.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  opportunity['title'] as String,
+                  style: AppTheme.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.warningColor,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spaceXS),
+                Text(
+                  opportunity['message'] as String,
+                  style: AppTheme.bodySmall,
+                ),
+                const SizedBox(height: AppTheme.spaceS),
+                Text(
+                  '💡 ${opportunity['suggestion']}',
+                  style: AppTheme.bodySmall.copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPredictionsCard(ComprehensiveInsight insight) {
+    final predictions = insight.predictions;
+    
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spaceM),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.psychology_outlined,
+                color: AppTheme.secondaryColor,
+                size: 24,
+              ),
+              const SizedBox(width: AppTheme.spaceS),
+              Text(
+                'AI 예측 분석',
+                style: AppTheme.headingSmall.copyWith(
+                  color: AppTheme.secondaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spaceM),
+          
+          // 목표 달성 확률
+          if (predictions['goalAchievementProbability'] != null) ...[
+            Container(
+              padding: const EdgeInsets.all(AppTheme.spaceM),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.successColor.withValues(alpha: 0.1),
+                    AppTheme.successColor.withValues(alpha: 0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    '목표 달성 확률',
+                    style: AppTheme.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.spaceS),
+                  Text(
+                    '${((predictions['goalAchievementProbability'] as double) * 100).round()}%',
+                    style: AppTheme.headingLarge.copyWith(
+                      color: AppTheme.successColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          
+          // 위험 요소
+          if (predictions['riskFactors'] != null && 
+              (predictions['riskFactors'] as List).isNotEmpty) ...[
+            const SizedBox(height: AppTheme.spaceM),
+            Text(
+              '주의사항',
+              style: AppTheme.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppTheme.errorColor,
+              ),
+            ),
+            const SizedBox(height: AppTheme.spaceS),
+            ...(predictions['riskFactors'] as List<String>).map((risk) => 
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_outlined,
+                      size: 16,
+                      color: AppTheme.errorColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        risk,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.errorColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Color _getPriorityColor(String priority) {
+    switch (priority.toUpperCase()) {
+      case 'HIGH':
+        return AppTheme.errorColor;
+      case 'MEDIUM':
+        return AppTheme.warningColor;
+      case 'LOW':
+        return AppTheme.successColor;
+      default:
+        return AppTheme.primaryColor;
+    }
+  }
+
+  String _formatCurrency(double amount) {
+    if (amount >= 10000) {
+      return '${(amount / 10000).toStringAsFixed(1)}만원';
+    }
+    return '${amount.toStringAsFixed(0)}원';
+  }
+}
