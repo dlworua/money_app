@@ -105,6 +105,34 @@ class AdRepository {
     _interstitialAd?.show();
   }
 
+  // 보상형 광고 생성
+  Future<RewardedAd?> createRewardedAd() async {
+    try {
+      LoggerService.info('Loading rewarded ad');
+      
+      RewardedAd? rewardedAd;
+      await RewardedAd.load(
+        adUnitId: AppConstants.rewardedAdUnitId,
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (ad) {
+            LoggerService.info('Rewarded ad loaded successfully');
+            rewardedAd = ad;
+          },
+          onAdFailedToLoad: (error) {
+            LoggerService.error('Rewarded ad failed to load', error);
+            rewardedAd = null;
+          },
+        ),
+      );
+      
+      return rewardedAd;
+    } catch (error) {
+      LoggerService.error('Rewarded ad load exception', error);
+      return null;
+    }
+  }
+
   // 보상형 광고 표시
   void showRewardedAd(Function(int) onEarnCoins) {
     _rewardedAd?.show(

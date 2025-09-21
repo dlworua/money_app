@@ -76,11 +76,18 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    // 안드로이드 하단바 자동 숨김 설정
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [SystemUiOverlay.top],
+    );
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    // 하단바 설정 복원
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 

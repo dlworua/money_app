@@ -35,6 +35,11 @@ class UserModel {
   final int dailySpinCount; // 일일 보상 횟수
   final DateTime? lastSpinDate; // 마지막 보상 날짜
   final int totalGamesPlayed; // 총 활동 횟수
+  
+  // 🎫 티켓 시스템
+  final int gameTickets; // 현재 보유 티켓
+  final int maxTickets; // 최대 티켓 수 (기본 10개)
+  final DateTime? lastTicketRefillTime; // 마지막 티켓 충전 시간
 
 
   // 🏆 고급 기능들
@@ -80,6 +85,10 @@ class UserModel {
     this.dailySpinCount = 0,
     this.lastSpinDate,
     this.totalGamesPlayed = 0,
+    // 🎫 티켓 시스템 필드들
+    this.gameTickets = 10, // 시작 시 10개 티켓
+    this.maxTickets = 10, // 기본 최대 10개
+    this.lastTicketRefillTime,
     // 🏆 고급 기능들
     this.streakMultiplier = 1,
     this.achievements2 = const {},
@@ -121,6 +130,10 @@ class UserModel {
     int? dailySpinCount,
     DateTime? lastSpinDate,
     int? totalGamesPlayed,
+    // 🎫 티켓 시스템 필드들
+    int? gameTickets,
+    int? maxTickets,
+    DateTime? lastTicketRefillTime,
     int? streakMultiplier,
     Map<String, dynamic>? achievements2,
     List<String>? aiTips,
@@ -160,6 +173,10 @@ class UserModel {
       dailySpinCount: dailySpinCount ?? this.dailySpinCount,
       lastSpinDate: lastSpinDate ?? this.lastSpinDate,
       totalGamesPlayed: totalGamesPlayed ?? this.totalGamesPlayed,
+      // 🎫 티켓 시스템 필드들
+      gameTickets: gameTickets ?? this.gameTickets,
+      maxTickets: maxTickets ?? this.maxTickets,
+      lastTicketRefillTime: lastTicketRefillTime ?? this.lastTicketRefillTime,
       streakMultiplier: streakMultiplier ?? this.streakMultiplier,
       achievements2: achievements2 ?? this.achievements2,
       aiTips: aiTips ?? this.aiTips,
@@ -203,6 +220,10 @@ class UserModel {
       'dailySpinCount': dailySpinCount,
       'lastSpinDate': lastSpinDate?.toIso8601String(),
       'totalGamesPlayed': totalGamesPlayed,
+      // 🎫 티켓 시스템 필드들
+      'gameTickets': gameTickets,
+      'maxTickets': maxTickets,
+      'lastTicketRefillTime': lastTicketRefillTime?.toIso8601String(),
       'streakMultiplier': streakMultiplier,
       'achievements2': achievements2,
       'aiTips': aiTips,
@@ -273,6 +294,12 @@ class UserModel {
           ? DateTime.parse(json['lastSpinDate'] as String)
           : null,
       totalGamesPlayed: json['totalGamesPlayed'] as int? ?? 0,
+      // 🎫 티켓 시스템 필드들
+      gameTickets: json['gameTickets'] as int? ?? 10,
+      maxTickets: json['maxTickets'] as int? ?? 10,
+      lastTicketRefillTime: json['lastTicketRefillTime'] != null
+          ? DateTime.parse(json['lastTicketRefillTime'] as String)
+          : null,
       streakMultiplier: json['streakMultiplier'] as int? ?? 1,
       achievements2: Map<String, dynamic>.from(json['achievements2'] ?? {}),
       aiTips: List<String>.from(json['aiTips'] ?? []),

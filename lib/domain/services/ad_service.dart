@@ -21,32 +21,24 @@ class AdService {
     }
   }
   
-  Future<void> loadRewardedAd({Function(int)? onEarnCoins}) async {
+  Future<RewardedAd?> loadRewardedAd() async {
     try {
-      await _adRepository.loadRewardedAd(onEarnCoins: onEarnCoins ?? (coins) async {
-        final user = await _userService.getUser();
-        if (user != null) {
-          await _userService.addCoins(coins, isPremium: user.isPremium);
-          LoggerService.info('Rewarded ad completed, earned $coins coins (premium: ${user.isPremium})');
-        }
-      });
-      
+      final rewardedAd = await _adRepository.createRewardedAd();
       LoggerService.info('Rewarded ad loaded through service');
+      return rewardedAd;
     } catch (error) {
       LoggerService.error('Failed to load rewarded ad through service', error);
-      rethrow;
+      return null;
     }
   }
   
-  Future<void> showRewardedAd({Function(int)? onEarnCoins}) async {
+  Future<void> showRewardedAd(RewardedAd rewardedAd) async {
     try {
-      _adRepository.showRewardedAd(onEarnCoins ?? (coins) async {
-        final user = await _userService.getUser();
-        if (user != null) {
-          await _userService.addCoins(coins, isPremium: user.isPremium);
-          LoggerService.info('Rewarded ad reward processed: $coins coins');
-        }
-      });
+      await rewardedAd.show(
+        onUserEarnedReward: (ad, reward) {
+          LoggerService.info('Rewarded ad completed: ${reward.amount} ${reward.type}');
+        },
+      );
     } catch (error) {
       LoggerService.error('Failed to show rewarded ad', error);
       rethrow;

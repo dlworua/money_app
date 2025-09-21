@@ -31,6 +31,11 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
     super.initState();
     _initializeBannerAd();
     _initializeGame();
+    // 안드로이드 하단바 자동 숨김 설정
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [SystemUiOverlay.top],
+    );
   }
 
   void _initializeBannerAd() {
@@ -153,6 +158,8 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
   @override
   void dispose() {
     _bannerAd?.dispose();
+    // 하단바 설정 복원
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -31,6 +32,11 @@ class _GamesViewState extends ConsumerState<GamesView> {
   void initState() {
     super.initState();
     _initializeGamesBannerAd();
+    // 안드로이드 하단바 자동 숨김 설정
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [SystemUiOverlay.top],
+    );
   }
 
   /// 게임 탭 전용 배너 광고 초기화
@@ -58,6 +64,8 @@ class _GamesViewState extends ConsumerState<GamesView> {
   @override
   void dispose() {
     _gamesBannerAd?.dispose();
+    // 하단바 설정 복원
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -110,6 +118,16 @@ class _GamesViewState extends ConsumerState<GamesView> {
 
                   // 보유 포인트 카드
                   _buildCoinCard(context, user),
+
+                  SizedBox(
+                    height: ResponsiveUtils.getIPhone16PlusSpacing(
+                      context,
+                      AppTheme.spaceM,
+                    ),
+                  ),
+
+                  // 티켓 시스템 카드
+                  _buildTicketCard(context, user),
 
                   SizedBox(
                     height: ResponsiveUtils.getIPhone16PlusSpacing(
@@ -942,6 +960,232 @@ class _GamesViewState extends ConsumerState<GamesView> {
       case PointHistorySource.other:
         return AppTheme.primaryColor;
     }
+  }
+
+  /// 티켓 시스템 카드
+  Widget _buildTicketCard(BuildContext context, user) {
+    final viewModel = ref.read(homeViewModelProvider.notifier);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(
+        ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceL),
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[600]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.deepPurple.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // 티켓 정보 헤더
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '🎫 게임 티켓',
+                    style: AppTheme.getBodyMedium(context).copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
+                        context,
+                        16,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        '${user.gameTickets}',
+                        style: AppTheme.getHeadingLarge(context).copyWith(
+                          color: Colors.white,
+                          fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
+                            context,
+                            32,
+                          ),
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      Text(
+                        ' / 10',
+                        style: AppTheme.getBodyMedium(context).copyWith(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
+                            context,
+                            16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              // 티켓 아이콘들
+              Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: List.generate(10, (index) {
+                  final isUsed = index >= user.gameTickets;
+                  return Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: isUsed
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Icon(
+                      Icons.confirmation_number,
+                      size: 12,
+                      color: isUsed
+                          ? Colors.white.withValues(alpha: 0.3)
+                          : Colors.deepPurple[400],
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // 충전 정보
+          if (user.gameTickets < 10)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '⏰ 5분마다 1개씩 자동 충전',
+                style: AppTheme.getBodySmall(
+                  context,
+                ).copyWith(color: Colors.white.withValues(alpha: 0.8)),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+          if (user.gameTickets < 10) const SizedBox(height: 16),
+
+          // 리워드 광고 버튼들
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    try {
+                      await viewModel.watchAdForTickets();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('🎫 티켓 3개를 획득했습니다!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (error) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('광고를 불러올 수 없습니다.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.video_camera_front, size: 16),
+                  label: Text(
+                    '티켓 3개',
+                    style: TextStyle(
+                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
+                        context,
+                        14,
+                      ),
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.deepPurple[600],
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    try {
+                      await viewModel.watchAdForPoints();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('💰 포인트 50개를 획득했습니다!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (error) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('광고를 불러올 수 없습니다.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.video_camera_front, size: 16),
+                  label: Text(
+                    '포인트 50개',
+                    style: TextStyle(
+                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
+                        context,
+                        14,
+                      ),
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.9),
+                    foregroundColor: Colors.deepPurple[600],
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   /// 게임 탭 전용 하단 배너 광고 위젯

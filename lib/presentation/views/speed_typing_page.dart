@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
-import '../../core/utils/responsive_utils.dart';
 import '../viewmodels/providers.dart';
 import '../../data/typing_stories_data.dart';
 
@@ -37,6 +37,11 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
     super.initState();
     _initializeBannerAd();
     _initializeGame();
+    // 안드로이드 하단바 자동 숨김 설정
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [SystemUiOverlay.top],
+    );
   }
 
   void _initializeBannerAd() {
@@ -235,17 +240,14 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
     _textController.dispose();
     _focusNode.dispose();
     _bannerAd?.dispose();
+    // 하단바 설정 복원
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // MediaQuery를 사용해 키보드 높이 확인
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    
     return Scaffold(
-      // 키보드가 올라올 때 화면이 축소되지 않도록 설정
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('🚀 스피드 타이핑'),
         backgroundColor: Colors.deepPurple,
@@ -256,310 +258,313 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
           statusBarBrightness: Brightness.dark,
         ),
       ),
-      body: SingleChildScrollView(
-        // 키보드가 올라올 때 스크롤 가능하도록 설정
-        physics: const ClampingScrollPhysics(),
-        child: SizedBox(
-          // 화면 전체 높이에서 앱바와 키보드 높이를 뺀 크기
-          height: MediaQuery.of(context).size.height - 
-                  kToolbarHeight - 
-                  MediaQuery.of(context).padding.top -
-                  keyboardHeight,
-          child: Column(
-            children: [
-          // 게임 정보
+      body: Column(
+        children: [
+          // 상단 게임 정보 (고정 영역)
           Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.purple[50],
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.purple[50],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  children: [
-                    const Text('남은 시간', style: TextStyle(fontSize: 12)),
-                    Text(
-                      '${_timeLeft}s',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: _timeLeft <= 5 ? Colors.red : Colors.black,
-                      ),
-                    ),
-                  ],
+                _buildStatColumn(
+                  '남은 시간',
+                  '${_timeLeft}s',
+                  _timeLeft <= 5 ? Colors.red : Colors.black,
                 ),
-                Column(
-                  children: [
-                    const Text('완성한 문장', style: TextStyle(fontSize: 12)),
-                    Text(
-                      '$_correctSentences',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    const Text('총 시도', style: TextStyle(fontSize: 12)),
-                    Text(
-                      '$_totalSentences',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildStatColumn('완성', '$_correctSentences', Colors.green),
+                _buildStatColumn('시도', '$_totalSentences', Colors.black),
               ],
             ),
           ),
 
-          // 게임 영역
+          // 메인 게임 영역 (고정)
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (!_isGameActive && _timeLeft == 60) ...[
-                    const Icon(Icons.keyboard, size: 64, color: Colors.purple),
-                    SizedBox(
-                      height: ResponsiveUtils.getIPhone16PlusSpacing(
-                        context,
-                        24,
-                      ),
-                    ),
-                    const Text(
-                      '화면에 나타나는 문장을 정확하고 빠르게 입력하세요!',
-                      style: TextStyle(fontSize: 18),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '60초 동안 최대한 많은 문장을 입력해보세요',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _startGame,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 48,
-                          vertical: 16,
-                        ),
-                      ),
-                      child: const Text(
-                        '게임 시작',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ] else if (_isGameActive && _currentStory != null) ...[
-                    // 제목 또는 현재 문장 표시
-                    if (_showTitle) ...[
-                      // 제목 표시
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.amber[50]!, Colors.orange[50]!],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.amber[300]!,
-                            width: 2,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            const Text(
-                              '📖 제목',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              _currentStory!.title,
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ] else ...[
-                      // 문장 표시
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.purple[50]!, Colors.pink[50]!],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.purple[200]!,
-                            width: 2,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              '📝 문장 ${_currentSentenceIndex + 1}/${_currentStory!.sentences.length}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              _currentStory!.sentences[_currentSentenceIndex],
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-
-                    const SizedBox(height: 24),
-
-                    // 현재 입력 내용 미리보기
-                    if (_textController.text.isNotEmpty)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              '📝 입력중인 내용:',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _textController.text,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                    // 입력 필드 (자동 포커스 개선)
-                    GestureDetector(
-                      onTap: () {
-                        _focusNode.requestFocus();
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: _focusNode.hasFocus
-                                ? Colors.purple[400]!
-                                : Colors.purple[300]!,
-                            width: _focusNode.hasFocus ? 2 : 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.purple.withValues(alpha: 0.1),
-                              blurRadius: _focusNode.hasFocus ? 8 : 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _textController,
-                          focusNode: _focusNode,
-                          autofocus: true,
-                          style: const TextStyle(fontSize: 18),
-                          textAlign: TextAlign.center,
-                          decoration: const InputDecoration(
-                            hintText: '여기에 입력하세요...',
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                            ),
-                            contentPadding: EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          onSubmitted: (_) => _checkInput(),
-                          onChanged: (_) {
-                            // 실시간으로 포커스 상태 업데이트
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: ResponsiveUtils.getIPhone16PlusSpacing(
-                        context,
-                        24,
-                      ),
-                    ),
-
-                    ElevatedButton(
-                      onPressed: _checkInput,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 12,
-                        ),
-                      ),
-                      child: const Text('확인'),
-                    ),
-                  ],
+                  if (!_isGameActive && _timeLeft == 60)
+                    _buildWelcomeScreen()
+                  else if (_isGameActive && _currentStory != null)
+                    _buildGameScreen(),
                 ],
               ),
             ),
           ),
-
-            ],
-          ),
-        ),
+        ],
       ),
       // 배너 광고를 bottomNavigationBar로 이동
       bottomNavigationBar: _buildBottomAd(),
+    );
+  }
+
+  /// 상단 스탯 컬럼 위젯
+  Widget _buildStatColumn(String label, String value, Color valueColor) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: Colors.grey,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: valueColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 웰컴 화면 위젯
+  Widget _buildWelcomeScreen() {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.purple[50]!, Colors.pink[50]!],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.purple.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Icon(
+                Icons.keyboard_alt_outlined,
+                size: 48,
+                color: Colors.purple[400],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                '🚀 스피드 타이핑',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '화면에 나타나는 문장을 정확하고 빠르게 입력하세요!',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[700],
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '60초 동안 최대한 많은 문장을 완성해보세요',
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _startGame,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: const Text(
+                  '게임 시작',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 게임 화면 위젯
+  Widget _buildGameScreen() {
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+
+        // 제목/문장 카드
+        _buildContentCard(),
+
+        const SizedBox(height: 20),
+
+        // 입력 영역과 확인 버튼을 가로로 배치
+        _buildInputWithButton(),
+      ],
+    );
+  }
+
+  /// 컨텐츠 카드 (제목/문장)
+  Widget _buildContentCard() {
+    final isTitle = _showTitle;
+    final content = isTitle
+        ? _currentStory!.title
+        : _currentStory!.sentences[_currentSentenceIndex];
+    final label = isTitle
+        ? '📖 제목'
+        : '📝 문장 ${_currentSentenceIndex + 1}/${_currentStory!.sentences.length}';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isTitle
+              ? [Colors.amber[50]!, Colors.orange[50]!]
+              : [Colors.purple[50]!, Colors.pink[50]!],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isTitle ? Colors.amber[200]! : Colors.purple[200]!,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (isTitle ? Colors.amber : Colors.purple).withValues(
+              alpha: 0.1,
+            ),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 12),
+          AutoSizeText(
+            content,
+            style: TextStyle(
+              fontSize: isTitle ? 20 : 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+              height: 1.3,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: isTitle ? 2 : 3,
+            minFontSize: 14,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 입력 영역과 확인 버튼을 가로로 배치
+  Widget _buildInputWithButton() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        // 텍스트 입력 영역 (확장)
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _focusNode.hasFocus
+                    ? Colors.purple[400]!
+                    : Colors.grey[300]!,
+                width: _focusNode.hasFocus ? 2 : 1,
+              ),
+              boxShadow: [
+                if (_focusNode.hasFocus)
+                  BoxShadow(
+                    color: Colors.purple.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+              ],
+            ),
+            child: TextField(
+              controller: _textController,
+              focusNode: _focusNode,
+              autofocus: true,
+              style: const TextStyle(fontSize: 16, height: 1.4),
+              maxLines: 3,
+              minLines: 2,
+              decoration: const InputDecoration(
+                hintText: '여기에 입력하세요...',
+                border: InputBorder.none,
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                contentPadding: EdgeInsets.all(16),
+              ),
+              onSubmitted: (_) => _checkInput(),
+              onChanged: (_) => setState(() {}),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // 확인 버튼 (고정 크기)
+        SizedBox(
+          height: 56, // 텍스트 필드와 비슷한 높이
+          child: ElevatedButton(
+            onPressed: _checkInput,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+            child: const Text(
+              '확인',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

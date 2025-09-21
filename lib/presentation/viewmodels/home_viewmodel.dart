@@ -492,7 +492,10 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
     try {
       state = state.copyWith(canWatchAd: false);
-      await _adService.showRewardedAd();
+      final rewardedAd = await _adService.loadRewardedAd();
+      if (rewardedAd != null) {
+        await _adService.showRewardedAd(rewardedAd);
+      }
 
       // 광고 시청 성공으로 가정하고 포인트 추가
       final updatedUser = await _addPointHistory(
@@ -1116,6 +1119,150 @@ class HomeViewModel extends StateNotifier<HomeState> {
       coins: newCoins,
       pointHistory: updatedHistory,
     );
+  }
+
+  // 🎫 티켓 시스템 관련 메서드들
+  
+  /// 티켓 자동 충전 확인 및 업데이트
+  Future<void> updateTickets() async {
+    final user = state.user;
+    if (user == null) return;
+    
+    final now = DateTime.now();
+    final lastRefill = user.lastTicketRefillTime ?? now;
+    final timeSinceLastRefill = now.difference(lastRefill);
+    
+    // 5분(300초)마다 1개씩 충전, 최대 maxTickets개
+    final ticketsToAdd = (timeSinceLastRefill.inSeconds / 300).floor();
+    
+    if (ticketsToAdd > 0) {
+      var newTickets = user.gameTickets + ticketsToAdd;
+      var newMaxTickets = user.maxTickets;
+      
+      // 티켓이 기본 최대치(10)를 초과하는 경우, maxTickets를 점진적으로 줄임
+      if (newTickets > 10) {
+        final excessTickets = newTickets - 10;
+        newMaxTickets = (user.maxTickets - excessTickets).clamp(10, user.maxTickets);
+        newTickets = newTickets.clamp(0, newMaxTickets);
+      } else {
+        newTickets = newTickets.clamp(0, user.maxTickets);
+      }
+      
+      final updatedUser = user.copyWith(
+        gameTickets: newTickets,
+        maxTickets: newMaxTickets,
+        lastTicketRefillTime: now,
+      );
+      
+      await _userService.saveUser(updatedUser);
+      state = state.copyWith(user: updatedUser);
+      
+      LoggerService.info('🎫 티켓 자동 충전: ${user.gameTickets} → $newTickets');
+    }
+  }
+  
+  /// 게임 시작 시 티켓 1개 소모
+  Future<bool> consumeTicket() async {
+    final user = state.user;
+    if (user == null) return false;
+    
+    // 먼저 티켓 충전 확인
+    await updateTickets();
+    final updatedUser = state.user!;
+    
+    if (updatedUser.gameTickets <= 0) {
+      LoggerService.info('🎫 티켓 부족: ${updatedUser.gameTickets}');
+      return false;
+    }
+    
+    final finalUser = updatedUser.copyWith(
+      gameTickets: updatedUser.gameTickets - 1,
+    );
+    
+    await _userService.saveUser(finalUser);
+    state = state.copyWith(user: finalUser);
+    
+    LoggerService.info('🎫 티켓 소모: ${updatedUser.gameTickets} → ${finalUser.gameTickets}');
+    return true;
+  }
+  
+  /// 리워드 광고 시청으로 티켓 3개 지급
+  Future<void> watchAdForTickets() async {
+    final user = state.user;
+    if (user == null) return;
+    
+    try {
+      // 리워드 광고 로드 및 표시
+      final rewardedAd = await _adService.loadRewardedAd();
+      if (rewardedAd != null) {
+        await _adService.showRewardedAd(rewardedAd);
+        
+        // 티켓 3개 추가
+        var newTickets = user.gameTickets + 3;
+        var newMaxTickets = user.maxTickets;
+        
+        // 리워드로 얻은 티켓이 기본 최대치를 초과하면 maxTickets 증가
+        if (newTickets > user.maxTickets) {
+          newMaxTickets = newTickets;
+        }
+        
+        final updatedUser = user.copyWith(
+          gameTickets: newTickets,
+          maxTickets: newMaxTickets,
+        );
+        
+        await _userService.saveUser(updatedUser);
+        state = state.copyWith(user: updatedUser);
+        
+        LoggerService.info('🎫 광고 시청으로 티켓 획득: ${user.gameTickets} → $newTickets');
+      }
+    } catch (error) {
+      LoggerService.error('🎫 티켓 광고 시청 실패: $error');
+      rethrow;
+    }
+  }
+  
+  /// 리워드 광고 시청으로 포인트 50개 지급
+  Future<void> watchAdForPoints() async {
+    final user = state.user;
+    if (user == null) return;
+    
+    try {
+      // 리워드 광고 로드 및 표시
+      final rewardedAd = await _adService.loadRewardedAd();
+      if (rewardedAd != null) {
+        await _adService.showRewardedAd(rewardedAd);
+        
+        // 포인트 50개 추가
+        final updatedUser = await _addPointHistory(
+          user,
+          PointHistoryType.earn,
+          PointHistorySource.adWatch,
+          50,
+          '리워드 광고 시청',
+        );
+        
+        await _userService.saveUser(updatedUser);
+        state = state.copyWith(user: updatedUser);
+        
+        LoggerService.info('💰 광고 시청으로 포인트 획득: +50');
+      }
+    } catch (error) {
+      LoggerService.error('💰 포인트 광고 시청 실패: $error');
+      rethrow;
+    }
+  }
+  
+  /// 티켓 충전까지 남은 시간 계산 (초 단위)
+  int getTimeUntilNextTicket() {
+    final user = state.user;
+    if (user == null || user.gameTickets >= user.maxTickets) return 0;
+    
+    final now = DateTime.now();
+    final lastRefill = user.lastTicketRefillTime ?? now;
+    final timeSinceLastRefill = now.difference(lastRefill);
+    
+    return (300 - (timeSinceLastRefill.inSeconds % 300)).clamp(0, 300);
   }
 
   @override
