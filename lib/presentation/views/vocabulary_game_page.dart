@@ -222,44 +222,80 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 한글 뜻 - 더 눈에 띄게
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Colors.purple[50]!, Colors.blue[50]!],
+                  // 한글 뜻 - 가로형으로 컴팩트하게 배치
+                  Row(
+                    children: [
+                      // 아이콘
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.purple[400]!, Colors.blue[400]!],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.translate,
+                          color: Colors.white,
+                          size: 24,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.purple[200]!, width: 1),
-                    ),
-                    child: Text(
-                      currentQuestion.korean,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        letterSpacing: -0.5,
+                      const SizedBox(width: 16),
+                      
+                      // 한글 뜻 텍스트
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Colors.purple[50]!, Colors.blue[50]!],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.purple[200]!, width: 1),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                '한글 뜻',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                currentQuestion.korean,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
+                    ],
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
                   const Text(
                     'Choose the correct English word',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
-                  // 선택지들
+                  // 선택지들 - 크기 조정으로 더 컴팩트하게
                   ...currentQuestion.options.asMap().entries.map((entry) {
                     final index = entry.key;
                     final option = entry.value;
@@ -281,7 +317,7 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
 
                     return Container(
                       width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 12),
+                      margin: const EdgeInsets.only(bottom: 8),
                       child: ElevatedButton(
                         onPressed: _isAnswered
                             ? null
@@ -289,15 +325,16 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor ?? Colors.grey[100],
                           foregroundColor: textColor ?? Colors.black,
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                           ),
+                          elevation: 0,
                         ),
                         child: Text(
                           option,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -305,33 +342,43 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                     );
                   }),
 
-                  // 결과 메시지
+                  // 결과 메시지 - 오버플로우 방지
                   if (_showResult)
                     Container(
-                      margin: const EdgeInsets.only(top: 24),
-                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(top: 16),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: (_selectedAnswerIndex == correctAnswerIndex)
                             ? Colors.green[50]
                             : Colors.red[50],
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
                         children: [
                           Text(
                             (_selectedAnswerIndex == correctAnswerIndex)
-                                ? '정답이예요! 정답은 ${currentQuestion.correctAnswer} 🎉'
-                                : '오답이네요! 정답은 ${currentQuestion.correctAnswer} 😅',
+                                ? '정답이예요! 🎉'
+                                : '오답이네요! 😅',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color:
                                   (_selectedAnswerIndex == correctAnswerIndex)
                                   ? Colors.green[700]
                                   : Colors.red[700],
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 4),
+                          Text(
+                            '정답: ${currentQuestion.correctAnswer}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[700],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ],
                       ),
                     ),
