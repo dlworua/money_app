@@ -398,9 +398,9 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
           statusBarBrightness: Brightness.dark,
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(80),
+          preferredSize: const Size.fromHeight(60),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.pink[400]!, Colors.pink[600]!],
@@ -412,17 +412,19 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
                       '진행도',
-                      style: TextStyle(fontSize: 12, color: Colors.white),
+                      style: TextStyle(fontSize: 11, color: Colors.white),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       '${_currentQuestionIndex + 1}/$_totalQuestions',
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -430,17 +432,19 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                   ],
                 ),
                 Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
                       '획득 포인트',
-                      style: TextStyle(fontSize: 12, color: Colors.white),
+                      style: TextStyle(fontSize: 11, color: Colors.white),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       '$_score',
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -461,13 +465,13 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
           ),
         ),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // 문제 카드
+              // 문제 카드 - 크기 조정
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(28),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -524,15 +528,15 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    // 문제 텍스트
+                    const SizedBox(height: 16),
+                    // 문제 텍스트 - 크기 조정
                     Text(
                       currentQuestion['question'],
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.black87,
-                        height: 1.4,
+                        height: 1.3,
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 4,
@@ -542,9 +546,9 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // 선택지
+              // 선택지 - 크기 조정
               ...currentQuestion['options'].asMap().entries.map((entry) {
                 final index = entry.key;
                 final option = entry.value;
@@ -552,7 +556,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                 final isSelected = _selectedAnswer == option;
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
+                  margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -578,7 +582,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                           ? null
                           : () => _selectAnswer(option, index),
                       child: Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           gradient: _hasAnswered
                               ? (isCorrect
@@ -660,7 +664,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                               child: Text(
                                 option,
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   color: _hasAnswered
                                       ? (isCorrect
