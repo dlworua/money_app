@@ -240,7 +240,12 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
 
   @override
   Widget build(BuildContext context) {
+    // MediaQuery를 사용해 키보드 높이 확인
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    
     return Scaffold(
+      // 키보드가 올라올 때 화면이 축소되지 않도록 설정
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('🚀 스피드 타이핑'),
         backgroundColor: Colors.deepPurple,
@@ -251,8 +256,17 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
           statusBarBrightness: Brightness.dark,
         ),
       ),
-      body: Column(
-        children: [
+      body: SingleChildScrollView(
+        // 키보드가 올라올 때 스크롤 가능하도록 설정
+        physics: const ClampingScrollPhysics(),
+        child: SizedBox(
+          // 화면 전체 높이에서 앱바와 키보드 높이를 뺀 크기
+          height: MediaQuery.of(context).size.height - 
+                  kToolbarHeight - 
+                  MediaQuery.of(context).padding.top -
+                  keyboardHeight,
+          child: Column(
+            children: [
           // 게임 정보
           Container(
             padding: const EdgeInsets.all(16),
@@ -426,7 +440,42 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
                       ),
                     ],
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
+
+                    // 현재 입력 내용 미리보기
+                    if (_textController.text.isNotEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '📝 입력중인 내용:',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _textController.text,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
                     // 입력 필드 (자동 포커스 개선)
                     GestureDetector(
@@ -511,7 +560,9 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
               height: _bannerAd!.size.height.toDouble(),
               child: AdWidget(ad: _bannerAd!),
             ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
