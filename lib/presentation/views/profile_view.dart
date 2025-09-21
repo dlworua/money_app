@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../viewmodels/providers.dart';
@@ -54,7 +55,8 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(homeViewModelProvider).user;
+    final state = ref.watch(homeViewModelProvider);
+    final user = state.user;
 
     return Scaffold(
       appBar: AppBar(
@@ -87,6 +89,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           ],
         ),
       ),
+      bottomNavigationBar: _buildBottomAd(state),
     );
   }
 
@@ -769,5 +772,32 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         .length;
 
     return savingTransactions;
+  }
+
+  /// 하단 배너 광고 위젯
+  /// HomeView와 동일한 패턴으로 구현
+  Widget? _buildBottomAd(dynamic state) {
+    try {
+      // 광고가 로드되지 않았으면 null 반환
+      if (state.bannerAd == null) return null;
+
+      return Container(
+        height: state.bannerAd!.size.height.toDouble(),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: AdWidget(ad: state.bannerAd!),
+      );
+    } catch (e) {
+      // 광고 표시 오류 시 null 반환하여 광고 영역을 숨김
+      return null;
+    }
   }
 }
