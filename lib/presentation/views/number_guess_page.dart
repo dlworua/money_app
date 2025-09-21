@@ -503,29 +503,34 @@ class _NumberGuessPageState extends ConsumerState<NumberGuessPage> {
 
                 SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, 20)),
 
-                // 배너 광고
-                if (_isAdLoaded && _bannerAd != null)
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                    child: SizedBox(
-                      height: _bannerAd!.size.height.toDouble(),
-                      child: AdWidget(ad: _bannerAd!),
-                    ),
-                  ),
               ],
             ),
           ),
         ),
+      ),
+      // 배너 광고를 bottomNavigationBar로 이동
+      bottomNavigationBar: _buildBottomAd(),
+    );
+  }
+
+  /// 하단 배너 광고 위젯 (안드로이드 하단바 가림 방지)
+  Widget? _buildBottomAd() {
+    if (!_isAdLoaded || _bannerAd == null) return null;
+
+    return SafeArea(
+      child: Container(
+        height: _bannerAd!.size.height.toDouble(),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: AdWidget(ad: _bannerAd!),
       ),
     );
   }

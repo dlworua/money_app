@@ -28,11 +28,38 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
   final TransactionRepository _transactionRepository = TransactionRepository();
   List<Transaction> _transactions = [];
   bool _isLoading = true;
+  
+  // 프로필 전용 배너 광고
+  BannerAd? _profileBannerAd;
+  bool _isProfileAdLoaded = false;
 
   @override
   void initState() {
     super.initState();
     _loadTransactions();
+    _initializeProfileBannerAd();
+  }
+
+  /// 프로필 전용 배너 광고 초기화
+  void _initializeProfileBannerAd() {
+    _profileBannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // 테스트 ID
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          if (mounted) {
+            setState(() {
+              _isProfileAdLoaded = true;
+            });
+          }
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+        },
+      ),
+    );
+    _profileBannerAd?.load();
   }
 
   Future<void> _loadTransactions() async {
@@ -89,8 +116,14 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomAd(state),
+      bottomNavigationBar: _buildBottomAd(),
     );
+  }
+
+  @override
+  void dispose() {
+    _profileBannerAd?.dispose();
+    super.dispose();
   }
 
   Widget _buildProfileSection(user) {
@@ -774,15 +807,14 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     return savingTransactions;
   }
 
-  /// 하단 배너 광고 위젯
-  /// HomeView와 동일한 패턴으로 구현
-  Widget? _buildBottomAd(dynamic state) {
+  /// 프로필 전용 하단 배너 광고 위젯
+  Widget? _buildBottomAd() {
     try {
-      // 광고가 로드되지 않았으면 null 반환
-      if (state.bannerAd == null) return null;
+      // 프로필 전용 광고가 로드되지 않았으면 null 반환
+      if (!_isProfileAdLoaded || _profileBannerAd == null) return null;
 
       return Container(
-        height: state.bannerAd!.size.height.toDouble(),
+        height: _profileBannerAd!.size.height.toDouble(),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -793,7 +825,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             ),
           ],
         ),
-        child: AdWidget(ad: state.bannerAd!),
+        child: AdWidget(ad: _profileBannerAd!),
       );
     } catch (e) {
       // 광고 표시 오류 시 null 반환하여 광고 영역을 숨김

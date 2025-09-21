@@ -15,8 +15,51 @@ import 'speed_typing_page.dart';
 import 'color_reaction_page.dart';
 import '../viewmodels/providers.dart';
 
-class GamesView extends ConsumerWidget {
+class GamesView extends ConsumerStatefulWidget {
   const GamesView({super.key});
+
+  @override
+  ConsumerState<GamesView> createState() => _GamesViewState();
+}
+
+class _GamesViewState extends ConsumerState<GamesView> {
+  // 게임 탭 전용 배너 광고
+  BannerAd? _gamesBannerAd;
+  bool _isGamesAdLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeGamesBannerAd();
+  }
+
+  /// 게임 탭 전용 배너 광고 초기화
+  void _initializeGamesBannerAd() {
+    _gamesBannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // 테스트 ID
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          if (mounted) {
+            setState(() {
+              _isGamesAdLoaded = true;
+            });
+          }
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+        },
+      ),
+    );
+    _gamesBannerAd?.load();
+  }
+
+  @override
+  void dispose() {
+    _gamesBannerAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -97,7 +140,7 @@ class GamesView extends ConsumerWidget {
                 ],
               ),
             ),
-      bottomNavigationBar: _buildBottomAd(state),
+      bottomNavigationBar: _buildBottomAd(),
     );
   }
 
@@ -901,15 +944,14 @@ class GamesView extends ConsumerWidget {
     }
   }
 
-  /// 하단 배너 광고 위젯
-  /// HomeView와 동일한 패턴으로 구현
-  Widget? _buildBottomAd(dynamic state) {
+  /// 게임 탭 전용 하단 배너 광고 위젯
+  Widget? _buildBottomAd() {
     try {
-      // 광고가 로드되지 않았으면 null 반환
-      if (state.bannerAd == null) return null;
+      // 게임 탭 전용 광고가 로드되지 않았으면 null 반환
+      if (!_isGamesAdLoaded || _gamesBannerAd == null) return null;
 
       return Container(
-        height: state.bannerAd!.size.height.toDouble(),
+        height: _gamesBannerAd!.size.height.toDouble(),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -920,7 +962,7 @@ class GamesView extends ConsumerWidget {
             ),
           ],
         ),
-        child: AdWidget(ad: state.bannerAd!),
+        child: AdWidget(ad: _gamesBannerAd!),
       );
     } catch (e) {
       // 광고 표시 오류 시 null 반환하여 광고 영역을 숨김
