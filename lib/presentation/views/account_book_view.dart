@@ -5,8 +5,6 @@ import '../viewmodels/providers.dart';
 import '../../data/models/transaction.dart';
 import '../../data/models/budget.dart';
 import '../../data/models/saving_goal.dart';
-import '../../core/utils/responsive_utils.dart';
-import '../../core/utils/safe_area_utils.dart';
 
 // 천 단위 컴마 입력 포매터
 class CurrencyInputFormatter extends TextInputFormatter {
@@ -92,30 +90,25 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
     final user = state.user;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.green[400]!, Colors.teal[400]!],
+              colors: [Colors.green.shade400, Colors.teal.shade400],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            '가계부',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 20),
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
+        title: const Text(
+          '가계부',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
           ),
         ),
         centerTitle: true,
@@ -125,41 +118,16 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
           indicatorColor: Colors.white,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
-          labelStyle: TextStyle(
-            fontSize: ResponsiveUtils.getResponsiveFontSize(context, 12),
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontSize: ResponsiveUtils.getResponsiveFontSize(context, 12),
-          ),
+          labelStyle: const TextStyle(fontSize: 12),
+          unselectedLabelStyle: const TextStyle(fontSize: 12),
           tabs: [
-            Tab(
-              text: '내역',
-              icon: Icon(
-                Icons.list_alt,
-                size: ResponsiveUtils.getResponsiveIconSize(context, 20),
-              ),
-            ),
-            Tab(
-              text: '통계',
-              icon: Icon(
-                Icons.analytics,
-                size: ResponsiveUtils.getResponsiveIconSize(context, 20),
-              ),
-            ),
-            Tab(
+            const Tab(text: '내역', icon: Icon(Icons.list_alt, size: 20)),
+            const Tab(text: '통계', icon: Icon(Icons.analytics, size: 20)),
+            const Tab(
               text: '예산',
-              icon: Icon(
-                Icons.account_balance_wallet,
-                size: ResponsiveUtils.getResponsiveIconSize(context, 20),
-              ),
+              icon: Icon(Icons.account_balance_wallet, size: 20),
             ),
-            Tab(
-              text: '목표',
-              icon: Icon(
-                Icons.flag,
-                size: ResponsiveUtils.getResponsiveIconSize(context, 20),
-              ),
-            ),
+            const Tab(text: '목표', icon: Icon(Icons.flag, size: 20)),
           ],
         ),
       ),
@@ -176,18 +144,11 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddTransactionDialog(),
-        backgroundColor: Colors.green[400],
-        icon: Icon(
-          Icons.add,
-          color: Colors.white,
-          size: ResponsiveUtils.getResponsiveIconSize(context, 24),
-        ),
-        label: Text(
+        backgroundColor: Colors.green.shade400,
+        icon: const Icon(Icons.add, color: Colors.white, size: 24),
+        label: const Text(
           '거래 추가',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 14),
         ),
       ),
     );
@@ -198,7 +159,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
       children: [
         // 월 선택기
         Container(
-          padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
+          padding: const EdgeInsets.all(16),
           color: Colors.white,
           child: Row(
             children: [
@@ -214,17 +175,12 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 icon: const Icon(Icons.chevron_left),
               ),
               Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    '${_selectedDate.year}년 ${_selectedDate.month}월',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 18),
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                child: Text(
+                  '${_selectedDate.year}년 ${_selectedDate.month}월',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -265,15 +221,22 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 .fold<double>(0, (sum, t) => sum + t.amount);
 
             return Container(
-              margin: ResponsiveUtils.getResponsiveMargin(context),
-              padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.green[50]!, Colors.teal[50]!],
+                  colors: [Colors.green.shade50, Colors.teal.shade50],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -285,11 +248,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                       Colors.blue,
                     ),
                   ),
-                  Container(
-                    width: 1,
-                    height: ResponsiveUtils.getScaledSize(context, 40),
-                    color: Colors.grey[300],
-                  ),
+                  Container(width: 1, height: 40.0, color: Colors.grey.shade300),
                   Expanded(
                     child: _buildSummaryItem(
                       '지출',
@@ -298,11 +257,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                       Colors.red,
                     ),
                   ),
-                  Container(
-                    width: 1,
-                    height: ResponsiveUtils.getScaledSize(context, 40),
-                    color: Colors.grey[300],
-                  ),
+                  Container(width: 1, height: 40.0, color: Colors.grey.shade300),
                   Expanded(
                     child: _buildSummaryItem(
                       '절약',
@@ -333,41 +288,35 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                     ..sort((a, b) => b.date.compareTo(a.date));
 
               if (transactions.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.receipt_long_outlined,
-                        size: ResponsiveUtils.getResponsiveIconSize(context, 64),
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '${_selectedDate.month}월 거래 내역이 없습니다.',
-                        style: TextStyle(
-                          fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
-                          color: Colors.grey[600],
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.receipt_long_outlined,
+                          size: 64,
+                          color: Colors.grey,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '첫 거래를 추가해보세요!',
-                        style: TextStyle(
-                          fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
-                          color: Colors.grey[500],
+                        SizedBox(height: 16),
+                        Text(
+                          '이번 달 거래 내역이 없습니다.',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        Text(
+                          '첫 거래를 추가해보세요!',
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
 
               return ListView.builder(
-                padding: EdgeInsets.symmetric(
-                  horizontal: ResponsiveUtils.getResponsivePadding(context).left,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: transactions.length,
                 itemBuilder: (context, index) {
                   final transaction = transactions[index];
@@ -389,19 +338,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
   ) {
     return Column(
       children: [
-        Icon(
-          icon,
-          color: color,
-          size: ResponsiveUtils.getResponsiveIconSize(context, 24),
-        ),
+        Icon(icon, color: color, size: 24.0),
         const SizedBox(height: 4),
-        Text(
-          title,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: ResponsiveUtils.getResponsiveFontSize(context, 12),
-          ),
-        ),
+        Text(title, style: TextStyle(color: Colors.grey.shade600, fontSize: 12.0)),
         const SizedBox(height: 2),
         FittedBox(
           fit: BoxFit.scaleDown,
@@ -409,7 +348,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             _formatCurrency(amount),
             style: TextStyle(
               color: color,
-              fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
+              fontSize: 16.0,
               fontWeight: FontWeight.bold,
             ),
             overflow: TextOverflow.ellipsis,
@@ -418,6 +357,10 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
         ),
       ],
     );
+  }
+
+  String _formatTransactionDate(DateTime date) {
+    return '${date.month}월 ${date.day}일';
   }
 
   Widget _buildTransactionItemWithData(Transaction transaction) {
@@ -429,10 +372,8 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
     final sign = isExpense ? '-' : '+';
 
     return Container(
-      margin: EdgeInsets.only(
-        bottom: ResponsiveUtils.getScaledSize(context, 8),
-      ),
-      padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
+      margin: EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -447,8 +388,8 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
       child: Row(
         children: [
           Container(
-            width: ResponsiveUtils.getScaledSize(context, 48),
-            height: ResponsiveUtils.getScaledSize(context, 48),
+            width: 48.0,
+            height: 48.0,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
@@ -456,48 +397,38 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             child: Center(
               child: Text(
                 transaction.category.emoji,
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.getResponsiveFontSize(context, 24),
-                ),
+                style: TextStyle(fontSize: 24.0),
               ),
             ),
           ),
-          SizedBox(width: ResponsiveUtils.getScaledSize(context, 12)),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   transaction.description,
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
+                  style: const TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
-                SizedBox(height: ResponsiveUtils.getScaledSize(context, 2)),
+                const SizedBox(height: 4),
                 Text(
-                  '${transaction.category.displayName} • ${transaction.date.hour.toString().padLeft(2, '0')}:${transaction.date.minute.toString().padLeft(2, '0')}',
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.getResponsiveFontSize(context, 12),
-                    color: Colors.grey[600],
-                  ),
+                  '${transaction.category.displayName} • ${_formatTransactionDate(transaction.date)}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
           ),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              '$sign${_formatCurrency(transaction.amount).replaceAll('원', '')}원',
-              style: TextStyle(
-                fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+          Text(
+            '$sign${_formatCurrency(transaction.amount).replaceAll('원', '')}원',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
         ],
@@ -507,7 +438,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
 
   Widget _buildStatisticsTab() {
     return SingleChildScrollView(
-      padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
+      padding: const EdgeInsets.all(16),
       child: Consumer(
         builder: (context, ref, child) {
           final homeState = ref.watch(homeViewModelProvider);
@@ -557,7 +488,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.purple[100]!, Colors.blue[100]!],
+                    colors: [Colors.purple.shade100, Colors.blue.shade100],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -578,27 +509,25 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                       child: Text(
                         _formatCurrency(netAmount, showSign: true),
                         style: TextStyle(
-                          fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 32),
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: netAmount >= 0
-                              ? Colors.green[600]
-                              : Colors.red[600],
+                              ? Colors.green.shade600
+                              : Colors.red.shade600,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '수입 ${_formatCurrency(income).replaceAll('원', '')} - 지출 ${_formatCurrency(expense).replaceAll('원', '')}',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                     ),
                     if (saving > 0) ...[
                       const SizedBox(height: 4),
                       Text(
                         '절약 ${_formatCurrency(saving, showSign: true)}',
                         style: TextStyle(
-                          color: Colors.green[600],
+                          color: Colors.green.shade600,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -627,14 +556,14 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                         Icon(
                           Icons.bar_chart_outlined,
                           size: 64,
-                          color: Colors.grey[400],
+                          color: Colors.grey.shade400,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           '이번 달 지출 내역이 없습니다.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: Colors.grey.shade600,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -642,7 +571,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                           '거래를 추가하면 통계를 확인할 수 있어요!',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[500],
+                            color: Colors.grey.shade500,
                           ),
                         ),
                       ],
@@ -720,12 +649,10 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 fit: BoxFit.scaleDown,
                 child: Text(
                   _formatCurrency(amount),
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
+                  style: const TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
                 ),
               ),
             ],
@@ -733,7 +660,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: percentage,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: Colors.grey.shade200,
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
           const SizedBox(height: 8),
@@ -742,7 +669,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             children: [
               Text(
                 '전체 지출의 ${(percentage * 100).round()}%',
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -768,7 +695,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
 
   Widget _buildBudgetTab() {
     return SingleChildScrollView(
-      padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -790,10 +717,66 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
 
           Consumer(
             builder: (context, ref, child) {
-              final homeState = ref.watch(homeViewModelProvider);
-              final budgets = homeState.budgets;
+              try {
+                final homeState = ref.watch(homeViewModelProvider);
+                final budgets = homeState.budgets;
 
-              if (budgets.isEmpty) {
+                // 로딩 상태 처리
+                if (homeState.isLoading) {
+                  return const SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                // 빈 상태 처리
+                if (budgets.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(40),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            '설정된 예산이 없습니다.',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '첫 예산을 추가해보세요!',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                // 예산 리스트 표시
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: budgets.length,
+                  itemBuilder: (context, index) {
+                    return _buildBudgetItemWithData(budgets[index]);
+                  },
+                );
+              } catch (error) {
+                // 에러 발생 시 기본 빈 상태 표시
                 return Container(
                   padding: const EdgeInsets.all(40),
                   child: Center(
@@ -801,24 +784,24 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.account_balance_wallet_outlined,
+                          Icons.error_outline,
                           size: 64,
-                          color: Colors.grey[400],
+                          color: Colors.grey.shade400,
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '설정된 예산이 없습니다.',
+                          '예산 데이터를 불러올 수 없습니다.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: Colors.grey.shade600,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '첫 예산을 추가해보세요!',
+                          '잠시 후 다시 시도해주세요.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[500],
+                            color: Colors.grey.shade500,
                           ),
                         ),
                       ],
@@ -826,13 +809,6 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   ),
                 );
               }
-
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: budgets
-                    .map((budget) => _buildBudgetItemWithData(budget))
-                    .toList(),
-              );
             },
           ),
         ],
@@ -851,7 +827,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: isOverBudget
-            ? Border.all(color: Colors.red[300]!, width: 1)
+            ? Border.all(color: Colors.red.shade300, width: 1)
             : null,
         boxShadow: [
           BoxShadow(
@@ -866,46 +842,49 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    budget.category.emoji,
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    budget.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+              Expanded(
+                child: Row(
+                  children: [
+                    Text(
+                      budget.category.emoji,
+                      style: const TextStyle(fontSize: 20),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        budget.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Row(
                 children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      _formatCurrency(budget.spent).replaceAll('원', ''),
-                      style: TextStyle(
-                        fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
-                        fontWeight: FontWeight.bold,
-                        color: isOverBudget ? Colors.red : Colors.black,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                  Text(
+                    '${_formatCurrency(budget.spent)} / ${_formatCurrency(budget.amount)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isOverBudget ? Colors.red : Colors.grey.shade600,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
-                  Flexible(
-                    child: Text(
-                      ' / ${_formatCurrency(budget.amount)}',
-                      style: TextStyle(
-                        fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 14),
-                        color: Colors.grey[600],
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => _showDeleteBudgetDialog(budget),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.delete_outline,
+                        size: 20,
+                        color: Colors.red.shade400,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
                   ),
                 ],
@@ -915,7 +894,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: percentage > 1.0 ? 1.0 : percentage,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: Colors.grey.shade200,
             valueColor: AlwaysStoppedAnimation<Color>(
               isOverBudget ? Colors.red : Colors.blue,
             ),
@@ -926,13 +905,13 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             children: [
               Text(
                 '${budget.period.displayName} 예산',
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
               Text(
                 '${percentage > 1 ? (percentage * 100).toInt() : budget.spentPercentage.toInt()}%',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isOverBudget ? Colors.red[600] : Colors.grey[600],
+                  color: isOverBudget ? Colors.red.shade600 : Colors.grey.shade600,
                   fontWeight: isOverBudget
                       ? FontWeight.w500
                       : FontWeight.normal,
@@ -947,7 +926,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
 
   Widget _buildGoalsTab() {
     return SingleChildScrollView(
-      padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -982,14 +961,14 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                         Icon(
                           Icons.flag_outlined,
                           size: 64,
-                          color: Colors.grey[400],
+                          color: Colors.grey.shade400,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           '설정된 목표가 없습니다.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: Colors.grey.shade600,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -997,7 +976,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                           '첫 절약 목표를 추가해보세요!',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[500],
+                            color: Colors.grey.shade500,
                           ),
                         ),
                       ],
@@ -1006,11 +985,13 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 );
               }
 
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: goals
-                    .map((goal) => _buildGoalItemWithData(goal))
-                    .toList(),
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: goals.length,
+                itemBuilder: (context, index) {
+                  return _buildGoalItemWithData(goals[index]);
+                },
               );
             },
           ),
@@ -1056,40 +1037,56 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                     if (goal.description != null) ...[
                       const SizedBox(height: 2),
                       Text(
-                        goal.description!,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        goal.description ?? '',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                     ],
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: goal.isCompleted
-                      ? Colors.green[100]
-                      : Colors.blue[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  goal.isCompleted ? '완료!' : '${(percentage * 100).round()}%',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: goal.isCompleted
-                        ? Colors.green[700]
-                        : Colors.blue[700],
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: goal.isCompleted
+                          ? Colors.green.shade100
+                          : Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      goal.isCompleted ? '완료!' : '${(percentage * 100).round()}%',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: goal.isCompleted
+                            ? Colors.green.shade700
+                            : Colors.blue.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => _showDeleteGoalDialog(goal),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.delete_outline,
+                        size: 20,
+                        color: Colors.red.shade400,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: percentage,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: Colors.grey.shade200,
             valueColor: AlwaysStoppedAnimation<Color>(
-              goal.isCompleted ? Colors.green[600]! : Colors.blue[600]!,
+              goal.isCompleted ? Colors.green.shade600 : Colors.blue.shade600,
             ),
           ),
           const SizedBox(height: 8),
@@ -1101,7 +1098,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 child: Text(
                   _formatCurrency(goal.currentAmount),
                   style: TextStyle(
-                    fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 14),
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -1112,8 +1109,8 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 child: Text(
                   '목표: ${_formatCurrency(goal.targetAmount)}',
                   style: TextStyle(
-                    fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 12),
-                    color: Colors.grey[600],
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -1127,15 +1124,15 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             children: [
               Text(
                 '${_formatCurrency(goal.remainingAmount)} 남음',
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
               Text(
                 'D-${goal.remainingDays}',
                 style: TextStyle(
                   fontSize: 12,
                   color: goal.remainingDays <= 7
-                      ? Colors.red[600]
-                      : Colors.grey[600],
+                      ? Colors.red.shade600
+                      : Colors.grey.shade600,
                   fontWeight: goal.remainingDays <= 7
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -1158,6 +1155,167 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
 
   void _showAddGoalDialog() {
     showDialog(context: context, builder: (context) => _AddGoalDialog());
+  }
+
+  // 예산 삭제 다이얼로그
+  void _showDeleteBudgetDialog(Budget budget) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('예산 삭제'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${budget.name} 예산을 삭제하시겠습니까?'),
+            const SizedBox(height: 8),
+            Text(
+              '삭제된 예산은 복구할 수 없습니다.',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => _deleteBudget(budget),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 절약 목표 삭제 다이얼로그 (감정적인 메시지)
+  void _showDeleteGoalDialog(SavingGoal goal) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.favorite_border, color: Colors.red),
+            SizedBox(width: 8),
+            Text('목표를 포기하시나요?'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${goal.name} 목표를 정말 포기하시겠습니까?',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '💪 현재 진행률: ${(goal.progress * 100).round()}%',
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  Text('💰 모인 금액: ${_formatCurrency(goal.currentAmount)}'),
+                  Text('🎯 남은 금액: ${_formatCurrency(goal.remainingAmount)}'),
+                  if (goal.remainingDays > 0)
+                    Text('📅 남은 기간: ${goal.remainingDays}일'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '포기하면 지금까지의 노력이 사라집니다.\n정말 삭제하시겠습니까?',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade700,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              '계속 도전할래요!',
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => _deleteGoal(goal),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('포기할게요...'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 예산 삭제 실행
+  void _deleteBudget(Budget budget) async {
+    try {
+      final homeViewModel = ref.read(homeViewModelProvider.notifier);
+      await homeViewModel.deleteBudget(budget.id);
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('예산이 삭제되었습니다')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('삭제 중 오류가 발생했습니다: $e')),
+      );
+    }
+  }
+
+  // 절약 목표 삭제 실행
+  void _deleteGoal(SavingGoal goal) async {
+    try {
+      final homeViewModel = ref.read(homeViewModelProvider.notifier);
+      await homeViewModel.deleteSavingGoal(goal.id);
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('목표가 삭제되었습니다. 언제든 새로운 도전을 시작하세요!'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('삭제 중 오류가 발생했습니다: $e')),
+      );
+    }
   }
 }
 
@@ -1229,14 +1387,9 @@ class _AddTransactionDialogState extends ConsumerState<_AddTransactionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        '거래 추가',
-        style: TextStyle(
-          fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
-        ),
-      ),
+      title: Text('거래 추가', style: TextStyle(fontSize: 20)),
       content: SizedBox(
-        width: ResponsiveUtils.getSafeResponsiveSize(context, 400, maxRatio: 0.9),
+        width: 400,
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -1248,9 +1401,7 @@ class _AddTransactionDialogState extends ConsumerState<_AddTransactionDialog> {
                   value: _selectedType,
                   decoration: InputDecoration(
                     labelText: '거래 유형',
-                    labelStyle: TextStyle(
-                      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
-                    ),
+                    labelStyle: TextStyle(fontSize: 14),
                   ),
                   items: TransactionType.values.map((type) {
                     String text;
@@ -1287,9 +1438,7 @@ class _AddTransactionDialogState extends ConsumerState<_AddTransactionDialog> {
                   value: _selectedCategory,
                   decoration: InputDecoration(
                     labelText: '카테고리',
-                    labelStyle: TextStyle(
-                      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
-                    ),
+                    labelStyle: TextStyle(fontSize: 14),
                   ),
                   items: _getCategoriesForType(_selectedType).map((category) {
                     return DropdownMenuItem(
@@ -1314,9 +1463,7 @@ class _AddTransactionDialogState extends ConsumerState<_AddTransactionDialog> {
                   decoration: InputDecoration(
                     labelText: '금액',
                     suffixText: '원',
-                    labelStyle: TextStyle(
-                      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
-                    ),
+                    labelStyle: TextStyle(fontSize: 14),
                   ),
                   keyboardType: TextInputType.number,
                   inputFormatters: [CurrencyInputFormatter()],
@@ -1324,8 +1471,9 @@ class _AddTransactionDialogState extends ConsumerState<_AddTransactionDialog> {
                     if (value?.isEmpty ?? true) return '금액을 입력해주세요';
                     // 컴마 제거 후 숫자 변환
                     final numericValue = value!.replaceAll(',', '');
-                    if (double.tryParse(numericValue) == null)
+                    if (double.tryParse(numericValue) == null) {
                       return '올바른 금액을 입력해주세요';
+                    }
                     return null;
                   },
                 ),
@@ -1336,9 +1484,7 @@ class _AddTransactionDialogState extends ConsumerState<_AddTransactionDialog> {
                   controller: _descriptionController,
                   decoration: InputDecoration(
                     labelText: '설명',
-                    labelStyle: TextStyle(
-                      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
-                    ),
+                    labelStyle: TextStyle(fontSize: 14),
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) return '설명을 입력해주세요';
@@ -1510,8 +1656,9 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                   if (value?.isEmpty ?? true) return '예산 금액을 입력해주세요';
                   // 컴마 제거 후 숫자 변환
                   final numericValue = value!.replaceAll(',', '');
-                  if (double.tryParse(numericValue) == null)
+                  if (double.tryParse(numericValue) == null) {
                     return '올바른 금액을 입력해주세요';
+                  }
                   return null;
                 },
               ),
@@ -1554,6 +1701,8 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
           amount: amount,
           period: _selectedPeriod,
         );
+
+        // 예산 추가 후 상태가 이미 업데이트되므로 추가 작업 불필요
 
         if (!mounted) return;
         Navigator.pop(context);
@@ -1625,8 +1774,9 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                   if (value?.isEmpty ?? true) return '목표 금액을 입력해주세요';
                   // 컴마 제거 후 숫자 변환
                   final numericValue = value!.replaceAll(',', '');
-                  if (double.tryParse(numericValue) == null)
+                  if (double.tryParse(numericValue) == null) {
                     return '올바른 금액을 입력해주세요';
+                  }
                   return null;
                 },
               ),

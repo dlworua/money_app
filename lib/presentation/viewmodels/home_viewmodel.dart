@@ -108,10 +108,10 @@ class HomeViewModel extends StateNotifier<HomeState> {
         state = state.copyWith(user: user, isLoading: false);
       }
 
-      // 데이터 로드
+      // 데이터 로드를 먼저 완료
       await _loadAllData();
 
-      // AI 코칭 초기화
+      // 데이터가 로드된 후 AI 코칭 초기화
       await _initializeAiCoaching();
 
       // 광고 초기화
@@ -124,18 +124,82 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
   Future<void> _initializeAiCoaching() async {
     final user = state.user;
-    if (user == null) return;
+    if (user == null) {
+      LoggerService.error('🚫 AI 코칭 초기화: 사용자 정보 없음');
+      return;
+    }
 
     try {
-      // 앱 시작 시에는 코칭을 자동으로 표시하지 않음
-      // 최근 인사이트만 조용히 로드
-      state = state.copyWith(
-        recentInsights: _aiCoaching.getRecentInsights(user, limit: 5),
-      );
-
-      LoggerService.info('AI 코칭 초기화 완료 - 자동 코칭 비활성화');
-    } catch (error) {
-      LoggerService.error('AI 코칭 초기화 실패: $error');
+      LoggerService.info('🤖 AI 코칭 초기화 시작...');
+      
+      // 기존 인사이트 로드
+      final recentInsights = _aiCoaching.getRecentInsights(user, limit: 5);
+      LoggerService.info('📚 기존 인사이트 ${recentInsights.length}개 로드됨');
+      
+      // 거래 데이터가 있다면 자동으로 한 번 AI 코칭 생성
+      final transactions = state.transactions;
+      final budgets = state.budgets;
+      
+      LoggerService.info('📊 현재 데이터: 거래 ${transactions.length}개, 예산 ${budgets.length}개');
+      
+      // 1건 이상의 거래가 있으면 자동으로 AI 코칭 생성
+      if (transactions.isNotEmpty) {
+        LoggerService.info('🎯 거래 데이터 발견 - AI 코칭 자동 생성 시작');
+        
+        // 새로운 개선된 AI 코칭 생성
+        final coaching = await _aiCoaching.getFinancialCoaching(
+          user,
+          transactions,
+          budgets,
+        );
+        
+        LoggerService.info('💡 AI 코칭 생성됨: ${coaching.title}');
+        LoggerService.info('📝 메시지: ${coaching.message.substring(0, 50)}...');
+        
+        final updatedUser = _aiCoaching.addCoachingInsight(user, coaching);
+        await _userService.saveUser(updatedUser);
+        
+        state = state.copyWith(
+          user: updatedUser,
+          currentCoaching: coaching,
+          recentInsights: [coaching, ...recentInsights].take(5).toList(),
+        );
+        
+        LoggerService.info('✅ 자동 AI 코칭 홈화면 표시 완료!');
+      } else {
+        // 거래 데이터가 없을 때도 기본 환영 메시지 생성
+        final welcomeCoaching = AiCoachingInsight(
+          id: 'welcome_${DateTime.now().millisecondsSinceEpoch}',
+          createdAt: DateTime.now(),
+          style: user.preferredCoachingStyle,
+          title: '🎉 가계부 관리 시작!',
+          message: '안녕하세요! 가계부를 시작해보세요. 거래를 기록하시면 맞춤형 절약 조언을 받을 수 있어요.',
+          type: InsightType.general,
+          analysisData: {'isEmpty': true},
+          confidenceScore: 1.0,
+          actionItems: [
+            '첫 번째 거래를 기록해보세요',
+            '카테고리별로 정확히 분류하기',
+            '꾸준히 기록하면 더 정확한 분석 받기'
+          ],
+        );
+        
+        final updatedUser = _aiCoaching.addCoachingInsight(user, welcomeCoaching);
+        await _userService.saveUser(updatedUser);
+        
+        state = state.copyWith(
+          user: updatedUser,
+          currentCoaching: welcomeCoaching,
+          recentInsights: [welcomeCoaching, ...recentInsights].take(5).toList(),
+        );
+        
+        LoggerService.info('📝 환영 메시지 생성 및 표시 완료');
+      }
+      
+      LoggerService.info('🎉 AI 코칭 초기화 완료!');
+    } catch (error, stackTrace) {
+      LoggerService.error('❌ AI 코칭 초기화 실패: $error');
+      LoggerService.error('스택 트레이스: $stackTrace');
     }
   }
 
@@ -621,24 +685,41 @@ class HomeViewModel extends StateNotifier<HomeState> {
   Future<void> _loadAllData() async {
     try {
       final transactions = await _transactionRepository.getTransactions();
-      final budgets = await _transactionRepository.updateAllBudgetSpending();
-      final goals = await _transactionRepository.updateAllGoalProgress();
+      
+      // 예산과 목표는 거래 데이터와 연동하여 업데이트
+      final updatedBudgets = await _transactionRepository.updateAllBudgetSpending();
+      final updatedGoals = await _transactionRepository.updateAllGoalProgress();
 
       state = state.copyWith(
         transactions: transactions,
-        budgets: budgets,
-        goals: goals,
+        budgets: updatedBudgets,
+        goals: updatedGoals,
       );
 
       LoggerService.info(
-        '모든 데이터 로드 완료 - 거래: ${transactions.length}, 예산: ${budgets.length}, 목표: ${goals.length}',
+        '모든 데이터 로드 완료 - 거래: ${transactions.length}, 예산: ${updatedBudgets.length}, 목표: ${updatedGoals.length}',
       );
+
+      // 기존 데이터 상태 로그
+      if (transactions.isNotEmpty) {
+        LoggerService.info('💾 기존 거래 내역 발견: ${transactions.length}건');
+        final recentTransaction = transactions.last;
+        LoggerService.info('🔍 최근 거래: ${recentTransaction.description} ${recentTransaction.amount}원');
+        
+        // 몇 개 거래 내용 출력해서 확인
+        for (int i = 0; i < transactions.length && i < 3; i++) {
+          final t = transactions[i];
+          LoggerService.info('   거래 ${i+1}: ${t.description} ${t.amount}원 (${t.date.toString().substring(0, 10)})');
+        }
+      } else {
+        LoggerService.info('📭 저장된 거래 내역이 없습니다');
+      }
     } catch (error) {
       LoggerService.error('데이터 로드 실패: $error');
     }
   }
 
-  // 연관 데이터 업데이트 (거래 추가 후 예산/목표 재계산)
+  // 연관 데이터 업데이트 (거래 추가 후 예산/목표 재계산 + AI 코칭 업데이트)
   Future<void> _updateRelatedData() async {
     try {
       final updatedBudgets = await _transactionRepository
@@ -651,8 +732,69 @@ class HomeViewModel extends StateNotifier<HomeState> {
         budgets: updatedBudgets,
         goals: updatedGoals,
       );
+
+      // 거래 데이터가 업데이트될 때마다 AI 코칭도 새로 생성
+      await _updateAiCoachingAfterTransaction();
     } catch (error) {
       LoggerService.error('연관 데이터 업데이트 실패: $error');
+    }
+  }
+
+  // 거래 후 AI 코칭 업데이트
+  Future<void> _updateAiCoachingAfterTransaction() async {
+    final user = state.user;
+    if (user == null) {
+      LoggerService.error('🚫 거래 후 AI 업데이트: 사용자 정보 없음');
+      return;
+    }
+
+    try {
+      LoggerService.info('🔄 거래 후 AI 코칭 업데이트 시작...');
+      
+      // 새로운 거래 데이터를 기반으로 AI 코칭 생성
+      final transactions = state.transactions;
+      final budgets = state.budgets;
+      
+      LoggerService.info('📊 업데이트된 데이터: 거래 ${transactions.length}개, 예산 ${budgets.length}개');
+
+      // 예산 초과 체크가 우선
+      final budgetAlert = await _aiCoaching.getBudgetOverspendAlert(
+        user, transactions, budgets);
+
+      if (budgetAlert != null) {
+        LoggerService.info('⚠️ 예산 초과 감지됨!');
+        
+        // 예산 초과시 즉시 알림
+        final updatedUser = _aiCoaching.addCoachingInsight(user, budgetAlert);
+        await _userService.saveUser(updatedUser);
+        
+        state = state.copyWith(
+          user: updatedUser,
+          currentCoaching: budgetAlert,
+        );
+        LoggerService.info('💥 예산 초과 알림 UI 업데이트: ${budgetAlert.title}');
+      } else {
+        LoggerService.info('💡 일반 재무 코칭 생성 중...');
+        
+        // 일반적인 재무 코칭 업데이트
+        final coaching = await _aiCoaching.getFinancialCoaching(
+          user, transactions, budgets);
+        
+        LoggerService.info('✨ 새 AI 코칭 생성: ${coaching.title}');
+        LoggerService.info('📝 메시지: ${coaching.message.substring(0, 50)}...');
+        
+        final updatedUser = _aiCoaching.addCoachingInsight(user, coaching);
+        await _userService.saveUser(updatedUser);
+        
+        state = state.copyWith(
+          user: updatedUser,
+          currentCoaching: coaching,
+        );
+        LoggerService.info('🎯 재무 코칭 UI 업데이트 완료!');
+      }
+    } catch (error, stackTrace) {
+      LoggerService.error('❌ 거래 후 AI 코칭 업데이트 실패: $error');
+      LoggerService.error('스택 트레이스: $stackTrace');
     }
   }
 
@@ -918,6 +1060,35 @@ class HomeViewModel extends StateNotifier<HomeState> {
       LoggerService.error('카드 뒤집기 게임 실패: $error');
     }
   }
+
+  /// 예산 삭제
+  Future<void> deleteBudget(String budgetId) async {
+    try {
+      await _transactionRepository.deleteBudget(budgetId);
+      final updatedBudgets = state.budgets.where((b) => b.id != budgetId).toList();
+      state = state.copyWith(budgets: updatedBudgets);
+      
+      LoggerService.info('✅ 예산 삭제됨: $budgetId');
+    } catch (error) {
+      LoggerService.error('❌ 예산 삭제 실패: $error');
+      rethrow;
+    }
+  }
+
+  /// 절약 목표 삭제
+  Future<void> deleteSavingGoal(String goalId) async {
+    try {
+      await _transactionRepository.deleteSavingGoal(goalId);
+      final updatedGoals = state.goals.where((g) => g.id != goalId).toList();
+      state = state.copyWith(goals: updatedGoals);
+      
+      LoggerService.info('✅ 절약 목표 삭제됨: $goalId');
+    } catch (error) {
+      LoggerService.error('❌ 절약 목표 삭제 실패: $error');
+      rethrow;
+    }
+  }
+
 
   /// 포인트 히스토리 추가 Helper 메서드
   Future<UserModel> _addPointHistory(

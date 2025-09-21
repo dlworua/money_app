@@ -159,7 +159,8 @@ class ResponsiveUtils {
   // iPhone 16 Plus 기준 게임 카드 그리드를 위한 최적화된 크기
   static double getGameCardAspectRatio(BuildContext context) {
     // iPhone 16 Plus 기준 비율을 모든 디바이스에서 유지
-    const baseAspectRatio = 0.85;
+    // 하단 공간을 줄이기 위해 카드를 더 세로로 길게 조정 (0.85 -> 0.95)
+    const baseAspectRatio = 0.95;
     return baseAspectRatio; // 모든 디바이스에서 동일한 비율 유지
   }
 

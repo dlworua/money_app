@@ -88,11 +88,11 @@ extension TransactionCategoryExtension on TransactionCategory {
       case TransactionCategory.sideJob: return '⚡';
       case TransactionCategory.gift: return '💝';
       // 절약
-      case TransactionCategory.mealSaving: return '🍽️💰';
-      case TransactionCategory.transportSaving: return '🚗💰';
-      case TransactionCategory.shoppingSaving: return '🛒💰';
-      case TransactionCategory.utilitySaving: return '💡💰';
-      case TransactionCategory.entertainmentSaving: return '🎮💰';
+      case TransactionCategory.mealSaving: return '🥗';
+      case TransactionCategory.transportSaving: return '🚲';
+      case TransactionCategory.shoppingSaving: return '🛍️';
+      case TransactionCategory.utilitySaving: return '💡';
+      case TransactionCategory.entertainmentSaving: return '🎯';
       case TransactionCategory.customSaving: return '💰';
     }
   }

@@ -5,7 +5,7 @@ import '../../core/exceptions/app_exceptions.dart';
 import '../../core/services/logger_service.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/user_repository.dart';
-import 'ai_coaching_service.dart';
+import '../../domain/services/ai_coaching_service.dart';
 import 'streak_service.dart';
 
 class UserService {

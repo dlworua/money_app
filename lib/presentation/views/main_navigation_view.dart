@@ -6,6 +6,7 @@ import '../../core/utils/responsive_utils.dart';
 import '../../core/utils/safe_area_utils.dart';
 import 'home_view.dart';
 import 'games_view.dart';
+import 'profile_view.dart';
 
 class MainNavigationView extends ConsumerStatefulWidget {
   const MainNavigationView({super.key});
@@ -174,56 +175,6 @@ class NavigationItem {
   });
 }
 
-// 임시 프로필 화면
-class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
-          child: Column(
-            children: [
-              SizedBox(height: MediaQuery.of(context).padding.top + ResponsiveUtils.getIPhone16PlusSpacing(context, 16)),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  '프로필',
-                  style: AppTheme.headingLarge.copyWith(
-                    color: AppTheme.primaryColor,
-                    fontWeight: FontWeight.w800,
-                    fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 28),
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, 20)),
-              Expanded(
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      '프로필 화면이 준비 중입니다',
-                      style: TextStyle(
-                        fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // 임시 설정 화면
 class SettingsView extends StatelessWidget {

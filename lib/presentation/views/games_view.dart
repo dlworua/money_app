@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/number_formatter.dart';
@@ -31,13 +32,6 @@ class GamesView extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 상단 여백 추가
-                  SizedBox(
-                    height:
-                        MediaQuery.of(context).padding.top +
-                        ResponsiveUtils.getIPhone16PlusSpacing(context, 16),
-                  ),
-
                   // 제목
                   Text(
                     '게임 & 활동',
@@ -103,6 +97,7 @@ class GamesView extends ConsumerWidget {
                 ],
               ),
             ),
+      bottomNavigationBar: _buildBottomAd(state),
     );
   }
 
@@ -271,7 +266,7 @@ class GamesView extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppTheme.spaceS,
-            vertical: 4,
+            vertical: 5,
           ),
           decoration: BoxDecoration(
             gradient: AppTheme.successGradient,
@@ -554,11 +549,11 @@ class GamesView extends ConsumerWidget {
                     AppTheme.spaceS,
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 12),
                 // 플레이 버튼
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: gradientColors
@@ -903,6 +898,33 @@ class GamesView extends ConsumerWidget {
         return AppTheme.errorColor;
       case PointHistorySource.other:
         return AppTheme.primaryColor;
+    }
+  }
+
+  /// 하단 배너 광고 위젯
+  /// HomeView와 동일한 패턴으로 구현
+  Widget? _buildBottomAd(dynamic state) {
+    try {
+      // 광고가 로드되지 않았으면 null 반환
+      if (state.bannerAd == null) return null;
+
+      return Container(
+        height: state.bannerAd!.size.height.toDouble(),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: AdWidget(ad: state.bannerAd!),
+      );
+    } catch (e) {
+      // 광고 표시 오류 시 null 반환하여 광고 영역을 숨김
+      return null;
     }
   }
 }

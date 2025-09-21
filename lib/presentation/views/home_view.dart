@@ -5,6 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/number_formatter.dart';
 import '../../core/utils/responsive_utils.dart';
+import '../../core/enums/coaching_style.dart';
 import '../../data/models/user_model.dart';
 import '../../data/models/transaction.dart';
 import '../viewmodels/providers.dart';
@@ -61,7 +62,7 @@ class HomeView extends ConsumerWidget {
               SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
 
               // AI 코칭
-              _buildAiCoaching(context, user),
+              _buildAiCoaching(context, user, ref),
               SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
 
               // 이번 달 소비 분석
@@ -515,7 +516,7 @@ class HomeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildAiCoaching(BuildContext context, UserModel user) {
+  Widget _buildAiCoaching(BuildContext context, UserModel user, WidgetRef ref) {
     return AnimatedExpansionCard(
       title: 'AI 절약 코칭',
       icon: Icons.psychology_rounded,
@@ -560,6 +561,16 @@ class HomeView extends ConsumerWidget {
                     ],
                   ),
                 ),
+                // AI 말투 설정 아이콘
+                IconButton(
+                  onPressed: () => _showCoachingStyleDialog(context, user, ref),
+                  icon: Icon(
+                    Icons.settings_rounded,
+                    color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
+                    size: 20,
+                  ),
+                  tooltip: 'AI 말투 설정',
+                ),
               ],
             ),
             const SizedBox(height: AppTheme.spaceM),
@@ -572,12 +583,66 @@ class HomeView extends ConsumerWidget {
                   color: AppTheme.accentColor.withValues(alpha: 0.1),
                 ),
               ),
-              child: Text(
-                '이번 달 식비가 예산의 70%를 차지하고 있어요. 집에서 요리하는 횟수를 늘려보는 건 어떨까요? 한 달에 약 15만원을 절약할 수 있을 거예요!',
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor,
-                  height: 1.4,
-                ),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final homeState = ref.watch(homeViewModelProvider);
+                  final currentCoaching = homeState.currentCoaching;
+                  final transactions = homeState.transactions;
+                  
+                  // 디버깅 정보 추가
+                  print('🔍 AI 코칭 UI 상태:');
+                  print('   - currentCoaching: ${currentCoaching?.title ?? "없음"}');
+                  print('   - 거래 개수: ${transactions.length}');
+                  print('   - 최근 인사이트: ${homeState.recentInsights.length}개');
+                  
+                  if (currentCoaching != null) {
+                    print('   - AI 메시지: ${currentCoaching.message.substring(0, 50)}...');
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${currentCoaching.title} (거래: ${transactions.length}개)',
+                          style: AppTheme.bodyMedium.copyWith(
+                            color: AppTheme.accentColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          currentCoaching.message,
+                          style: AppTheme.bodySmall.copyWith(
+                            color: AppTheme.onSurfaceColor,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  
+                  // 기본 메시지 (데이터 없을 때)
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '거래: ${transactions.length}개 | 인사이트: ${homeState.recentInsights.length}개',
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.accentColor,
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        transactions.isEmpty 
+                            ? '가계부에 거래 내역을 추가하면 AI가 맞춤형 절약 팁을 제공해드려요! 📊✨'
+                            : 'AI 코칭을 받으려면 "더 많은 조언 보기" 버튼을 눌러주세요! ${transactions.length}건의 거래 데이터를 분석해드릴게요.',
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.onSurfaceColor,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: AppTheme.spaceM),
@@ -585,7 +650,7 @@ class HomeView extends ConsumerWidget {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _showAiCoachingDialog(context),
+                    onPressed: () => _requestAiCoachingAndShowDialog(context, ref),
                     icon: const Icon(Icons.lightbulb_outline, size: 18),
                     label: const Text('더 많은 조언 보기'),
                     style: ElevatedButton.styleFrom(
@@ -703,29 +768,32 @@ class HomeView extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: categoryColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceS)),
-                  Flexible(
-                    child: Text(
-                      category,
-                      style: AppTheme.getBodyMedium(context).copyWith(
-                        color: AppTheme.onSurfaceColor,
-                        fontWeight: FontWeight.w500,
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: categoryColor,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
-                  ),
-                ],
+                    SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceS)),
+                    Expanded(
+                      child: Text(
+                        category,
+                        style: AppTheme.getBodyMedium(context).copyWith(
+                          color: AppTheme.onSurfaceColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -1066,16 +1134,16 @@ class HomeView extends ConsumerWidget {
 
   String _getTimeAgo(DateTime date) {
     final now = DateTime.now();
-    final difference = now.difference(date);
+    final today = DateTime(now.year, now.month, now.day);
+    final transactionDate = DateTime(date.year, date.month, date.day);
+    final difference = today.difference(transactionDate).inDays;
 
-    if (difference.inMinutes < 1) {
-      return '방금 전';
-    } else if (difference.inHours < 1) {
-      return '${difference.inMinutes}분 전';
-    } else if (difference.inDays < 1) {
-      return '${difference.inHours}시간 전';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}일 전';
+    if (difference == 0) {
+      return '오늘';
+    } else if (difference == 1) {
+      return '어제';
+    } else if (difference < 7) {
+      return '$difference일 전';
     } else {
       return '${date.month}월 ${date.day}일';
     }
@@ -1264,57 +1332,90 @@ class HomeView extends ConsumerWidget {
     );
   }
 
+  void _requestAiCoachingAndShowDialog(BuildContext context, WidgetRef ref) async {
+    print('🎯 "더 많은 조언 보기" 버튼 클릭됨!');
+    
+    try {
+      // 로딩 표시 (선택사항)
+      // showDialog로 로딩 스피너 표시할 수 있지만 일단 생략
+      
+      // 직접 AI 코칭 요청 - 이미 state가 업데이트됨
+      final viewModel = ref.read(homeViewModelProvider.notifier);
+      await viewModel.requestPersonalizedCoaching();
+      
+      print('✅ AI 코칭 요청 완료 - 홈화면 자동 업데이트됨');
+      
+      // 다이얼로그 표시 (mounted 체크)
+      if (context.mounted) {
+        _showAiCoachingDialog(context);
+      }
+    } catch (error) {
+      print('❌ AI 코칭 요청 실패: $error');
+      // 에러 처리 - 사용자에게 메시지 표시할 수 있음
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('AI 조언을 가져오는 중 문제가 발생했습니다. 다시 시도해주세요.')),
+        );
+      }
+    }
+  }
+
   void _showAiCoachingDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.psychology, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('AI 절약 코칭'),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildCoachingCard(
-                '💡 스마트 절약 팁',
-                '이번 달 식비가 예산의 70%를 차지하고 있어요. 집에서 요리하는 횟수를 늘려보는 건 어떨까요?',
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final homeState = ref.watch(homeViewModelProvider);
+          final insights = homeState.recentInsights;
+          
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.psychology, color: Colors.blue),
+                SizedBox(width: 8),
+                Text('AI 절약 코칭'),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: insights.isNotEmpty
+                    ? insights.map((insight) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _buildCoachingCard(
+                          insight.title,
+                          insight.message,
+                        ),
+                      )).toList()
+                    : [
+                        _buildCoachingCard(
+                          '🚀 시작해보세요!',
+                          '가계부에 거래 내역을 추가하면 AI가 맞춤형 분석과 절약 조언을 제공해드려요.',
+                        ),
+                        const SizedBox(height: 16),
+                        _buildCoachingCard(
+                          '💡 기본 절약 팁',
+                          '매일 작은 지출도 기록하는 습관이 절약의 첫걸음입니다. 오늘부터 시작해보세요!',
+                        ),
+                      ],
               ),
-              const SizedBox(height: 16),
-              _buildCoachingCard(
-                '📊 소비 패턴 분석',
-                '지난 3개월간 주말 소비가 평일보다 40% 높습니다. 주말 예산을 따로 계획해보세요.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('닫기'),
               ),
-              const SizedBox(height: 16),
-              _buildCoachingCard(
-                '🎯 절약 챌린지',
-                '커피 한 잔 줄이기만으로도 한 달에 3만원을 절약할 수 있어요. 도전해보실래요?',
-              ),
-              const SizedBox(height: 16),
-              _buildCoachingCard(
-                '🏆 성과 피드백',
-                '이번 주 절약 목표를 120% 달성했네요! 정말 대단해요. 이 습관을 계속 유지해보세요.',
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: 개인화된 AI 코칭 기능 구현
+                  Navigator.pop(context);
+                },
+                child: const Text('맞춤 조언 받기'),
               ),
             ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('닫기'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // TODO: 개인화된 AI 코칭 기능 구현
-              Navigator.pop(context);
-            },
-            child: const Text('맞춤 조언 받기'),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -1350,6 +1451,120 @@ class HomeView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _showCoachingStyleDialog(BuildContext context, UserModel user, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.psychology_rounded, color: Colors.blue),
+              SizedBox(width: 8),
+              Text('AI 말투 설정'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: CoachingStyle.values.map((style) {
+              final isSelected = user.preferredCoachingStyle == style;
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: isSelected ? Colors.blue : Colors.grey.shade300,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  color: isSelected ? Colors.blue.shade50 : null,
+                ),
+                child: ListTile(
+                  leading: Icon(
+                    _getCoachingStyleIcon(style),
+                    color: isSelected ? Colors.blue : Colors.grey.shade600,
+                  ),
+                  title: Text(
+                    _getCoachingStyleName(style),
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      color: isSelected ? Colors.blue : null,
+                    ),
+                  ),
+                  subtitle: Text(
+                    _getCoachingStyleDescription(style),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  onTap: () async {
+                    if (user.preferredCoachingStyle != style) {
+                      final viewModel = ref.read(homeViewModelProvider.notifier);
+                      await viewModel.changeCoachingStyle(style);
+                    }
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('취소'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  IconData _getCoachingStyleIcon(CoachingStyle style) {
+    switch (style) {
+      case CoachingStyle.friendly:
+        return Icons.sentiment_very_satisfied_rounded;
+      case CoachingStyle.strict:
+        return Icons.business_center_rounded;
+      case CoachingStyle.kind:
+        return Icons.favorite_rounded;
+      case CoachingStyle.motivational:
+        return Icons.rocket_launch_rounded;
+      case CoachingStyle.analytical:
+        return Icons.analytics_rounded;
+    }
+  }
+
+  String _getCoachingStyleName(CoachingStyle style) {
+    switch (style) {
+      case CoachingStyle.friendly:
+        return '친구처럼';
+      case CoachingStyle.strict:
+        return '냉철하게';
+      case CoachingStyle.kind:
+        return '친절하게';
+      case CoachingStyle.motivational:
+        return '열정적으로';
+      case CoachingStyle.analytical:
+        return '분석적으로';
+    }
+  }
+
+  String _getCoachingStyleDescription(CoachingStyle style) {
+    switch (style) {
+      case CoachingStyle.friendly:
+        return '"와! 진짜 잘하고 있어!"';
+      case CoachingStyle.strict:
+        return '"분석 결과 개선이 필요합니다"';
+      case CoachingStyle.kind:
+        return '"정말 잘하고 계세요!"';
+      case CoachingStyle.motivational:
+        return '"대박! 이런 게 프로야!"';
+      case CoachingStyle.analytical:
+        return '"데이터 분석 결과입니다"';
+    }
   }
 }
 

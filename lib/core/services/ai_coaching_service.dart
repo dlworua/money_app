@@ -10,24 +10,116 @@ class AiCoachingService {
   final AiCoachGenerator _generator = AiCoachGenerator();
   final FinancialAnalysisService _analysisService = FinancialAnalysisService();
   
-  /// 가계부 데이터 기반 맞춤 코칭 제공
+  /// 실제 계부 데이터와 완전히 연동된 맞춤 코칭 제공
   Future<AiCoachingInsight> getFinancialCoaching(
     UserModel user, 
     List<Transaction> transactions,
     List<Budget> budgets
   ) async {
-    // 재무 데이터 분석
-    final spendingAnalysis = _analysisService.analyzeSpendingPattern(transactions);
-    final budgetAnalysis = _analysisService.analyzeBudgetPerformance(transactions, budgets);
-    final opportunities = _analysisService.findSavingOpportunities(transactions, budgets);
-    
-    // 분석 결과를 바탕으로 코칭 생성
-    return await _generateDataDrivenCoaching(
-      user, 
-      spendingAnalysis, 
-      budgetAnalysis, 
-      opportunities
-    );
+    try {
+      print('🔧 AI 코칭 생성 시작: 거래 ${transactions.length}건, 예산 ${budgets.length}개');
+      
+      // 데이터가 없으면 기본 메시지
+      if (transactions.isEmpty) {
+        return _createWelcomeCoaching(user);
+      }
+      
+      // 간단한 분석부터 시작 (복잡한 AnalysisService 사용 안함)
+      final totalSpending = transactions
+          .where((t) => t.type == TransactionType.expense)
+          .fold<double>(0, (sum, t) => sum + t.amount);
+      
+      final categorySpending = <TransactionCategory, double>{};
+      for (final t in transactions.where((t) => t.type == TransactionType.expense)) {
+        categorySpending[t.category] = (categorySpending[t.category] ?? 0) + t.amount;
+      }
+      
+      TransactionCategory? topCategory;
+      double maxAmount = 0;
+      categorySpending.forEach((category, amount) {
+        if (amount > maxAmount) {
+          maxAmount = amount;
+          topCategory = category;
+        }
+      });
+      
+      final dailyAverage = totalSpending / 30;
+      
+      print('💡 분석 완료: 총 지출 ${_formatCurrency(totalSpending)}, 최고 카테고리 ${topCategory?.displayName}');
+      
+      // 거래 건수에 따른 맞춤 코칭
+      String title;
+      String message;
+      List<String> actionItems = [];
+      
+      if (transactions.length == 1) {
+        title = '🎯 첫 거래 분석!';
+        message = '첫 거래를 기록하셨네요! ${_formatCurrency(totalSpending)}을 ${topCategory?.displayName ?? '기타'}에 지출하셨어요. 좋은 시작입니다!';
+        actionItems.addAll([
+          '오늘 남은 지출들도 기록해보세요',
+          '${topCategory?.displayName ?? '해당 카테고리'}에서 절약 방법 생각해보기',
+          '일주일간 꾸준히 기록해서 패턴 파악하기'
+        ]);
+      } else if (transactions.length < 5) {
+        title = '📈 가계부 시작 단계!';
+        message = '총 ${transactions.length}건 기록하셨네요! ${_formatCurrency(totalSpending)} 지출하시고, ${topCategory?.displayName ?? '기타'}에 가장 많이 쓰셨어요.';
+        actionItems.addAll([
+          '하루 3-5건 정도 꾸준히 기록하기',
+          '${topCategory?.displayName ?? '해당 카테고리'} 지출 줄여보기',
+          '1주일 더 기록하면 상세 분석 가능해요!'
+        ]);
+      } else {
+        title = '💰 가계부 분석 결과';
+        message = '${transactions.length}건 거래로 총 ${_formatCurrency(totalSpending)} 지출하셨어요. 일평균 ${_formatCurrency(dailyAverage)}이고, ${topCategory?.displayName ?? '기타'}에 가장 많이 쓰셨네요.';
+        actionItems.addAll([
+          '${topCategory?.displayName ?? '최고 지출 카테고리'}에서 20% 줄여보기',
+          '일일 예산을 ${_formatCurrency(dailyAverage * 0.8)}로 설정해보기',
+          '매주 가계부 리뷰하는 습관 만들기'
+        ]);
+      }
+      
+      if (topCategory != null) {
+        actionItems.addAll(_getBasicAdviceForCategory(topCategory));
+      }
+      
+      return AiCoachingInsight(
+        id: 'financial_${DateTime.now().millisecondsSinceEpoch}',
+        createdAt: DateTime.now(),
+        style: user.preferredCoachingStyle,
+        title: title,
+        message: message,
+        type: InsightType.spendingPattern,
+        analysisData: {
+          'transactionCount': transactions.length,
+          'totalSpending': totalSpending,
+          'topCategory': topCategory?.name,
+          'dailyAverage': dailyAverage,
+        },
+        confidenceScore: transactions.length >= 5 ? 0.8 : 0.6,
+        actionItems: actionItems.take(4).toList(),
+      );
+      
+    } catch (error, stackTrace) {
+      print('❌ AI 코칭 생성 실패: $error');
+      print('스택 트레이스: $stackTrace');
+      
+      // 에러 발생시 기본 코칭 제공 
+      return AiCoachingInsight(
+        id: 'error_fallback_${DateTime.now().millisecondsSinceEpoch}',
+        createdAt: DateTime.now(),
+        style: user.preferredCoachingStyle,
+        title: '📊 가계부 현황',
+        message: '${transactions.length}건의 거래를 기록하셨네요! 더 자세한 분석은 조금 더 데이터를 쌓은 후 제공해드릴게요.',
+        type: InsightType.general,
+        analysisData: {'transactionCount': transactions.length, 'error': error.toString()},
+        confidenceScore: 0.5,
+        actionItems: [
+          '꾸준히 가계부 작성하기',
+          '카테고리별로 정확히 분류하기',
+          '매주 지출 패턴 확인하기'
+        ],
+      );
+    }
   }
   
   /// 절약 기회 알림
@@ -61,7 +153,7 @@ class AiCoachingService {
     return alerts;
   }
   
-  /// 예산 초과 경고
+  /// 실제 거래 기반 예산 초과 경고
   Future<AiCoachingInsight?> getBudgetOverspendAlert(
     UserModel user,
     List<Transaction> transactions,
@@ -85,14 +177,50 @@ class AiCoachingService {
     final categoryData = budgetAnalysis[worstCategory];
     final categoryEnum = TransactionCategory.values.byName(worstCategory!);
     
+    // 해당 카테고리의 실제 거래 분석
+    final categoryTransactions = transactions
+        .where((t) => t.category == categoryEnum && t.type == TransactionType.expense)
+        .toList();
+    
+    final recentTransactions = categoryTransactions
+        .where((t) => DateTime.now().difference(t.date).inDays <= 7)
+        .toList();
+    
+    final recentSpending = recentTransactions.fold<double>(0, (sum, t) => sum + t.amount);
+    final avgTransactionAmount = categoryTransactions.isEmpty 
+        ? 0.0 
+        : categoryTransactions.fold<double>(0, (sum, t) => sum + t.amount) / categoryTransactions.length;
+    
+    String detailMessage = '이달 ${categoryEnum.displayName} 예산 ${_formatCurrency(categoryData['budgetAmount'])}을 '
+                          '${categoryData['spendingPercentage'].toInt()}% 사용해서 '
+                          '${_formatCurrency(worstOverspend)} 초과했어요. ';
+    
+    if (recentTransactions.isNotEmpty) {
+      detailMessage += '최근 7일간 ${recentTransactions.length}건으로 ${_formatCurrency(recentSpending)} 지출했네요.';
+    }
+    
+    List<String> specificActions = [];
+    
+    // 거래 패턴 기반 맞춤 조언
+    if (avgTransactionAmount > 50000) {
+      specificActions.add('한 번에 ${_formatCurrency(avgTransactionAmount)} 정도 쓰시는데, 소액 지출로 나눠보세요.');
+    }
+    
+    if (categoryTransactions.length > 20) {
+      specificActions.add('${categoryTransactions.length}건의 잦은 지출이 있어요. 주 2-3회로 줄여보세요.');
+    } else if (categoryTransactions.length < 5) {
+      specificActions.add('지출 건수는 적지만 금액이 커요. 대용량 구매보다 필요한 만큼만 구매해보세요.');
+    }
+    
+    // 카테고리별 구체적 조언 추가
+    specificActions.addAll(_getDetailedAdviceForTopCategory(categoryEnum, categoryData['actualSpending'], categoryData['actualSpending'] / 30, categoryTransactions.length));
+    
     return AiCoachingInsight(
       id: 'budget_alert_${DateTime.now().millisecondsSinceEpoch}',
       createdAt: DateTime.now(),
       style: user.preferredCoachingStyle,
-      title: '⚠️ ${categoryEnum.displayName} 예산 초과 알림',
-      message: '이달 ${categoryEnum.displayName} 예산 ${categoryData['budgetAmount'].toInt()}원을 '
-               '${categoryData['spendingPercentage'].toInt()}% 사용했어요. '
-               '${worstOverspend.toInt()}원 초과했습니다.',
+      title: '🚨 ${categoryEnum.displayName} 예산 ${worstOverspend > categoryData['budgetAmount'] * 0.5 ? "대폭 " : ""}초과!',
+      message: detailMessage,
       type: InsightType.warning,
       analysisData: {
         'category': worstCategory!,
@@ -100,74 +228,154 @@ class AiCoachingService {
         'actualSpending': categoryData['actualSpending'],
         'overspendAmount': worstOverspend,
         'spendingPercentage': categoryData['spendingPercentage'],
+        'transactionCount': categoryTransactions.length,
+        'recentSpending': recentSpending,
+        'avgTransactionAmount': avgTransactionAmount,
       },
-      confidenceScore: 0.95, // 예산 초과는 확실한 데이터
-      actionItems: [
-        '남은 기간 동안 일일 ${categoryData['recommendedDailySpend'].toInt()}원 이하로 지출을 제한해보세요.',
-        '${categoryEnum.displayName} 카테고리에서 불필요한 지출을 줄여보세요.',
-      ],
+      confidenceScore: 0.95,
+      actionItems: specificActions.take(4).toList(),
     );
   }
   
-  /// 월말 재무 리포트
+  /// 실제 거래 분석 기반 월말 재무 리포트
   Future<AiCoachingInsight> getMonthlyFinancialReport(
     UserModel user,
     List<Transaction> transactions,
     List<Budget> budgets
   ) async {
+    final now = DateTime.now();
+    final thisMonth = transactions.where((t) => 
+        t.date.year == now.year && t.date.month == now.month).toList();
+    
     final spendingAnalysis = _analysisService.analyzeSpendingPattern(transactions, days: 30);
     final budgetAnalysis = _analysisService.analyzeBudgetPerformance(transactions, budgets);
-    final savingGoals = _analysisService.generateSavingGoals(transactions, budgets, 0.1); // 기본 10% 저축률
+    final savingGoals = _analysisService.generateSavingGoals(transactions, budgets, 0.1);
     
-    if (spendingAnalysis['isEmpty'] == true) {
+    final transactionCount = thisMonth.length;
+    final expenseCount = thisMonth.where((t) => t.type == TransactionType.expense).length;
+    final incomeCount = thisMonth.where((t) => t.type == TransactionType.income).length;
+    final savingCount = thisMonth.where((t) => t.type == TransactionType.saving).length;
+    
+    if (transactionCount < 5) {
       return AiCoachingInsight(
         id: 'monthly_report_empty_${DateTime.now().millisecondsSinceEpoch}',
         createdAt: DateTime.now(),
         style: user.preferredCoachingStyle,
         title: '📊 이달의 가계부 현황',
-        message: '아직 충분한 거래 데이터가 없어요. 가계부를 더 작성해주시면 맞춤 분석을 제공할게요!',
+        message: '이달 ${transactionCount}건의 거래만 기록되어 있어요. 더 정확한 분석을 위해 매일 가계부를 작성해보세요!',
         type: InsightType.general,
-        analysisData: {},
-        confidenceScore: 1.0,
-        actionItems: ['수입과 지출을 꾸준히 기록해보세요.'],
+        analysisData: {'transactionCount': transactionCount},
+        confidenceScore: 0.5,
+        actionItems: [
+          '매일 최소 3-5건의 거래 기록하기',
+          '작은 지출도 놓치지 말고 기록하기',
+          '영수증 사진과 함께 메모 남기기'
+        ],
       );
     }
     
     final monthlySpending = spendingAnalysis['totalSpending'];
+    final monthlyIncome = thisMonth
+        .where((t) => t.type == TransactionType.income)
+        .fold<double>(0, (sum, t) => sum + t.amount);
+    final monthlySaving = thisMonth
+        .where((t) => t.type == TransactionType.saving)
+        .fold<double>(0, (sum, t) => sum + t.amount);
+    
     final dailyAverage = spendingAnalysis['dailyAverage'];
-    final topCategory = spendingAnalysis['topCategory'] as TransactionCategory;
+    final topCategory = spendingAnalysis['topCategory'] as TransactionCategory?;
     final spendingTrend = spendingAnalysis['spendingTrend'];
     
+    // 거래 패턴 분석
+    final avgExpenseAmount = expenseCount > 0 
+        ? thisMonth.where((t) => t.type == TransactionType.expense).fold<double>(0, (sum, t) => sum + t.amount) / expenseCount
+        : 0.0;
+    
+    final bigSpendingCount = thisMonth
+        .where((t) => t.type == TransactionType.expense && t.amount > 50000)
+        .length;
+    
+    String detailMessage = '이달 총 ${transactionCount}건 거래: ';
+    detailMessage += '수입 ${incomeCount}건(${_formatCurrency(monthlyIncome)}), ';
+    detailMessage += '지출 ${expenseCount}건(${_formatCurrency(monthlySpending)})';
+    if (savingCount > 0) {
+      detailMessage += ', 절약 ${savingCount}건(${_formatCurrency(monthlySaving)})';
+    }
+    detailMessage += '.\n';
+    
+    detailMessage += '일평균 ${_formatCurrency(dailyAverage)} 지출하시고, ';
+    if (topCategory != null) {
+      detailMessage += '${topCategory.displayName}에 가장 많이 쓰셨어요. ';
+    }
+    
+    // 지출 트렌드 분석
     String trendMessage;
-    if (spendingTrend > 0.1) {
-      trendMessage = '지난 주 대비 ${(spendingTrend * 100).toInt()}% 증가했어요. 지출을 점검해보세요.';
+    if (spendingTrend > 0.15) {
+      trendMessage = '지난 대비 지출이 ${(spendingTrend * 100).toInt()}% 늘었어요. 지출 관리가 필요해요!';
     } else if (spendingTrend < -0.1) {
-      trendMessage = '지난 주 대비 ${(-spendingTrend * 100).toInt()}% 절약했어요! 👏';
+      trendMessage = '지난 대비 ${(-spendingTrend * 100).toInt()}% 절약에 성공했어요! 🎉';
     } else {
       trendMessage = '지출이 안정적으로 유지되고 있어요.';
     }
+    detailMessage += trendMessage;
     
-    final message = '이달 총 ${monthlySpending.toInt()}원 지출했어요. '
-                   '일평균 ${dailyAverage.toInt()}원이며, '
-                   '${topCategory.displayName}에 가장 많이 썼어요. $trendMessage';
+    // 맞춤 액션 아이템 생성
+    List<String> actionItems = [];
+    
+    // 거래 패턴 기반 조언
+    if (avgExpenseAmount > 30000) {
+      actionItems.add('평균 지출 금액이 ${_formatCurrency(avgExpenseAmount)}로 높아요. 소액 지출 늘리기');
+    }
+    
+    if (bigSpendingCount > 5) {
+      actionItems.add('5만원 이상 큰 지출이 ${bigSpendingCount}회 있었어요. 고액 지출 전 하루 고민하기');
+    }
+    
+    if (incomeCount == 0) {
+      actionItems.add('수입 기록이 없어요. 급여나 수입도 함께 기록해보세요');
+    } else if (monthlyIncome > 0 && monthlySpending > monthlyIncome * 0.8) {
+      actionItems.add('지출이 수입의 80% 이상이에요. 절약 목표 세우기');
+    }
+    
+    if (savingCount == 0) {
+      actionItems.add('절약 기록을 시작해보세요. 작은 절약도 의미 있어요!');
+    }
+    
+    // 카테고리별 맞춤 조언 추가
+    if (topCategory != null && actionItems.length < 3) {
+      actionItems.addAll(_getOptimizationAdviceForCategory(topCategory, monthlySpending * 0.3, dailyAverage));
+    }
+    
+    // 기본 조언 추가
+    if (topCategory != null) {
+      actionItems.addAll(_getReportActionSuggestions(savingGoals, topCategory));
+    }
     
     return AiCoachingInsight(
       id: 'monthly_report_${DateTime.now().millisecondsSinceEpoch}',
       createdAt: DateTime.now(),
       style: user.preferredCoachingStyle,
-      title: '📊 이달의 가계부 현황',
-      message: message,
+      title: '📊 ${now.month}월 가계부 분석 리포트',
+      message: detailMessage,
       type: InsightType.monthlyReview,
       analysisData: {
+        'transactionCount': transactionCount,
+        'expenseCount': expenseCount,
+        'incomeCount': incomeCount,
+        'savingCount': savingCount,
         'monthlySpending': monthlySpending,
+        'monthlyIncome': monthlyIncome,
+        'monthlySaving': monthlySaving,
         'dailyAverage': dailyAverage,
-        'topCategory': topCategory.name,
+        'topCategory': topCategory?.name,
         'spendingTrend': spendingTrend,
+        'avgExpenseAmount': avgExpenseAmount,
+        'bigSpendingCount': bigSpendingCount,
         'budgetAnalysis': budgetAnalysis,
         'savingGoals': savingGoals,
       },
-      confidenceScore: 0.9,
-      actionItems: _getReportActionSuggestions(savingGoals, topCategory),
+      confidenceScore: transactionCount > 20 ? 0.95 : 0.8,
+      actionItems: actionItems.take(5).toList(),
     );
   }
 
@@ -437,35 +645,117 @@ class AiCoachingService {
     return suggestions;
   }
   
-  /// 데이터 기반 코칭 생성
+  /// 실제 거래 내역 기반 맞춤 코칭 생성
   Future<AiCoachingInsight> _generateDataDrivenCoaching(
     UserModel user,
     Map<String, dynamic> spendingAnalysis,
     Map<String, dynamic> budgetAnalysis,
-    List<Map<String, dynamic>> opportunities,
-  ) async {
-    // 가장 중요한 인사이트 선택
+    List<Map<String, dynamic>> opportunities, {
+    List<Transaction>? transactions,
+  }) async {
     String title;
     String message;
     List<String> actionItems = [];
     InsightType type = InsightType.general;
     
-    if (opportunities.isNotEmpty) {
-      final topOpportunity = opportunities.first;
-      title = '💡 절약 기회 발견!';
-      message = topOpportunity['message'];
-      actionItems.add(topOpportunity['suggestion']);
-      type = InsightType.spendingPattern;
-    } else if (spendingAnalysis['spendingTrend'] > 0.2) {
-      title = '📈 지출 증가 알림';
-      message = '최근 지출이 ${(spendingAnalysis['spendingTrend'] * 100).toInt()}% 증가했어요.';
-      actionItems.add('지출 내역을 점검하고 불필요한 항목을 찾아보세요.');
-      type = InsightType.warning;
-    } else {
-      title = '📊 가계부 현황';
-      message = '현재 재정 관리를 잘하고 계시네요! 이 상태를 유지해보세요.';
-      actionItems.add('꾸준한 가계부 작성으로 더 정확한 분석을 받아보세요.');
+    final totalSpending = spendingAnalysis['totalSpending'] ?? 0.0;
+    final dailyAverage = spendingAnalysis['dailyAverage'] ?? 0.0;
+    final topCategory = spendingAnalysis['topCategory'];
+    final spendingTrend = spendingAnalysis['spendingTrend'] ?? 0.0;
+    final transactionCount = spendingAnalysis['transactionCount'] ?? 0;
+    
+    // 거래 빈도와 패턴 분석 (1건부터 분석 가능)
+    if (transactionCount == 0) {
+      title = '📝 가계부를 시작해보세요!';
+      message = '아직 거래 기록이 없네요. 오늘부터 가계부를 작성해서 돈의 흐름을 파악해보세요.';
+      actionItems.addAll([
+        '오늘 하루 모든 지출을 기록해보기',
+        '카테고리별로 정확히 분류하기',
+        '영수증 사진도 함께 저장하기'
+      ]);
       type = InsightType.general;
+    } else if (transactionCount == 1) {
+      title = '🎯 첫 거래 분석!';
+      message = '첫 거래를 기록하셨네요! ${_formatCurrency(totalSpending)}을 ${topCategory?.displayName ?? '기타'}에 지출하셨어요. 이런 식으로 꾸준히 기록하시면 더 정확한 절약 조언을 드릴 수 있어요.';
+      actionItems.addAll([
+        '오늘 남은 지출들도 모두 기록해보기',
+        '${topCategory?.displayName ?? '해당 카테고리'}에서 절약 방법 생각해보기',
+        '일주일간 꾸준히 기록해서 패턴 파악하기'
+      ]);
+      if (topCategory != null) {
+        actionItems.addAll(_getDetailedAdviceForTopCategory(topCategory, totalSpending, dailyAverage, transactionCount));
+      }
+      type = InsightType.spendingPattern;
+    } else if (transactionCount < 5) {
+      title = '📈 가계부 기록 시작!';
+      message = '총 ${transactionCount}건의 거래를 기록하셨네요! 총 ${_formatCurrency(totalSpending)} 지출하시고, ${topCategory?.displayName ?? '기타'}에 가장 많이 쓰셨어요. 좋은 시작이에요!';
+      actionItems.addAll([
+        '하루 3-5건 정도 꾸준히 기록하기',
+        '${topCategory?.displayName ?? '해당 카테고리'} 지출 패턴 관찰하기',
+        '1주일 더 기록하면 상세 분석 가능해요!'
+      ]);
+      if (topCategory != null) {
+        actionItems.addAll(_getDetailedAdviceForTopCategory(topCategory, totalSpending, dailyAverage, transactionCount));
+      }
+      type = InsightType.general;
+    } else {
+      // 충분한 데이터가 있을 때 세밀한 분석
+      if (opportunities.isNotEmpty) {
+        final topOpportunity = opportunities.first;
+        title = '💰 절약 기회 발견!';
+        message = '가계부 분석 결과, ${topOpportunity['message']} ';
+        message += '월 평균 ${_formatCurrency(dailyAverage * 30)}를 지출하시는데, ${_formatCurrency(topOpportunity['potentialSaving'] ?? 0)}정도 절약이 가능해요.';
+        
+        actionItems.add(topOpportunity['suggestion']);
+        if (topCategory != null) {
+          actionItems.addAll(_getDetailedAdviceForTopCategory(topCategory, totalSpending, dailyAverage, transactionCount));
+        }
+        type = InsightType.spendingPattern;
+      } else if (spendingTrend > 0.15) {
+        title = '🚨 지출 증가 경고';
+        message = '최근 지출이 ${(spendingTrend * 100).toInt()}% 증가했어요! ';
+        message += '이번 달 ${transactionCount}건, 총 ${_formatCurrency(totalSpending)} 지출 중 ';
+        
+        if (topCategory != null) {
+          final categorySpending = _getCategorySpending(topCategory, spendingAnalysis);
+          message += '${_getCategoryDisplayName(topCategory)}가 ${_formatCurrency(categorySpending)}(${((categorySpending / totalSpending) * 100).toInt()}%)로 가장 큰 비중을 차지해요.';
+        }
+        
+        actionItems.addAll([
+          '가장 많이 쓴 ${topCategory?.displayName ?? '카테고리'}에서 20% 줄이기',
+          '지난주와 이번주 지출 내역 비교해보기',
+          '불필요한 구독 서비스 해지 검토하기',
+          '현금 결제로 지출 의식 높이기'
+        ]);
+        type = InsightType.warning;
+      } else if (spendingTrend < -0.1) {
+        title = '🎉 절약 성공!';
+        message = '지난 대비 지출이 ${(-spendingTrend * 100).toInt()}% 줄었어요! ';
+        message += '${transactionCount}건의 거래로 총 ${_formatCurrency(totalSpending)} 지출하며 절약에 성공했네요.';
+        
+        actionItems.addAll([
+          '현재 절약 패턴 유지하기',
+          '절약한 금액을 저축 계좌로 이체하기',
+          '성공 요인을 분석해서 다음 달에도 적용하기'
+        ]);
+        type = InsightType.achievement;
+      } else {
+        title = '📊 안정적인 가계 관리';
+        message = '${transactionCount}건의 거래로 총 ${_formatCurrency(totalSpending)} 지출하며 안정적으로 관리하고 계시네요. ';
+        
+        if (topCategory != null) {
+          final categorySpending = _getCategorySpending(topCategory, spendingAnalysis);
+          message += '${_getCategoryDisplayName(topCategory)}에 ${_formatCurrency(categorySpending)}(${((categorySpending / totalSpending) * 100).toInt()}%) 지출이 가장 많아요.';
+          
+          actionItems.addAll(_getOptimizationAdviceForCategory(topCategory, categorySpending, dailyAverage));
+        }
+        
+        actionItems.addAll([
+          '월간 예산 설정으로 더 체계적 관리하기',
+          '저축 목표 설정해보기'
+        ]);
+        type = InsightType.general;
+      }
     }
     
     return AiCoachingInsight(
@@ -479,9 +769,273 @@ class AiCoachingService {
         'spendingAnalysis': spendingAnalysis,
         'budgetAnalysis': budgetAnalysis,
         'opportunities': opportunities,
+        'transactionCount': transactionCount,
+        'totalSpending': totalSpending,
+        'dailyAverage': dailyAverage,
       },
-      confidenceScore: 0.85,
+      confidenceScore: transactionCount < 5 ? 0.6 : 0.9,
       actionItems: actionItems,
     );
+  }
+
+  /// 환영 코칭 생성
+  AiCoachingInsight _createWelcomeCoaching(UserModel user) {
+    return AiCoachingInsight(
+      id: 'welcome_${DateTime.now().millisecondsSinceEpoch}',
+      createdAt: DateTime.now(),
+      style: user.preferredCoachingStyle,
+      title: '🎉 가계부 시작하기!',
+      message: '안녕하세요! 거래를 기록하시면 AI가 맞춤형 절약 조언을 제공해드려요.',
+      type: InsightType.general,
+      analysisData: {'isEmpty': true},
+      confidenceScore: 1.0,
+      actionItems: [
+        '첫 번째 거래를 기록해보세요',
+        '카테고리별로 정확히 분류하기',
+        '꾸준히 기록하면 더 정확한 분석'
+      ],
+    );
+  }
+
+  /// 카테고리별 기본 조언
+  List<String> _getBasicAdviceForCategory(TransactionCategory? category) {
+    if (category == null) return ['절약 방법 찾아보기', '지출 패턴 분석하기'];
+    switch (category) {
+      case TransactionCategory.food:
+        return ['집밥 도전해보기', '할인 상품 활용하기'];
+      case TransactionCategory.transport:
+        return ['대중교통 이용하기', '걸을 수 있는 거리는 도보로'];
+      case TransactionCategory.shopping:
+        return ['필요한 것만 구매하기', '할인 쿠폰 활용하기'];
+      default:
+        return ['절약 방법 찾아보기', '대안 상품 비교하기'];
+    }
+  }
+
+  /// 통화 포맷 헬퍼 메서드
+  String _formatCurrency(double amount) {
+    if (amount >= 10000) {
+      return '${(amount / 10000).toInt()}만원';
+    } else if (amount >= 1000) {
+      return '${(amount / 1000).toInt()}천원';
+    } else {
+      return '${amount.toInt()}원';
+    }
+  }
+
+  /// 카테고리 표시명 가져오기
+  String _getCategoryDisplayName(TransactionCategory category) {
+    return category.displayName;
+  }
+
+  /// 카테고리 지출 금액 추출
+  double _getCategorySpending(TransactionCategory category, Map<String, dynamic> spendingAnalysis) {
+    final categoryBreakdown = spendingAnalysis['categoryBreakdown'] as Map<String, double>? ?? {};
+    return categoryBreakdown[category.name] ?? 0.0;
+  }
+
+  /// 최고 지출 카테고리에 대한 상세 조언
+  List<String> _getDetailedAdviceForTopCategory(TransactionCategory category, double totalAmount, double dailyAverage, int transactionCount) {
+    final monthlyAverage = dailyAverage * 30;
+    
+    switch (category) {
+      case TransactionCategory.food:
+        if (monthlyAverage > 300000) {
+          return [
+            '식비가 월 ${_formatCurrency(monthlyAverage)}로 높은 편이에요. 주 3회 집밥으로 20% 절약해보세요.',
+            '배달음식을 마트 도시락으로 바꿔보기',
+            '점심 도시락 준비로 일일 1만원씩 아끼기'
+          ];
+        } else {
+          return [
+            '합리적인 식비 관리하고 계시네요!',
+            '할인마트 이용으로 10% 더 절약하기',
+            '간단한 요리 레시피 3개 도전해보기'
+          ];
+        }
+        
+      case TransactionCategory.transport:
+        if (monthlyAverage > 150000) {
+          return [
+            '교통비가 월 ${_formatCurrency(monthlyAverage)}네요. 정기권 구매로 15% 절약 가능해요.',
+            '가까운 거리는 도보나 자전거 이용하기',
+            '카풀 앱 활용으로 택시비 반으로 줄이기'
+          ];
+        } else {
+          return [
+            '교통비를 잘 관리하고 계시네요!',
+            '도보 시간을 늘려 건강까지 챙기기',
+            '대중교통 앱으로 최적 경로 찾기'
+          ];
+        }
+        
+      case TransactionCategory.shopping:
+        return [
+          '쇼핑 전 꼭 필요한 것만 리스트 작성하기',
+          '온라인 구매 시 24시간 후 재검토하기',
+          '중고 거래로 30% 저렴하게 구매하기',
+          '할인 쿠폰과 적립금 활용하기'
+        ];
+        
+      case TransactionCategory.entertainment:
+        if (monthlyAverage > 200000) {
+          return [
+            '엔터테인먼트 비용이 높아요. 무료 문화 행사 활용해보세요.',
+            '구독 서비스 2개 이상 시 가족 공유 계획으로 변경',
+            '영화관 대신 홈시어터나 도서관 이용하기'
+          ];
+        } else {
+          return [
+            '적절한 여가 비용이에요!',
+            '무료 전시회나 공원 산책으로 더 알차게',
+            'OTT 서비스는 번갈아 구독하기'
+          ];
+        }
+        
+      default:
+        return [
+          '${category.displayName} 지출을 세부 항목별로 점검해보세요',
+          '불필요한 구독이나 정기 결제 확인하기',
+          '구매 전 3일 고민 시간 갖기'
+        ];
+    }
+  }
+
+  /// 카테고리별 최적화 조언
+  List<String> _getOptimizationAdviceForCategory(TransactionCategory category, double categorySpending, double dailyAverage) {
+    final monthlySpending = dailyAverage * 30;
+    
+    switch (category) {
+      case TransactionCategory.food:
+        if (categorySpending > monthlySpending * 0.3) {
+          return [
+            '식비가 전체 지출의 30% 이상이에요. 주 2회 집밥 도전!',
+            '점심 도시락으로 월 10만원 절약하기'
+          ];
+        }
+        return ['현재 식비 관리 잘하고 계시네요!', '가끔 특가 상품 활용해보기'];
+        
+      case TransactionCategory.transport:
+        return [
+          '정기권 할인 혜택 확인해보기',
+          '가까운 거리는 걸어서 건강도 챙기기'
+        ];
+        
+      case TransactionCategory.shopping:
+        return [
+          '충동구매 방지를 위한 1일 고민 시간 갖기',
+          '필요한 것과 원하는 것 구분해서 구매하기'
+        ];
+        
+      default:
+        return [
+          '${category.displayName} 지출 패턴 분석해보기',
+          '더 저렴한 대안 옵션 찾아보기'
+        ];
+    }
+  }
+
+  /// 코칭 스타일에 맞는 메시지 톤 적용
+  String _applyCoachingStyle(String baseMessage, CoachingStyle style) {
+    switch (style) {
+      case CoachingStyle.strict:
+        return baseMessage.replaceAll('해보세요', '하십시오')
+                          .replaceAll('어떨까요', '권장합니다')
+                          .replaceAll('!', '.')
+                          .replaceAll('👏', '')
+                          .replaceAll('🎉', '');
+        
+      case CoachingStyle.kind:
+        return baseMessage + ' 함께 천천히 해나가요! 😊';
+        
+      case CoachingStyle.friendly:
+        return baseMessage.replaceAll('하세요', '해봐!')
+                          .replaceAll('해보세요', '해봐~')
+                          .replaceAll('.', '!');
+        
+      case CoachingStyle.motivational:
+        return baseMessage + ' 💪 당신은 할 수 있어요! 화이팅!';
+        
+      case CoachingStyle.analytical:
+        return baseMessage.replaceAll('많이', '통계적으로 높은 비율로')
+                          .replaceAll('적게', '상대적으로 낮은 수준으로')
+                          .replaceAll('!', '.');
+    }
+  }
+
+  /// 실제 거래 데이터 기반 즉시 실행 가능한 조언 생성
+  List<String> _generateActionableAdvice(
+    List<Transaction> transactions,
+    TransactionCategory? topCategory,
+    double totalSpending,
+  ) {
+    List<String> advice = [];
+    final now = DateTime.now();
+    
+    // 최근 7일 거래 분석
+    final recentTransactions = transactions.where(
+      (t) => now.difference(t.date).inDays <= 7 && t.type == TransactionType.expense
+    ).toList();
+    
+    if (recentTransactions.isNotEmpty) {
+      final recentSpending = recentTransactions.fold<double>(0, (sum, t) => sum + t.amount);
+      final dailyRecent = recentSpending / 7;
+      
+      if (dailyRecent > 30000) {
+        advice.add('최근 일일 ${_formatCurrency(dailyRecent)} 지출 중이에요. 내일은 2만원대로 도전해보세요');
+      }
+      
+      // 자주 쓰는 곳 분석
+      final frequentPlaces = <String, int>{};
+      for (final t in recentTransactions) {
+        if (t.description.isNotEmpty) {
+          final place = t.description.split(' ').first;
+          frequentPlaces[place] = (frequentPlaces[place] ?? 0) + 1;
+        }
+      }
+      
+      final mostFrequent = frequentPlaces.entries
+          .where((e) => e.value >= 3)
+          .map((e) => e.key)
+          .toList();
+      
+      if (mostFrequent.isNotEmpty) {
+        advice.add('${mostFrequent.join(', ')}을 자주 이용하시네요. 대안 찾기 도전!');
+      }
+    }
+    
+    // 고정 지출 패턴 찾기
+    final subscriptions = transactions
+        .where((t) => 
+            t.type == TransactionType.expense && 
+            (t.description.contains('구독') || t.description.contains('멤버십') || t.amount == t.amount.roundToDouble()))
+        .toList();
+    
+    if (subscriptions.length > 3) {
+      final subTotal = subscriptions.fold<double>(0, (sum, t) => sum + t.amount);
+      advice.add('구독/정기 서비스로 월 ${_formatCurrency(subTotal)} 지출 중. 3개월 안쓴 서비스 해지하기');
+    }
+    
+    // 카테고리별 즉시 실행 가능한 팁
+    if (topCategory != null) {
+      switch (topCategory) {
+        case TransactionCategory.food:
+          advice.add('내일 점심은 도시락이나 간단한 샌드위치로 도전!');
+          advice.add('이번 주말 1시간 투자해서 반찬 3개 만들기');
+          break;
+        case TransactionCategory.transport:
+          advice.add('내일부터 3일간 대중교통 앱으로 최단경로 찾기');
+          advice.add('1km 이내 거리는 무조건 걷기 도전');
+          break;
+        case TransactionCategory.shopping:
+          advice.add('온라인 쇼핑카트에 담은 물건 24시간 후 재검토하기');
+          advice.add('이번 주는 꼭 필요한 것만 리스트 작성 후 구매');
+          break;
+        default:
+          advice.add('이번 주는 ${topCategory.displayName}에서 하나 줄여보기');
+      }
+    }
+    
+    return advice.take(3).toList();
   }
 }

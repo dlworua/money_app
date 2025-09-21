@@ -30,7 +30,7 @@ class AiCoachingService {
   /// 사용자 데이터를 분석해서 맞춤형 코칭 팁을 제공
   static List<String> getPersonalizedTips(UserModel user) {
     List<String> tips = [];
-    
+
     try {
       // 1. 레벨 기반 팁
       if (user.level < 3) {
@@ -47,26 +47,35 @@ class AiCoachingService {
       }
 
       // 3. 월 목표 달성률 기반 팁
-      final achievementRate = user.monthlyGoal > 0 
-          ? user.currentMonthSaved / user.monthlyGoal 
+      final achievementRate = user.monthlyGoal > 0
+          ? user.currentMonthSaved / user.monthlyGoal
           : 0.0;
-      
+
       if (achievementRate < 0.3) {
-        tips.add('⏰ 이번 달 목표까지 ${((user.monthlyGoal - user.currentMonthSaved)/1000).ceil()}천원 남았어요! 하루 ${((user.monthlyGoal - user.currentMonthSaved)/DateTime.now().day/1000).ceil()}천원씩 절약하면 달성!');
+        tips.add(
+          '⏰ 이번 달 목표까지 ${((user.monthlyGoal - user.currentMonthSaved) / 1000).ceil()}천원 남았어요! 하루 ${((user.monthlyGoal - user.currentMonthSaved) / DateTime.now().day / 1000).ceil()}천원씩 절약하면 달성!',
+        );
       } else if (achievementRate > 0.8) {
         tips.add('🎊 이번 달 목표를 거의 달성했네요! 남은 기간 동안 더 도전해볼까요?');
       }
 
       // 4. 절약 패턴 분석
-      final recentRecords = user.savingRecords.length > 5 
+      final recentRecords = user.savingRecords.length > 5
           ? user.savingRecords.take(5).toList()
           : user.savingRecords;
 
       if (recentRecords.isNotEmpty) {
-        final avgAmount = recentRecords.fold<double>(0, (sum, record) => sum + record.amount) / recentRecords.length;
-        
+        final avgAmount =
+            recentRecords.fold<double>(
+              0,
+              (sum, record) => sum + record.amount,
+            ) /
+            recentRecords.length;
+
         if (avgAmount < 5000) {
-          tips.add('💰 소액 절약도 소중해요! 큰 금액 절약에도 도전해보세요. 외식 대신 집밥 한 번으로 2-3만원 절약!');
+          tips.add(
+            '💰 소액 절약도 소중해요! 큰 금액 절약에도 도전해보세요. 외식 대신 집밥 한 번으로 2-3만원 절약!',
+          );
         } else if (avgAmount > 20000) {
           tips.add('🌟 대단한 절약 실력이네요! 이 패턴을 유지하면 목표를 훨씬 초과 달성할 수 있어요!');
         }
@@ -74,7 +83,8 @@ class AiCoachingService {
         // 카테고리별 분석
         final categoryStats = <String, int>{};
         for (final record in recentRecords) {
-          categoryStats[record.category] = (categoryStats[record.category] ?? 0) + 1;
+          categoryStats[record.category] =
+              (categoryStats[record.category] ?? 0) + 1;
         }
 
         final mostFrequentCategory = categoryStats.entries
@@ -104,8 +114,9 @@ class AiCoachingService {
         tips.add(_generalTips[Random().nextInt(_generalTips.length)]);
       }
 
-      LoggerService.info('Generated ${tips.length} personalized tips for user ${user.id}');
-
+      LoggerService.info(
+        'Generated ${tips.length} personalized tips for user ${user.id}',
+      );
     } catch (e) {
       LoggerService.error('Error generating personalized tips', e);
       tips.add(_generalTips[Random().nextInt(_generalTips.length)]);
@@ -118,26 +129,32 @@ class AiCoachingService {
   static double predictGoalAchievementProbability(UserModel user) {
     try {
       final daysInMonth = DateTime.now().day;
-      final daysRemaining = DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day - daysInMonth;
-      
-      if (daysRemaining <= 0) return user.currentMonthSaved >= user.monthlyGoal ? 1.0 : 0.0;
-      
+      final daysRemaining =
+          DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day -
+          daysInMonth;
+
+      if (daysRemaining <= 0)
+        return user.currentMonthSaved >= user.monthlyGoal ? 1.0 : 0.0;
+
       // 현재 달성률 (미래 확장용으로 유지)
-      
+
       // 일일 평균 절약 금액
-      final dailyAverage = daysInMonth > 0 ? user.currentMonthSaved / daysInMonth : 0.0;
-      
+      final dailyAverage = daysInMonth > 0
+          ? user.currentMonthSaved / daysInMonth
+          : 0.0;
+
       // 예상 월말 달성 금액
-      final projectedTotal = user.currentMonthSaved + (dailyAverage * daysRemaining);
-      
+      final projectedTotal =
+          user.currentMonthSaved + (dailyAverage * daysRemaining);
+
       // 달성 확률 계산 (여러 요소 고려)
       double probability = (projectedTotal / user.monthlyGoal).clamp(0.0, 1.0);
-      
+
       // 보정 요소들
       if (user.consecutiveDays > 7) probability += 0.1; // 꾸준함 보너스
       if (user.level > 5) probability += 0.05; // 경험 보너스
       if (user.savingRecords.length > 10) probability += 0.05; // 기록 횟수 보너스
-      
+
       return probability.clamp(0.0, 1.0);
     } catch (e) {
       LoggerService.error('Error predicting goal achievement', e);
@@ -155,16 +172,21 @@ class AiCoachingService {
   static double suggestOptimalMonthlyGoal(UserModel user) {
     try {
       // 최근 3개월 평균 절약 금액 기반 (현재는 이번 달만 사용)
-      final baseAmount = user.currentMonthSaved > 0 ? user.currentMonthSaved * 1.2 : 50000.0;
-      
+      final baseAmount = user.currentMonthSaved > 0
+          ? user.currentMonthSaved * 1.2
+          : 50000.0;
+
       // 사용자 레벨에 따른 조정
       final levelMultiplier = 1.0 + (user.level * 0.05);
-      
+
       // 연속일에 따른 조정
-      final streakMultiplier = user.consecutiveDays > 0 ? 1.0 + (user.consecutiveDays * 0.01) : 1.0;
-      
-      final suggestedGoal = (baseAmount * levelMultiplier * streakMultiplier).roundToDouble();
-      
+      final streakMultiplier = user.consecutiveDays > 0
+          ? 1.0 + (user.consecutiveDays * 0.01)
+          : 1.0;
+
+      final suggestedGoal = (baseAmount * levelMultiplier * streakMultiplier)
+          .roundToDouble();
+
       // 최소/최대 제한
       return suggestedGoal.clamp(30000.0, 500000.0);
     } catch (e) {
