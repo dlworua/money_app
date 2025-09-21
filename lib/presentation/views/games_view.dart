@@ -62,7 +62,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(homeViewModelProvider);
     final user = state.user;
 
