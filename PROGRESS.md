@@ -192,6 +192,16 @@ lib/
 - 반응형 디자인 최적화
 - 광고 시스템 전면 확산 (홈, 게임, 프로필)
 
+### 🎫 티켓 시스템 구현 (최신):
+1. **티켓 시스템 추가**: 최대 10개 티켓, 5분마다 1개씩 자동 충전
+2. **퍼즐게임 스타일 UI**: 티켓 수량, 충전 시간, 진행도 표시
+3. **리워드 광고 연동**: 티켓 3개 또는 포인트 50개 선택 가능
+4. **티켓 초과 시스템**: 10개 초과 시 점진적으로 maxTickets 감소
+5. **UserModel 확장**: gameTickets, maxTickets, lastTicketRefillTime 필드 추가
+6. **HomeViewModel 메서드**: updateTickets, consumeTicket, watchAdForTickets 구현
+7. **AdService/Repository 개선**: RewardedAd 생성 및 표시 메서드 개선
+8. **안드로이드 하단바 처리**: 게임 중 하단바 자동 숨김 기능 추가
+
 ---
 
 *이 문서는 개발 진행상황을 추적하기 위해 생성되었습니다. 마지막 업데이트: 2025-09-21*
