@@ -177,9 +177,21 @@ class AppTheme {
   static const double spaceXL = 32;
   static const double spaceXXL = 48;
 
+  // 🌙 다크 모드 컬러 팔레트
+  static const darkPrimaryColor = Color(0xFF60A5FA); // 밝은 블루
+  static const darkSecondaryColor = Color(0xFF3B82F6);
+  static const darkAccentColor = Color(0xFF34D399); // 밝은 그린
+  static const darkBackgroundColor = Color(0xFF111827); // 다크 배경
+  static const darkSurfaceColor = Color(0xFF1F2937); // 다크 서피스
+  static const darkOnSurfaceColor = Color(0xFFF9FAFB); // 밝은 텍스트
+  static const darkOnBackgroundColor = Color(0xFFE5E7EB);
+
+  /// 라이트 테마
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: backgroundColor,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         brightness: Brightness.light,
@@ -245,6 +257,94 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: radiusMedium),
           side: const BorderSide(color: Color(0xFFE5E7EB)),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 다크 테마
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: darkBackgroundColor,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: darkPrimaryColor,
+        brightness: Brightness.dark,
+        primary: darkPrimaryColor,
+        secondary: darkSecondaryColor,
+        tertiary: darkAccentColor,
+        surface: darkSurfaceColor,
+        error: errorColor,
+        onSurface: darkOnSurfaceColor,
+        onBackground: darkOnBackgroundColor,
+      ),
+      fontFamily: 'SF Pro Display',
+      textTheme: TextTheme(
+        headlineLarge: headingLarge.copyWith(color: darkOnSurfaceColor),
+        headlineMedium: headingMedium.copyWith(color: darkOnSurfaceColor),
+        headlineSmall: headingSmall.copyWith(color: darkOnSurfaceColor),
+        bodyLarge: bodyLarge.copyWith(color: darkOnBackgroundColor),
+        bodyMedium: bodyMedium.copyWith(color: darkOnBackgroundColor),
+        bodySmall: bodySmall.copyWith(color: darkOnBackgroundColor),
+        labelLarge: labelLarge.copyWith(color: darkOnBackgroundColor),
+      ),
+      appBarTheme: const AppBarTheme(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: darkOnSurfaceColor,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        titleTextStyle: TextStyle(
+          color: darkOnSurfaceColor,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.2,
+        ),
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: radiusMedium),
+        color: darkSurfaceColor,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: darkPrimaryColor,
+          foregroundColor: darkBackgroundColor,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: radiusMedium),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          elevation: 0,
+          backgroundColor: darkPrimaryColor,
+          foregroundColor: darkBackgroundColor,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: radiusMedium),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: radiusMedium),
+          side: const BorderSide(color: Color(0xFF374151)),
+          foregroundColor: darkOnSurfaceColor,
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,

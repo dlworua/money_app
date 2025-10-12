@@ -5,6 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../viewmodels/providers.dart';
+import '../viewmodels/theme_viewmodel.dart';
 import '../../data/models/transaction.dart';
 import '../../data/repositories/transaction_repository.dart';
 import '../dialogs/premium_dialog.dart';
@@ -1143,10 +1144,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             title: '테마 설정',
             subtitle: '라이트/다크 모드 변경',
             onTap: () {
-              // TODO: 테마 설정 기능 구현
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('테마 설정 기능 준비 중입니다')),
-              );
+              _showThemeDialog(context);
             },
           ),
 
@@ -1318,6 +1316,75 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       height: 1,
       margin: const EdgeInsets.symmetric(vertical: 8),
       color: Colors.grey[200],
+    );
+  }
+
+  /// 테마 선택 다이얼로그
+  void _showThemeDialog(BuildContext context) {
+    final currentThemeMode = ref.read(themeViewModelProvider);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.palette_outlined, color: AppTheme.primaryColor),
+              SizedBox(width: 8),
+              Text('테마 설정'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 라이트 모드
+              ListTile(
+                leading: const Icon(Icons.light_mode, color: Colors.amber),
+                title: const Text('라이트 모드'),
+                trailing: currentThemeMode == ThemeMode.light
+                    ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                    : null,
+                onTap: () {
+                  ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.light);
+                  Navigator.pop(context);
+                },
+              ),
+              const Divider(),
+              // 다크 모드
+              ListTile(
+                leading: const Icon(Icons.dark_mode, color: Colors.indigo),
+                title: const Text('다크 모드'),
+                trailing: currentThemeMode == ThemeMode.dark
+                    ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                    : null,
+                onTap: () {
+                  ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.dark);
+                  Navigator.pop(context);
+                },
+              ),
+              const Divider(),
+              // 시스템 설정 따르기
+              ListTile(
+                leading: const Icon(Icons.settings_suggest, color: Colors.grey),
+                title: const Text('시스템 설정 따르기'),
+                trailing: currentThemeMode == ThemeMode.system
+                    ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                    : null,
+                onTap: () {
+                  ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.system);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('닫기'),
+            ),
+          ],
+        );
+      },
     );
   }
 
