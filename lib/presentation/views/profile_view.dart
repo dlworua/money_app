@@ -133,10 +133,11 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     super.dispose();
   }
 
+  /// 프로필 섹션 - 컴팩트 디자인
   Widget _buildProfileSection(user) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -151,50 +152,82 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: AppTheme.primaryColor,
-            child: Text('💰', style: const TextStyle(fontSize: 32)),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '머니 마스터',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
+          // 상단: 프로필 + 코인 (한 줄로 정리)
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.monetization_on, color: Colors.amber[600], size: 20),
-              const SizedBox(width: 4),
-              Text(
-                '${user?.coins ?? 0} 코인',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.amber[700],
+              // 프로필 아바타
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: AppTheme.primaryColor,
+                child: const Text('💰', style: TextStyle(fontSize: 24)),
+              ),
+              const SizedBox(width: 12),
+
+              // 이름 + 코인
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '머니 마스터',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.monetization_on,
+                          color: Colors.amber[600],
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${user?.coins ?? 0} 코인',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.amber[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+
           const SizedBox(height: 16),
+
+          // 구분선
+          Container(
+            height: 1,
+            color: AppTheme.primaryColor.withValues(alpha: 0.1),
+          ),
+
+          const SizedBox(height: 12),
+
+          // 하단: 통계 정보 (컴팩트하게 가로 배치)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem(
-                '게임 플레이',
-                '${_getTotalGamesPlayed()}회',
+              _buildCompactStatItem(
                 Icons.games,
+                '${_getTotalGamesPlayed()}',
+                '게임',
               ),
-              _buildStatItem(
-                '연속 접속',
-                '${_getStreakDays()}일',
+              _buildCompactStatItem(
                 Icons.local_fire_department,
+                '${_getStreakDays()}일',
+                '연속접속',
               ),
-              _buildStatItem(
-                '절약 달성',
-                '${_getSavingAchievements()}회',
+              _buildCompactStatItem(
                 Icons.savings,
+                '${_getSavingAchievements()}',
+                '절약달성',
               ),
             ],
           ),
@@ -203,16 +236,26 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
+  /// 컴팩트한 통계 아이템
+  Widget _buildCompactStatItem(IconData icon, String value, String label) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.primaryColor, size: 24),
+        Icon(icon, color: AppTheme.primaryColor, size: 20),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey[600],
+          ),
+        ),
       ],
     );
   }
