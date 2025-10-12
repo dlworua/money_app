@@ -110,8 +110,7 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
                   child: GestureDetector(
                     onTap: () => _onItemTapped(index),
                     behavior: HitTestBehavior.opaque,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
+                    child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected
@@ -122,51 +121,23 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // 백그라운드 원
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: isSelected ? 40 : 0,
-                                height: isSelected ? 40 : 0,
-                                decoration: BoxDecoration(
-                                  color: item.color.withValues(alpha: 0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              // 아이콘
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 200),
-                                child: Icon(
-                                  isSelected ? item.activeIcon : item.icon,
-                                  key: ValueKey(isSelected),
-                                  size: ResponsiveUtils.getResponsiveIconSize(context, 24),
-                                  color: isSelected
-                                      ? item.color
-                                      : Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                          // 아이콘 (바운싱 없이 단순 표시)
+                          Icon(
+                            isSelected ? item.activeIcon : item.icon,
+                            size: ResponsiveUtils.getResponsiveIconSize(context, 24),
+                            color: isSelected ? item.color : Colors.grey[600],
                           ),
                           SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, 4)),
-                          AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 200),
+                          // 텍스트 (바운싱 없이 단순 표시)
+                          Text(
+                            item.label,
                             style: TextStyle(
                               fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, isSelected ? 12 : 11),
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                               color: isSelected ? item.color : Colors.grey[600],
                             ),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                item.label,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ],
                       ),
