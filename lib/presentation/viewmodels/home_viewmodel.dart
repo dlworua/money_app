@@ -1265,6 +1265,24 @@ class HomeViewModel extends StateNotifier<HomeState> {
     return (300 - (timeSinceLastRefill.inSeconds % 300)).clamp(0, 300);
   }
 
+  // 🎯 프리미엄 관련 메서드들
+
+  /// 프리미엄 상태 토글 (목 데이터용)
+  Future<void> togglePremium() async {
+    final user = state.user;
+    if (user == null) return;
+
+    try {
+      final updatedUser = user.copyWith(isPremium: !user.isPremium);
+      await _userService.saveUser(updatedUser);
+      state = state.copyWith(user: updatedUser);
+
+      LoggerService.info('프리미엄 상태 변경: ${updatedUser.isPremium}');
+    } catch (error) {
+      LoggerService.error('프리미엄 상태 변경 실패: $error');
+    }
+  }
+
   @override
   void dispose() {
     state.bannerAd?.dispose();
