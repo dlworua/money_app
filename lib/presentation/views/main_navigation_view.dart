@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/responsive_utils.dart';
-import '../../core/utils/safe_area_utils.dart';
 import 'home_view.dart';
 import 'games_view.dart';
 import 'profile_view.dart';
@@ -18,11 +17,11 @@ class MainNavigationView extends ConsumerStatefulWidget {
 class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
   int _selectedIndex = 0;
 
+  // 3탭 구조로 변경: 홈, 게임, 프로필
   final List<Widget> _pages = [
     const HomeView(),
     const GamesView(),
     const ProfileView(),
-    const SettingsView(),
   ];
 
   final List<NavigationItem> _navigationItems = [
@@ -43,12 +42,6 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
       activeIcon: Icons.person,
       label: '프로필',
       color: AppTheme.accentColor,
-    ),
-    NavigationItem(
-      icon: Icons.settings_outlined,
-      activeIcon: Icons.settings,
-      label: '설정',
-      color: Colors.grey[600]!,
     ),
   ];
 
@@ -173,56 +166,4 @@ class NavigationItem {
     required this.label,
     required this.color,
   });
-}
-
-
-// 임시 설정 화면
-class SettingsView extends StatelessWidget {
-  const SettingsView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: SafeAreaUtils.getSafeResponsivePadding(context, all: 16),
-          child: Column(
-            children: [
-              SizedBox(height: MediaQuery.of(context).padding.top + ResponsiveUtils.getIPhone16PlusSpacing(context, 16)),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  '설정',
-                  style: AppTheme.headingLarge.copyWith(
-                    color: AppTheme.primaryColor,
-                    fontWeight: FontWeight.w800,
-                    fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 28),
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, 20)),
-              Expanded(
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      '설정 화면이 준비 중입니다',
-                      style: TextStyle(
-                        fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

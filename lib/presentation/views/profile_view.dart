@@ -118,6 +118,13 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
             // GitHub 잔디심기 스타일 섹션
             _buildGrassPlantingSection(),
+
+            const SizedBox(height: 24),
+
+            // 설정 섹션
+            _buildSettingsSection(context, user),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -1087,6 +1094,233 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         .length;
 
     return savingTransactions;
+  }
+
+  /// 설정 섹션
+  Widget _buildSettingsSection(BuildContext context, user) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '⚙️ 설정',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+
+          // 프로필 관리
+          _buildSettingItem(
+            icon: Icons.person_outline,
+            title: '프로필 편집',
+            subtitle: '닉네임 및 프로필 사진 변경',
+            onTap: () {
+              // TODO: 프로필 편집 기능 구현
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('프로필 편집 기능 준비 중입니다')),
+              );
+            },
+          ),
+
+          _buildDivider(),
+
+          // 테마 설정
+          _buildSettingItem(
+            icon: Icons.palette_outlined,
+            title: '테마 설정',
+            subtitle: '라이트/다크 모드 변경',
+            onTap: () {
+              // TODO: 테마 설정 기능 구현
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('테마 설정 기능 준비 중입니다')),
+              );
+            },
+          ),
+
+          _buildDivider(),
+
+          // 프리미엄
+          _buildSettingItem(
+            icon: user?.isPremium == true
+                ? Icons.workspace_premium
+                : Icons.workspace_premium_outlined,
+            title: user?.isPremium == true ? '프리미엄 관리' : '프리미엄 가입',
+            subtitle: user?.isPremium == true
+                ? '프리미엄 혜택 확인 및 해지'
+                : '광고 제거 및 3배 포인트',
+            iconColor: Colors.amber[700]!,
+            onTap: () {
+              // TODO: 프리미엄 가입/해지 기능 구현
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(user?.isPremium == true
+                      ? '프리미엄 관리 기능 준비 중입니다'
+                      : '프리미엄 가입 기능 준비 중입니다'),
+                ),
+              );
+            },
+          ),
+
+          _buildDivider(),
+
+          // 로그아웃
+          _buildSettingItem(
+            icon: Icons.logout,
+            title: '로그아웃',
+            subtitle: '다른 계정으로 로그인',
+            iconColor: Colors.orange[700]!,
+            onTap: () {
+              // TODO: 로그아웃 기능 구현
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('로그아웃'),
+                  content: const Text('로그아웃 하시겠습니까?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('로그아웃 기능 준비 중입니다')),
+                        );
+                      },
+                      child: const Text('로그아웃'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+
+          _buildDivider(),
+
+          // 회원탈퇴
+          _buildSettingItem(
+            icon: Icons.person_remove_outlined,
+            title: '회원 탈퇴',
+            subtitle: '계정 및 모든 데이터 삭제',
+            iconColor: Colors.red[700]!,
+            onTap: () {
+              // TODO: 회원탈퇴 기능 구현
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('회원 탈퇴'),
+                  content: const Text(
+                    '정말 탈퇴하시겠습니까?\n모든 데이터가 삭제되며 복구할 수 없습니다.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('회원탈퇴 기능 준비 중입니다')),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                      ),
+                      child: const Text('탈퇴'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 설정 아이템 위젯
+  Widget _buildSettingItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    Color? iconColor,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: (iconColor ?? AppTheme.primaryColor)
+                    .withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: iconColor ?? AppTheme.primaryColor,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: Colors.grey[400],
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 구분선
+  Widget _buildDivider() {
+    return Container(
+      height: 1,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      color: Colors.grey[200],
+    );
   }
 
   /// 프로필 전용 하단 배너 광고 위젯
