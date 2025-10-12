@@ -16,6 +16,19 @@ class MainNavigationView extends ConsumerStatefulWidget {
 
 class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
   int _selectedIndex = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   // 3탭 구조로 변경: 홈, 게임, 프로필
   final List<Widget> _pages = [
@@ -45,18 +58,33 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
     ),
   ];
 
+  /// 탭 선택 시 페이지 슬라이드 애니메이션
   void _onItemTapped(int index) {
     if (_selectedIndex != index) {
-      setState(() {
-        _selectedIndex = index;
-      });
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
+  }
+
+  /// PageView의 페이지 변경 시 네비게이션 바 업데이트
+  void _onPageChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _pages),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        physics: const NeverScrollableScrollPhysics(), // 스와이프 제스처 비활성화 (버튼으로만 전환)
+        children: _pages,
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
