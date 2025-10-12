@@ -116,18 +116,8 @@ class _GamesViewState extends ConsumerState<GamesView> {
                     ),
                   ),
 
-                  // 보유 포인트 카드
-                  _buildCoinCard(context, user),
-
-                  SizedBox(
-                    height: ResponsiveUtils.getIPhone16PlusSpacing(
-                      context,
-                      AppTheme.spaceM,
-                    ),
-                  ),
-
-                  // 티켓 시스템 카드
-                  _buildTicketCard(context, user),
+                  // 포인트 & 티켓 통합 컴팩트 위젯
+                  _buildCompactStatsCard(context, user),
 
                   SizedBox(
                     height: ResponsiveUtils.getIPhone16PlusSpacing(
@@ -162,132 +152,216 @@ class _GamesViewState extends ConsumerState<GamesView> {
     );
   }
 
-  Widget _buildCoinCard(BuildContext context, user) {
-    return GestureDetector(
-      onTap: () => _showCoinHistoryDialog(context, user),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(
-          ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceL),
+  /// 포인트 & 티켓 통합 컴팩트 카드
+  Widget _buildCompactStatsCard(BuildContext context, user) {
+    final viewModel = ref.read(homeViewModelProvider.notifier);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(
+        ResponsiveUtils.getIPhone16PlusSpacing(context, 16),
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppTheme.primaryColor, AppTheme.secondaryColor],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppTheme.warningColor, Colors.amber[600]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.warningColor.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    '보유 포인트',
-                    style: AppTheme.getBodyMedium(context).copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                        context,
-                        16,
+        ],
+      ),
+      child: Column(
+        children: [
+          // 상단: 포인트 & 티켓 정보
+          Row(
+            children: [
+              // 포인트 섹션
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _showCoinHistoryDialog(context, user),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.monetization_on_rounded,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '포인트',
+                            style: AppTheme.getBodyMedium(context).copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        NumberFormatter.formatInt(user.coins),
+                        style: AppTheme.getHeadingLarge(context).copyWith(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 구분선
+              Container(
+                width: 1,
+                height: 50,
+                color: Colors.white.withValues(alpha: 0.3),
+              ),
+
+              const SizedBox(width: 16),
+
+              // 티켓 섹션
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '🎫',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '티켓',
+                          style: AppTheme.getBodyMedium(context).copyWith(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          '${user.gameTickets}',
+                          style: AppTheme.getHeadingLarge(context).copyWith(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          ' / 10',
+                          style: AppTheme.getBodyMedium(context).copyWith(
+                            color: Colors.white.withValues(alpha: 0.6),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                Icon(
-                  Icons.monetization_on_rounded,
-                  color: Colors.white.withValues(alpha: 0.9),
-                  size: ResponsiveUtils.getResponsiveIconSize(context, 24),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: ResponsiveUtils.getIPhone16PlusSpacing(
-                context,
-                AppTheme.spaceS,
               ),
-            ),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                NumberFormatter.formatInt(user.coins),
-                style: AppTheme.getHeadingLarge(context).copyWith(
-                  color: Colors.white,
-                  fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                    context,
-                    36,
-                  ),
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
-            SizedBox(
-              height: ResponsiveUtils.getIPhone16PlusSpacing(
-                context,
-                AppTheme.spaceXS,
-              ),
-            ),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                '게임으로 더 많은 포인트을 모아보세요!',
-                style: AppTheme.getBodySmall(context).copyWith(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                    context,
-                    14,
-                  ),
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
-            SizedBox(
-              height: ResponsiveUtils.getIPhone16PlusSpacing(
-                context,
-                AppTheme.spaceM,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(AppTheme.spaceS),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: AppTheme.radiusSmall,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.touch_app_rounded,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    size: 16,
-                  ),
-                  const SizedBox(width: AppTheme.spaceXS),
-                  Text(
-                    '탭하여 포인트 적립/사용 내역 보기',
-                    style: AppTheme.getBodySmall(context).copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontWeight: FontWeight.w500,
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // 하단: 광고 시청 버튼
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    try {
+                      await viewModel.watchAdForTickets();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('🎫 티켓 3개를 획득했습니다!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (error) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('광고를 불러올 수 없습니다.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.video_camera_front, size: 16),
+                  label: const Text('티켓 3개'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppTheme.primaryColor,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    try {
+                      await viewModel.watchAdForPoints();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('💰 포인트 50개를 획득했습니다!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (error) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('광고를 불러올 수 없습니다.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.video_camera_front, size: 16),
+                  label: const Text('P 50개'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.9),
+                    foregroundColor: AppTheme.primaryColor,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -962,231 +1036,6 @@ class _GamesViewState extends ConsumerState<GamesView> {
     }
   }
 
-  /// 티켓 시스템 카드
-  Widget _buildTicketCard(BuildContext context, user) {
-    final viewModel = ref.read(homeViewModelProvider.notifier);
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(
-        ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceL),
-      ),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.deepPurple[400]!, Colors.purple[600]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 티켓 정보 헤더
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '🎫 게임 티켓',
-                    style: AppTheme.getBodyMedium(context).copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                        context,
-                        16,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        '${user.gameTickets}',
-                        style: AppTheme.getHeadingLarge(context).copyWith(
-                          color: Colors.white,
-                          fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                            context,
-                            32,
-                          ),
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        ' / 10',
-                        style: AppTheme.getBodyMedium(context).copyWith(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                            context,
-                            16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              // 티켓 아이콘들
-              Wrap(
-                spacing: 4,
-                runSpacing: 4,
-                children: List.generate(10, (index) {
-                  final isUsed = index >= user.gameTickets;
-                  return Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: isUsed
-                          ? Colors.white.withValues(alpha: 0.2)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Icon(
-                      Icons.confirmation_number,
-                      size: 12,
-                      color: isUsed
-                          ? Colors.white.withValues(alpha: 0.3)
-                          : Colors.deepPurple[400],
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // 충전 정보
-          if (user.gameTickets < 10)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '⏰ 5분마다 1개씩 자동 충전',
-                style: AppTheme.getBodySmall(
-                  context,
-                ).copyWith(color: Colors.white.withValues(alpha: 0.8)),
-                textAlign: TextAlign.center,
-              ),
-            ),
-
-          if (user.gameTickets < 10) const SizedBox(height: 16),
-
-          // 리워드 광고 버튼들
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    try {
-                      await viewModel.watchAdForTickets();
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('🎫 티켓 3개를 획득했습니다!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    } catch (error) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('광고를 불러올 수 없습니다.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  icon: const Icon(Icons.video_camera_front, size: 16),
-                  label: Text(
-                    '티켓 3개',
-                    style: TextStyle(
-                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                        context,
-                        14,
-                      ),
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.deepPurple[600],
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    try {
-                      await viewModel.watchAdForPoints();
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('💰 포인트 50개를 획득했습니다!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    } catch (error) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('광고를 불러올 수 없습니다.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  icon: const Icon(Icons.video_camera_front, size: 16),
-                  label: Text(
-                    '포인트 50개',
-                    style: TextStyle(
-                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
-                        context,
-                        14,
-                      ),
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.9),
-                    foregroundColor: Colors.deepPurple[600],
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   /// 게임 탭 전용 하단 배너 광고 위젯
   Widget? _buildBottomAd() {
