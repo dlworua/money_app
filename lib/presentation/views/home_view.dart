@@ -15,6 +15,7 @@ import '../widgets/premium_card.dart';
 import '../widgets/premium_buttons.dart';
 import '../widgets/animated_expansion_card.dart';
 import '../dialogs/add_transaction_dialog.dart';
+import '../dialogs/enhanced_ai_coaching_dialog.dart';
 import 'account_book_view.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -1431,8 +1432,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // TODO: 개인화된 AI 코칭 기능 구현
+                  // 현재 다이얼로그 닫기
                   Navigator.pop(context);
+                  // 🧠 Enhanced AI 코칭 다이얼로그 열기 (실제 가계부 데이터 100% 연동)
+                  showDialog(
+                    context: context,
+                    builder: (context) => const EnhancedAiCoachingDialog(),
+                  );
                 },
                 child: const Text('맞춤 조언 받기'),
               ),

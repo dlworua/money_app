@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/enhanced_ai_coach.dart';
-import '../../data/models/transaction.dart';
-import '../../data/models/budget.dart';
 import '../viewmodels/providers.dart';
 
 class EnhancedAiCoachingDialog extends ConsumerWidget {
@@ -65,21 +63,22 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
     );
   }
   
+  /// 🔄 실제 가계부 데이터를 로드하여 AI 인사이트 생성
   Future<ComprehensiveInsight> _generateInsight(WidgetRef ref) async {
     final state = ref.read(homeViewModelProvider);
     final coach = EnhancedAiCoach();
-    
-    // 실제 앱에서는 실제 거래와 예산 데이터를 가져와야 합니다
-    // 지금은 데모용으로 빈 데이터를 사용합니다
-    final transactions = <Transaction>[];
-    final budgets = <Budget>[];
-    
+
     // state.user가 null일 경우를 처리
     final user = state.user;
     if (user == null) {
       throw Exception('사용자 정보를 찾을 수 없습니다');
     }
-    
+
+    // 🎯 실제 거래 내역과 예산 데이터를 TransactionRepository에서 로드
+    final transactionRepository = ref.read(transactionRepositoryProvider);
+    final transactions = await transactionRepository.getTransactions();
+    final budgets = await transactionRepository.getBudgets();
+
     return await coach.generateComprehensiveInsight(user, transactions, budgets);
   }
   
