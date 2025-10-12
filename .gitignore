@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 
+# Internal documentation (not tracked in git)
+CLAUDE.md
+PROGRESS.md
+claude.md
+progress.md
+
 # IntelliJ related
 *.iml
 *.ipr
