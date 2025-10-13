@@ -158,24 +158,24 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
 
     if (isFalseStart) {
       message = '❌ False Start!\n너무 빨리 눌렀습니다!';
-      backgroundColor = Colors.red[50]!;
+      backgroundColor = AppTheme.red(context, 50);
     } else if (reactionTime != null) {
       if (reactionTime <= 200) {
         message = '🏆 환상적이네요! ${reactionTime}ms\n프로 레이서 수준이에요!';
-        backgroundColor = Colors.green[50]!;
+        backgroundColor = AppTheme.green(context, 50);
       } else if (reactionTime <= 300) {
         message = '⚡ 훌륭해요! ${reactionTime}ms\n매우 빠른 반응이에요!';
-        backgroundColor = Colors.blue[50]!;
+        backgroundColor = AppTheme.blue(context, 50);
       } else if (reactionTime <= 500) {
         message = '👍 좋아요! ${reactionTime}ms\n괜찮은 반응속도에요!';
-        backgroundColor = Colors.orange[50]!;
+        backgroundColor = AppTheme.orange(context, 50);
       } else {
         message = '🐌 아쉬워요! ${reactionTime}ms\n좀 더 집중해보세요!';
-        backgroundColor = Colors.grey[50]!;
+        backgroundColor = AppTheme.getGreyColor(context, 50);
       }
     } else {
       message = '시간 초과!';
-      backgroundColor = Colors.grey[50]!;
+      backgroundColor = AppTheme.getGreyColor(context, 50);
     }
 
     showDialog(
@@ -271,7 +271,7 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.red[50]!, Colors.orange[50]!],
+              colors: [AppTheme.red(context, 50), AppTheme.orange(context, 50)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
