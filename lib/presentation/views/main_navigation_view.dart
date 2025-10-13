@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -22,6 +23,8 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedIndex);
+    // 초기화 시 안드로이드 네비게이션 바 숨김
+    _ensureNavigationBarHidden();
   }
 
   @override
@@ -74,6 +77,17 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
     setState(() {
       _selectedIndex = index;
     });
+
+    // 페이지 변경 시 안드로이드 네비게이션 바 재숨김
+    _ensureNavigationBarHidden();
+  }
+
+  /// 안드로이드 네비게이션 바 완전 숨김 유지
+  void _ensureNavigationBarHidden() {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [],
+    );
   }
 
   @override
