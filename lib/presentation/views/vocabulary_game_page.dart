@@ -126,7 +126,7 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
             children: [
               Icon(
                 Icons.school,
-                color: _totalEarnedCoins > 0 ? Colors.green : Colors.grey,
+                color: _totalEarnedCoins > 0 ? AppTheme.green(context) : AppTheme.getGreyColor(context, 500),
                 size: 48,
               ),
               const SizedBox(height: 16),
@@ -178,7 +178,7 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
       appBar: AppBar(
         title: const Text('소비 영단어 게임'),
         backgroundColor: AppTheme.successColor,
-        foregroundColor: Colors.white,
+        foregroundColor: AppTheme.white(context),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
@@ -190,7 +190,7 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
           // 진행도 표시
           Container(
             padding: const EdgeInsets.all(16),
-            color: Colors.green[50],
+            color: AppTheme.green(context, 50),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -237,13 +237,13 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.purple[400]!, Colors.blue[400]!],
+                            colors: [AppTheme.purple(context, 400), AppTheme.blue(context, 400)],
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.translate,
-                          color: Colors.white,
+                          color: AppTheme.white(context),
                           size: 24,
                         ),
                       ),
@@ -257,29 +257,29 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [Colors.purple[50]!, Colors.blue[50]!],
+                              colors: [AppTheme.purple(context, 50), AppTheme.blue(context, 50)],
                             ),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.purple[200]!, width: 1),
+                            border: Border.all(color: AppTheme.purple(context, 200), width: 1),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 '한글 뜻',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: AppTheme.getGreyColor(context, 500),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 currentQuestion.korean,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: AppTheme.black(context).withValues(alpha: 0.87),
                                 ),
                               ),
                             ],
@@ -291,11 +291,11 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
 
                   const SizedBox(height: 20),
 
-                  const Text(
+                  Text(
                     'Choose the correct English word',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey,
+                      color: AppTheme.getGreyColor(context, 500),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -311,15 +311,15 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
 
                     if (_showResult && _selectedAnswerIndex == index) {
                       if (index == correctAnswerIndex) {
-                        buttonColor = Colors.green;
-                        textColor = Colors.white;
+                        buttonColor = AppTheme.green(context);
+                        textColor = AppTheme.white(context);
                       } else {
-                        buttonColor = Colors.red;
-                        textColor = Colors.white;
+                        buttonColor = AppTheme.red(context);
+                        textColor = AppTheme.white(context);
                       }
                     } else if (_showResult && index == correctAnswerIndex) {
-                      buttonColor = Colors.green[100];
-                      textColor = Colors.green[700];
+                      buttonColor = AppTheme.green(context, 100);
+                      textColor = AppTheme.green(context, 700);
                     }
 
                     return Container(
@@ -330,8 +330,8 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                             ? null
                             : () => _selectAnswer(index),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: buttonColor ?? Colors.grey[100],
-                          foregroundColor: textColor ?? Colors.black,
+                          backgroundColor: buttonColor ?? AppTheme.getGreyColor(context, 100),
+                          foregroundColor: textColor ?? AppTheme.black(context),
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -356,8 +356,8 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: (_selectedAnswerIndex == correctAnswerIndex)
-                            ? Colors.green[50]
-                            : Colors.red[50],
+                            ? AppTheme.green(context, 50)
+                            : AppTheme.red(context, 50),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
@@ -371,8 +371,8 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                               fontWeight: FontWeight.bold,
                               color:
                                   (_selectedAnswerIndex == correctAnswerIndex)
-                                  ? Colors.green[700]
-                                  : Colors.red[700],
+                                  ? AppTheme.green(context, 700)
+                                  : AppTheme.red(context, 700),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -382,7 +382,7 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Colors.grey[700],
+                              color: AppTheme.getGreyColor(context, 700),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -409,10 +409,10 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
       child: Container(
         height: _bannerAd!.size.height.toDouble(),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.white(context),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppTheme.black(context).withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
