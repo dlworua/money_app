@@ -396,7 +396,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
             fontSize: 18,
           ),
         ),
-        backgroundColor: Colors.pink[600],
+        backgroundColor: AppTheme.pink(context, 600),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         systemOverlayStyle: const SystemUiOverlayStyle(
@@ -410,7 +410,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.pink[400]!, Colors.pink[600]!],
+                colors: [AppTheme.pink(context, 400), AppTheme.pink(context, 600)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

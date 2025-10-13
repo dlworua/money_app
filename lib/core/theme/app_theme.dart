@@ -371,7 +371,9 @@ class AppTheme {
     );
   }
 
+  /// ========================================
   /// 테마 인식 헬퍼 메서드들
+  /// ========================================
 
   /// 현재 테마가 다크 모드인지 확인
   static bool isDark(BuildContext context) {
@@ -383,7 +385,7 @@ class AppTheme {
     return isDark(context) ? darkBackgroundColor : backgroundColor;
   }
 
-  /// 테마에 따른 서피스 색상 반환
+  /// 테마에 따른 서피스 색상 반환 (카드, 패널 등)
   static Color getSurfaceColor(BuildContext context) {
     return isDark(context) ? darkSurfaceColor : surfaceColor;
   }
@@ -410,5 +412,92 @@ class AppTheme {
       return shade >= 500 ? Colors.grey[400]! : Colors.grey[600]!;
     }
     return Colors.grey[shade]!;
+  }
+
+  /// ========================================
+  /// 하드코딩 색상 대체 헬퍼 메서드들
+  /// ========================================
+
+  /// Colors.white 대체 - 가장 밝은 색상
+  static Color white(BuildContext context) {
+    return isDark(context) ? darkSurfaceColor : Colors.white;
+  }
+
+  /// Colors.black 대체 - 가장 어두운 색상
+  static Color black(BuildContext context) {
+    return isDark(context) ? Colors.white : Colors.black;
+  }
+
+  /// 테마에 따른 Pink 색상
+  static Color pink(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      // 다크모드에서는 약간 밝게
+      return shade >= 500 ? Colors.pink[300]! : Colors.pink[200]!;
+    }
+    return Colors.pink[shade]!;
+  }
+
+  /// 테마에 따른 Purple 색상
+  static Color purple(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.purple[300]! : Colors.purple[200]!;
+    }
+    return Colors.purple[shade]!;
+  }
+
+  /// 테마에 따른 Blue 색상
+  static Color blue(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.blue[300]! : Colors.blue[200]!;
+    }
+    return Colors.blue[shade]!;
+  }
+
+  /// 테마에 따른 Green 색상
+  static Color green(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.green[300]! : Colors.green[200]!;
+    }
+    return Colors.green[shade]!;
+  }
+
+  /// 테마에 따른 Orange 색상
+  static Color orange(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.orange[300]! : Colors.orange[200]!;
+    }
+    return Colors.orange[shade]!;
+  }
+
+  /// 테마에 따른 Red 색상
+  static Color red(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.red[300]! : Colors.red[200]!;
+    }
+    return Colors.red[shade]!;
+  }
+
+  /// 테마에 따른 Amber 색상
+  static Color amber(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.amber[300]! : Colors.amber[200]!;
+    }
+    return Colors.amber[shade]!;
+  }
+
+  /// 테마에 따른 Teal 색상
+  static Color teal(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.teal[300]! : Colors.teal[200]!;
+    }
+    return Colors.teal[shade]!;
+  }
+
+  /// 테마에 따른 Indigo 색상
+  static Color indigo(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      return shade >= 500 ? Colors.indigo[300]! : Colors.indigo[200]!;
+    }
+    return Colors.indigo[shade]!;
   }
 }
