@@ -32,6 +32,13 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
     super.initState();
     _loadBannerAd();
     _selectRandomQuestions();
+    // 안드로이드 네비게이션 바 숨김 유지
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.immersiveSticky,
+        overlays: [],
+      );
+    });
   }
 
   void _selectRandomQuestions() {
@@ -459,7 +466,11 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.pink[50]!, Colors.purple[50]!, Colors.white],
+            colors: [
+              Colors.pink[50]!,
+              Colors.purple[50]!,
+              AppTheme.getBackgroundColor(context),
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

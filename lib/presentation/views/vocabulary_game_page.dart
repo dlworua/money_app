@@ -31,6 +31,13 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
     super.initState();
     _initializeBannerAd();
     _initializeGame();
+    // 안드로이드 네비게이션 바 숨김 유지
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.immersiveSticky,
+        overlays: [],
+      );
+    });
   }
 
   void _initializeBannerAd() {
