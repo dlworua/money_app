@@ -213,14 +213,29 @@ class AppTheme {
         contentTextStyle: bodyMedium.copyWith(color: onBackgroundColor),
       ),
       fontFamily: 'SF Pro Display', // iOS 스타일 폰트
-      textTheme: const TextTheme(
-        headlineLarge: headingLarge,
-        headlineMedium: headingMedium,
-        headlineSmall: headingSmall,
-        bodyLarge: bodyLarge,
-        bodyMedium: bodyMedium,
-        bodySmall: bodySmall,
-        labelLarge: labelLarge,
+      textTheme: TextTheme(
+        headlineLarge: headingLarge.copyWith(color: onSurfaceColor),
+        headlineMedium: headingMedium.copyWith(color: onSurfaceColor),
+        headlineSmall: headingSmall.copyWith(color: onSurfaceColor),
+        bodyLarge: bodyLarge.copyWith(color: onSurfaceColor),
+        bodyMedium: bodyMedium.copyWith(color: onSurfaceColor),
+        bodySmall: bodySmall.copyWith(color: onSurfaceColor),
+        labelLarge: labelLarge.copyWith(color: onSurfaceColor),
+        // 기본 Text 스타일 설정
+        displayLarge: headingLarge.copyWith(color: onSurfaceColor),
+        displayMedium: headingMedium.copyWith(color: onSurfaceColor),
+        displaySmall: headingSmall.copyWith(color: onSurfaceColor),
+        titleLarge: headingSmall.copyWith(color: onSurfaceColor),
+        titleMedium: bodyLarge.copyWith(color: onSurfaceColor),
+        titleSmall: bodyMedium.copyWith(color: onSurfaceColor),
+        labelMedium: bodySmall.copyWith(color: onSurfaceColor),
+        labelSmall: bodySmall.copyWith(color: onSurfaceColor, fontSize: 11),
+      ),
+      // 모든 Text 위젯의 기본 스타일
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: primaryColor,
+        selectionColor: primaryColor.withValues(alpha: 0.3),
+        selectionHandleColor: primaryColor,
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
@@ -311,10 +326,25 @@ class AppTheme {
         headlineLarge: headingLarge.copyWith(color: darkOnSurfaceColor),
         headlineMedium: headingMedium.copyWith(color: darkOnSurfaceColor),
         headlineSmall: headingSmall.copyWith(color: darkOnSurfaceColor),
-        bodyLarge: bodyLarge.copyWith(color: darkOnBackgroundColor),
-        bodyMedium: bodyMedium.copyWith(color: darkOnBackgroundColor),
-        bodySmall: bodySmall.copyWith(color: darkOnBackgroundColor),
-        labelLarge: labelLarge.copyWith(color: darkOnBackgroundColor),
+        bodyLarge: bodyLarge.copyWith(color: darkOnSurfaceColor),
+        bodyMedium: bodyMedium.copyWith(color: darkOnSurfaceColor),
+        bodySmall: bodySmall.copyWith(color: darkOnSurfaceColor),
+        labelLarge: labelLarge.copyWith(color: darkOnSurfaceColor),
+        // 기본 Text 스타일 설정
+        displayLarge: headingLarge.copyWith(color: darkOnSurfaceColor),
+        displayMedium: headingMedium.copyWith(color: darkOnSurfaceColor),
+        displaySmall: headingSmall.copyWith(color: darkOnSurfaceColor),
+        titleLarge: headingSmall.copyWith(color: darkOnSurfaceColor),
+        titleMedium: bodyLarge.copyWith(color: darkOnSurfaceColor),
+        titleSmall: bodyMedium.copyWith(color: darkOnSurfaceColor),
+        labelMedium: bodySmall.copyWith(color: darkOnSurfaceColor),
+        labelSmall: bodySmall.copyWith(color: darkOnSurfaceColor, fontSize: 11),
+      ),
+      // 모든 Text 위젯의 기본 스타일
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: darkPrimaryColor,
+        selectionColor: darkPrimaryColor.withValues(alpha: 0.3),
+        selectionHandleColor: darkPrimaryColor,
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
