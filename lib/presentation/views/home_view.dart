@@ -128,7 +128,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
                 child: Icon(
                   Icons.account_balance_wallet_rounded,
-                  color: Colors.white,
+                  color: AppTheme.white(context),
                   size: ResponsiveUtils.getResponsiveIconSize(context, 24),
                 ),
               ),
@@ -167,7 +167,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   child: Text(
                     '프리미엄',
                     style: AppTheme.getBodySmall(context).copyWith(
-                      color: Colors.white,
+                      color: AppTheme.white(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -195,12 +195,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
               Text(
                 '이번 달 절약',
                 style: AppTheme.getBodyMedium(context).copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppTheme.white(context).withValues(alpha: 0.9),
                 ),
               ),
               Icon(
                 Icons.savings_outlined,
-                color: Colors.white.withValues(alpha: 0.9),
+                color: AppTheme.white(context).withValues(alpha: 0.9),
                 size: ResponsiveUtils.getResponsiveIconSize(context, 20),
               ),
             ],
@@ -211,7 +211,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             child: Text(
               NumberFormatter.formatWon(user.currentMonthSaved),
               style: AppTheme.getHeadingLarge(context).copyWith(
-                color: Colors.white,
+                color: AppTheme.white(context),
                 fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 36),
                 fontWeight: FontWeight.w700,
               ),
@@ -229,7 +229,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   child: Text(
                     '목표: ${NumberFormatter.formatWon(user.monthlyGoal)}',
                     style: AppTheme.getBodySmall(context).copyWith(
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: AppTheme.white(context).withValues(alpha: 0.8),
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -239,7 +239,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 Icon(
                   Icons.edit,
                   size: ResponsiveUtils.getResponsiveIconSize(context, 14),
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: AppTheme.white(context).withValues(alpha: 0.8),
                 ),
               ],
             ),
@@ -248,14 +248,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
           Container(
             padding: ResponsiveUtils.getResponsivePaddingCustom(context, all: AppTheme.spaceS),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: AppTheme.white(context).withValues(alpha: 0.15),
               borderRadius: AppTheme.radiusSmall,
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.trending_up_rounded,
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppTheme.white(context).withValues(alpha: 0.9),
                   size: ResponsiveUtils.getResponsiveIconSize(context, 16),
                 ),
                 SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceXS)),
@@ -263,7 +263,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   child: Text(
                     '이번 달 ${user.consecutiveDays}일 연속 절약 중',
                     style: AppTheme.getBodySmall(context).copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: AppTheme.white(context).withValues(alpha: 0.9),
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -672,7 +672,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     label: const Text('더 많은 조언 보기'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.accentColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppTheme.white(context),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
