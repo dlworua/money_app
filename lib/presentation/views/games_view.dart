@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -32,11 +31,6 @@ class _GamesViewState extends ConsumerState<GamesView> {
   void initState() {
     super.initState();
     _initializeGamesBannerAd();
-    // 안드로이드 하단바 자동 숨김 설정
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-      overlays: [SystemUiOverlay.top],
-    );
   }
 
   /// 게임 탭 전용 배너 광고 초기화
@@ -64,8 +58,6 @@ class _GamesViewState extends ConsumerState<GamesView> {
   @override
   void dispose() {
     _gamesBannerAd?.dispose();
-    // 하단바 설정 복원
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 

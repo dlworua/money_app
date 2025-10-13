@@ -40,11 +40,6 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     super.initState();
     _loadTransactions();
     _initializeProfileBannerAd();
-    // 안드로이드 하단바 자동 숨김 설정
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-      overlays: [SystemUiOverlay.top],
-    );
   }
 
   /// 프로필 전용 배너 광고 초기화
@@ -137,8 +132,6 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
   @override
   void dispose() {
     _profileBannerAd?.dispose();
-    // 하단바 설정 복원
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 

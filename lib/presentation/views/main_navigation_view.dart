@@ -78,6 +78,8 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: PageView(
         controller: _pageController,
@@ -87,10 +89,12 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: isDarkMode
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -125,7 +129,9 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
                           Icon(
                             isSelected ? item.activeIcon : item.icon,
                             size: ResponsiveUtils.getResponsiveIconSize(context, 24),
-                            color: isSelected ? item.color : Colors.grey[600],
+                            color: isSelected
+                                ? item.color
+                                : (isDarkMode ? Colors.grey[400] : Colors.grey[600]),
                           ),
                           SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, 4)),
                           // 텍스트 (바운싱 없이 단순 표시)
@@ -134,7 +140,9 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
                             style: TextStyle(
                               fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, isSelected ? 12 : 11),
                               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                              color: isSelected ? item.color : Colors.grey[600],
+                              color: isSelected
+                                  ? item.color
+                                  : (isDarkMode ? Colors.grey[400] : Colors.grey[600]),
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,

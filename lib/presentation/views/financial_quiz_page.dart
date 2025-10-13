@@ -32,11 +32,6 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
     super.initState();
     _loadBannerAd();
     _selectRandomQuestions();
-    // 안드로이드 하단바 자동 숨김 설정
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-      overlays: [SystemUiOverlay.top],
-    );
   }
 
   void _selectRandomQuestions() {
@@ -723,8 +718,6 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
   @override
   void dispose() {
     _bannerAd?.dispose();
-    // 하단바 설정 복원
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 }

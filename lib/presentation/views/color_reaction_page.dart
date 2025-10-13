@@ -42,11 +42,6 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
   void initState() {
     super.initState();
     _loadBannerAd();
-    // 안드로이드 하단바 자동 숨김 설정
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-      overlays: [SystemUiOverlay.top],
-    );
   }
 
   void _loadBannerAd() {
@@ -793,8 +788,6 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
   void dispose() {
     _gameTimer?.cancel();
     _bannerAd?.dispose();
-    // 하단바 설정 복원
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 }
