@@ -354,4 +354,45 @@ class AppTheme {
       ),
     );
   }
+
+  /// 테마 인식 헬퍼 메서드들
+
+  /// 현재 테마가 다크 모드인지 확인
+  static bool isDark(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
+  /// 테마에 따른 배경색 반환
+  static Color getBackgroundColor(BuildContext context) {
+    return isDark(context) ? darkBackgroundColor : backgroundColor;
+  }
+
+  /// 테마에 따른 서피스 색상 반환
+  static Color getSurfaceColor(BuildContext context) {
+    return isDark(context) ? darkSurfaceColor : surfaceColor;
+  }
+
+  /// 테마에 따른 텍스트 색상 반환
+  static Color getTextColor(BuildContext context) {
+    return isDark(context) ? darkOnSurfaceColor : onSurfaceColor;
+  }
+
+  /// 테마에 따른 보조 텍스트 색상 반환
+  static Color getSecondaryTextColor(BuildContext context) {
+    return isDark(context) ? darkOnBackgroundColor : onBackgroundColor;
+  }
+
+  /// 테마에 따른 카드 색상 반환
+  static Color getCardColor(BuildContext context) {
+    return Theme.of(context).cardTheme.color ?? getSurfaceColor(context);
+  }
+
+  /// 테마에 따른 회색 톤 반환
+  static Color getGreyColor(BuildContext context, [int shade = 600]) {
+    if (isDark(context)) {
+      // 다크 모드에서는 밝은 회색
+      return shade >= 500 ? Colors.grey[400]! : Colors.grey[600]!;
+    }
+    return Colors.grey[shade]!;
+  }
 }

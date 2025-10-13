@@ -1096,12 +1096,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.getCardColor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: AppTheme.getGreyColor(context, 300)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: AppTheme.getGreyColor(context).withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
