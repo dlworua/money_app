@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../viewmodels/providers.dart';
 import '../../data/typing_stories_data.dart';
 
@@ -179,10 +180,10 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
                   ? Icons.thumb_up
                   : Icons.emoji_events,
               color: coins > 15
-                  ? Colors.amber
+                  ? AppTheme.amber(context)
                   : coins > 10
-                  ? Colors.blue
-                  : Colors.green,
+                  ? AppTheme.blue(context)
+                  : AppTheme.green(context),
               size: 48,
             ),
             const SizedBox(height: 16),
@@ -201,17 +202,17 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
                   : '💪 연습이 필요해요!',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: AppTheme.getGreyColor(context, 600),
                 fontStyle: FontStyle.italic,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               '획득 포인트: $coins개',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: AppTheme.green(context),
               ),
             ),
           ],
@@ -251,7 +252,7 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
       appBar: AppBar(
         title: const Text('🚀 스피드 타이핑'),
         backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        foregroundColor: AppTheme.white(context),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
@@ -264,10 +265,10 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.purple[50],
+              color: AppTheme.purple(context, 50),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: AppTheme.black(context).withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -279,10 +280,10 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
                 _buildStatColumn(
                   '남은 시간',
                   '${_timeLeft}s',
-                  _timeLeft <= 5 ? Colors.red : Colors.black,
+                  _timeLeft <= 5 ? AppTheme.red(context) : AppTheme.black(context),
                 ),
-                _buildStatColumn('완성', '$_correctSentences', Colors.green),
-                _buildStatColumn('시도', '$_totalSentences', Colors.black),
+                _buildStatColumn('완성', '$_correctSentences', AppTheme.green(context)),
+                _buildStatColumn('시도', '$_totalSentences', AppTheme.black(context)),
               ],
             ),
           ),
@@ -316,9 +317,9 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: Colors.grey,
+            color: AppTheme.getGreyColor(context, 500),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -346,12 +347,12 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.purple[50]!, Colors.pink[50]!],
+              colors: [AppTheme.purple(context, 50), AppTheme.pink(context, 50)],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.purple.withValues(alpha: 0.1),
+                color: AppTheme.purple(context).withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -362,15 +363,15 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
               Icon(
                 Icons.keyboard_alt_outlined,
                 size: 48,
-                color: Colors.purple[400],
+                color: AppTheme.purple(context, 400),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 '🚀 스피드 타이핑',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppTheme.black(context).withValues(alpha: 0.87),
                 ),
               ),
               const SizedBox(height: 12),
@@ -378,7 +379,7 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
                 '화면에 나타나는 문장을 정확하고 빠르게 입력하세요!',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[700],
+                  color: AppTheme.getGreyColor(context, 700),
                   height: 1.4,
                 ),
                 textAlign: TextAlign.center,
@@ -386,15 +387,15 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
               const SizedBox(height: 8),
               Text(
                 '60초 동안 최대한 많은 문장을 완성해보세요',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 14, color: AppTheme.getGreyColor(context, 600)),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _startGame,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppTheme.purple(context),
+                  foregroundColor: AppTheme.white(context),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
                     vertical: 14,
@@ -451,17 +452,17 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isTitle
-              ? [Colors.amber[50]!, Colors.orange[50]!]
-              : [Colors.purple[50]!, Colors.pink[50]!],
+              ? [AppTheme.amber(context, 50), AppTheme.orange(context, 50)]
+              : [AppTheme.purple(context, 50), AppTheme.pink(context, 50)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isTitle ? Colors.amber[200]! : Colors.purple[200]!,
+          color: isTitle ? AppTheme.amber(context, 200) : AppTheme.purple(context, 200),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: (isTitle ? Colors.amber : Colors.purple).withValues(
+            color: (isTitle ? AppTheme.amber(context) : AppTheme.purple(context)).withValues(
               alpha: 0.1,
             ),
             blurRadius: 8,
@@ -476,7 +477,7 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              color: AppTheme.getGreyColor(context, 600),
             ),
           ),
           const SizedBox(height: 12),
@@ -485,7 +486,7 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
             style: TextStyle(
               fontSize: isTitle ? 20 : 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: AppTheme.black(context).withValues(alpha: 0.87),
               height: 1.3,
             ),
             textAlign: TextAlign.center,
@@ -506,18 +507,18 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.white(context),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: _focusNode.hasFocus
-                    ? Colors.purple[400]!
-                    : Colors.grey[300]!,
+                    ? AppTheme.purple(context, 400)
+                    : AppTheme.getGreyColor(context, 300),
                 width: _focusNode.hasFocus ? 2 : 1,
               ),
               boxShadow: [
                 if (_focusNode.hasFocus)
                   BoxShadow(
-                    color: Colors.purple.withValues(alpha: 0.1),
+                    color: AppTheme.purple(context).withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -530,11 +531,11 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
               style: const TextStyle(fontSize: 16, height: 1.4),
               maxLines: 3,
               minLines: 2,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '여기에 입력하세요...',
                 border: InputBorder.none,
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                contentPadding: EdgeInsets.all(16),
+                hintStyle: TextStyle(color: AppTheme.getGreyColor(context, 500), fontSize: 14),
+                contentPadding: const EdgeInsets.all(16),
               ),
               onSubmitted: (_) => _checkInput(),
               onChanged: (_) => setState(() {}),
@@ -550,8 +551,8 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
           child: ElevatedButton(
             onPressed: _checkInput,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.purple(context),
+              foregroundColor: AppTheme.white(context),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -576,10 +577,10 @@ class _SpeedTypingPageState extends ConsumerState<SpeedTypingPage> {
       child: Container(
         height: _bannerAd!.size.height.toDouble(),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.white(context),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppTheme.black(context).withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
