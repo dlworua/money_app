@@ -852,13 +852,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Color _getCategoryColor(String category) {
     switch (category) {
       case '식비':
-        return Colors.orange;
+        return AppTheme.orange(context);
       case '교통비':
-        return Colors.blue;
+        return AppTheme.blue(context);
       case '쇼핑':
-        return Colors.pink;
+        return AppTheme.pink(context);
       case '기타':
-        return Colors.grey;
+        return AppTheme.getGreyColor(context, 500);
       default:
         return AppTheme.primaryColor;
     }
