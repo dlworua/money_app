@@ -206,9 +206,11 @@ class AppTheme {
         onSurface: onSurfaceColor,
       ),
       // Dialog 테마 설정
-      dialogTheme: const DialogThemeData(
+      dialogTheme: DialogThemeData(
         backgroundColor: surfaceColor,
         surfaceTintColor: Colors.transparent,
+        titleTextStyle: headingSmall.copyWith(color: onSurfaceColor),
+        contentTextStyle: bodyMedium.copyWith(color: onBackgroundColor),
       ),
       fontFamily: 'SF Pro Display', // iOS 스타일 폰트
       textTheme: const TextTheme(
@@ -224,6 +226,7 @@ class AppTheme {
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: onSurfaceColor,
+        iconTheme: IconThemeData(color: onSurfaceColor),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         titleTextStyle: TextStyle(
           color: onSurfaceColor,
@@ -232,6 +235,7 @@ class AppTheme {
           letterSpacing: -0.2,
         ),
       ),
+      iconTheme: const IconThemeData(color: onSurfaceColor),
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: radiusMedium),
@@ -296,9 +300,11 @@ class AppTheme {
         onSurface: darkOnSurfaceColor,
       ),
       // Dialog 테마 설정
-      dialogTheme: const DialogThemeData(
+      dialogTheme: DialogThemeData(
         backgroundColor: darkSurfaceColor,
         surfaceTintColor: Colors.transparent,
+        titleTextStyle: headingSmall.copyWith(color: darkOnSurfaceColor),
+        contentTextStyle: bodyMedium.copyWith(color: darkOnBackgroundColor),
       ),
       fontFamily: 'SF Pro Display',
       textTheme: TextTheme(
@@ -314,6 +320,7 @@ class AppTheme {
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: darkOnSurfaceColor,
+        iconTheme: IconThemeData(color: darkOnSurfaceColor),
         systemOverlayStyle: SystemUiOverlayStyle.light,
         titleTextStyle: TextStyle(
           color: darkOnSurfaceColor,
@@ -322,6 +329,7 @@ class AppTheme {
           letterSpacing: -0.2,
         ),
       ),
+      iconTheme: const IconThemeData(color: darkOnSurfaceColor),
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: radiusMedium),
