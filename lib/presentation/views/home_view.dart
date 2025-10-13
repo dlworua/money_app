@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -606,14 +605,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   final currentCoaching = homeState.currentCoaching;
                   final transactions = homeState.transactions;
                   
-                  // 디버깅 정보 추가
-                  print('🔍 AI 코칭 UI 상태:');
-                  print('   - currentCoaching: ${currentCoaching?.title ?? "없음"}');
-                  print('   - 거래 개수: ${transactions.length}');
-                  print('   - 최근 인사이트: ${homeState.recentInsights.length}개');
                   
                   if (currentCoaching != null) {
-                    print('   - AI 메시지: ${currentCoaching.message.substring(0, 50)}...');
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1350,7 +1343,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   void _requestAiCoachingAndShowDialog(BuildContext context, WidgetRef ref) async {
-    print('🎯 "더 많은 조언 보기" 버튼 클릭됨!');
     
     try {
       // 로딩 표시 (선택사항)
@@ -1360,14 +1352,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
       final viewModel = ref.read(homeViewModelProvider.notifier);
       await viewModel.requestPersonalizedCoaching();
       
-      print('✅ AI 코칭 요청 완료 - 홈화면 자동 업데이트됨');
       
       // 다이얼로그 표시 (mounted 체크)
       if (context.mounted) {
         _showAiCoachingDialog(context);
       }
     } catch (error) {
-      print('❌ AI 코칭 요청 실패: $error');
       // 에러 처리 - 사용자에게 메시지 표시할 수 있음
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

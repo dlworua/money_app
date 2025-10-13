@@ -133,8 +133,9 @@ class AiCoachingService {
           DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day -
           daysInMonth;
 
-      if (daysRemaining <= 0)
+      if (daysRemaining <= 0) {
         return user.currentMonthSaved >= user.monthlyGoal ? 1.0 : 0.0;
+      }
 
       // 현재 달성률 (미래 확장용으로 유지)
 

@@ -17,8 +17,6 @@ class AiCoachingService {
     List<Budget> budgets
   ) async {
     try {
-      print('🔧 AI 코칭 생성 시작: 거래 ${transactions.length}건, 예산 ${budgets.length}개');
-      
       // 데이터가 없으면 기본 메시지
       if (transactions.isEmpty) {
         return _createWelcomeCoaching(user);
@@ -44,8 +42,6 @@ class AiCoachingService {
       });
       
       final dailyAverage = totalSpending / 30;
-      
-      print('💡 분석 완료: 총 지출 ${_formatCurrency(totalSpending)}, 최고 카테고리 ${topCategory?.displayName}');
       
       // 거래 건수에 따른 맞춤 코칭
       String title;
@@ -99,10 +95,7 @@ class AiCoachingService {
         actionItems: actionItems.take(4).toList(),
       );
       
-    } catch (error, stackTrace) {
-      print('❌ AI 코칭 생성 실패: $error');
-      print('스택 트레이스: $stackTrace');
-      
+    } catch (error) {
       // 에러 발생시 기본 코칭 제공 
       return AiCoachingInsight(
         id: 'error_fallback_${DateTime.now().millisecondsSinceEpoch}',
@@ -262,7 +255,7 @@ class AiCoachingService {
         createdAt: DateTime.now(),
         style: user.preferredCoachingStyle,
         title: '📊 이달의 가계부 현황',
-        message: '이달 ${transactionCount}건의 거래만 기록되어 있어요. 더 정확한 분석을 위해 매일 가계부를 작성해보세요!',
+        message: '이달 $transactionCount건의 거래만 기록되어 있어요. 더 정확한 분석을 위해 매일 가계부를 작성해보세요!',
         type: InsightType.general,
         analysisData: {'transactionCount': transactionCount},
         confidenceScore: 0.5,
@@ -295,11 +288,11 @@ class AiCoachingService {
         .where((t) => t.type == TransactionType.expense && t.amount > 50000)
         .length;
     
-    String detailMessage = '이달 총 ${transactionCount}건 거래: ';
-    detailMessage += '수입 ${incomeCount}건(${_formatCurrency(monthlyIncome)}), ';
-    detailMessage += '지출 ${expenseCount}건(${_formatCurrency(monthlySpending)})';
+    String detailMessage = '이달 총 $transactionCount건 거래: ';
+    detailMessage += '수입 $incomeCount건(${_formatCurrency(monthlyIncome)}), ';
+    detailMessage += '지출 $expenseCount건(${_formatCurrency(monthlySpending)})';
     if (savingCount > 0) {
-      detailMessage += ', 절약 ${savingCount}건(${_formatCurrency(monthlySaving)})';
+      detailMessage += ', 절약 $savingCount건(${_formatCurrency(monthlySaving)})';
     }
     detailMessage += '.\n';
     
@@ -328,7 +321,7 @@ class AiCoachingService {
     }
     
     if (bigSpendingCount > 5) {
-      actionItems.add('5만원 이상 큰 지출이 ${bigSpendingCount}회 있었어요. 고액 지출 전 하루 고민하기');
+      actionItems.add('5만원 이상 큰 지출이 $bigSpendingCount회 있었어요. 고액 지출 전 하루 고민하기');
     }
     
     if (incomeCount == 0) {
@@ -645,139 +638,6 @@ class AiCoachingService {
     return suggestions;
   }
   
-  /// 실제 거래 내역 기반 맞춤 코칭 생성
-  Future<AiCoachingInsight> _generateDataDrivenCoaching(
-    UserModel user,
-    Map<String, dynamic> spendingAnalysis,
-    Map<String, dynamic> budgetAnalysis,
-    List<Map<String, dynamic>> opportunities, {
-    List<Transaction>? transactions,
-  }) async {
-    String title;
-    String message;
-    List<String> actionItems = [];
-    InsightType type = InsightType.general;
-    
-    final totalSpending = spendingAnalysis['totalSpending'] ?? 0.0;
-    final dailyAverage = spendingAnalysis['dailyAverage'] ?? 0.0;
-    final topCategory = spendingAnalysis['topCategory'];
-    final spendingTrend = spendingAnalysis['spendingTrend'] ?? 0.0;
-    final transactionCount = spendingAnalysis['transactionCount'] ?? 0;
-    
-    // 거래 빈도와 패턴 분석 (1건부터 분석 가능)
-    if (transactionCount == 0) {
-      title = '📝 가계부를 시작해보세요!';
-      message = '아직 거래 기록이 없네요. 오늘부터 가계부를 작성해서 돈의 흐름을 파악해보세요.';
-      actionItems.addAll([
-        '오늘 하루 모든 지출을 기록해보기',
-        '카테고리별로 정확히 분류하기',
-        '영수증 사진도 함께 저장하기'
-      ]);
-      type = InsightType.general;
-    } else if (transactionCount == 1) {
-      title = '🎯 첫 거래 분석!';
-      message = '첫 거래를 기록하셨네요! ${_formatCurrency(totalSpending)}을 ${topCategory?.displayName ?? '기타'}에 지출하셨어요. 이런 식으로 꾸준히 기록하시면 더 정확한 절약 조언을 드릴 수 있어요.';
-      actionItems.addAll([
-        '오늘 남은 지출들도 모두 기록해보기',
-        '${topCategory?.displayName ?? '해당 카테고리'}에서 절약 방법 생각해보기',
-        '일주일간 꾸준히 기록해서 패턴 파악하기'
-      ]);
-      if (topCategory != null) {
-        actionItems.addAll(_getDetailedAdviceForTopCategory(topCategory, totalSpending, dailyAverage, transactionCount));
-      }
-      type = InsightType.spendingPattern;
-    } else if (transactionCount < 5) {
-      title = '📈 가계부 기록 시작!';
-      message = '총 ${transactionCount}건의 거래를 기록하셨네요! 총 ${_formatCurrency(totalSpending)} 지출하시고, ${topCategory?.displayName ?? '기타'}에 가장 많이 쓰셨어요. 좋은 시작이에요!';
-      actionItems.addAll([
-        '하루 3-5건 정도 꾸준히 기록하기',
-        '${topCategory?.displayName ?? '해당 카테고리'} 지출 패턴 관찰하기',
-        '1주일 더 기록하면 상세 분석 가능해요!'
-      ]);
-      if (topCategory != null) {
-        actionItems.addAll(_getDetailedAdviceForTopCategory(topCategory, totalSpending, dailyAverage, transactionCount));
-      }
-      type = InsightType.general;
-    } else {
-      // 충분한 데이터가 있을 때 세밀한 분석
-      if (opportunities.isNotEmpty) {
-        final topOpportunity = opportunities.first;
-        title = '💰 절약 기회 발견!';
-        message = '가계부 분석 결과, ${topOpportunity['message']} ';
-        message += '월 평균 ${_formatCurrency(dailyAverage * 30)}를 지출하시는데, ${_formatCurrency(topOpportunity['potentialSaving'] ?? 0)}정도 절약이 가능해요.';
-        
-        actionItems.add(topOpportunity['suggestion']);
-        if (topCategory != null) {
-          actionItems.addAll(_getDetailedAdviceForTopCategory(topCategory, totalSpending, dailyAverage, transactionCount));
-        }
-        type = InsightType.spendingPattern;
-      } else if (spendingTrend > 0.15) {
-        title = '🚨 지출 증가 경고';
-        message = '최근 지출이 ${(spendingTrend * 100).toInt()}% 증가했어요! ';
-        message += '이번 달 ${transactionCount}건, 총 ${_formatCurrency(totalSpending)} 지출 중 ';
-        
-        if (topCategory != null) {
-          final categorySpending = _getCategorySpending(topCategory, spendingAnalysis);
-          message += '${_getCategoryDisplayName(topCategory)}가 ${_formatCurrency(categorySpending)}(${((categorySpending / totalSpending) * 100).toInt()}%)로 가장 큰 비중을 차지해요.';
-        }
-        
-        actionItems.addAll([
-          '가장 많이 쓴 ${topCategory?.displayName ?? '카테고리'}에서 20% 줄이기',
-          '지난주와 이번주 지출 내역 비교해보기',
-          '불필요한 구독 서비스 해지 검토하기',
-          '현금 결제로 지출 의식 높이기'
-        ]);
-        type = InsightType.warning;
-      } else if (spendingTrend < -0.1) {
-        title = '🎉 절약 성공!';
-        message = '지난 대비 지출이 ${(-spendingTrend * 100).toInt()}% 줄었어요! ';
-        message += '${transactionCount}건의 거래로 총 ${_formatCurrency(totalSpending)} 지출하며 절약에 성공했네요.';
-        
-        actionItems.addAll([
-          '현재 절약 패턴 유지하기',
-          '절약한 금액을 저축 계좌로 이체하기',
-          '성공 요인을 분석해서 다음 달에도 적용하기'
-        ]);
-        type = InsightType.achievement;
-      } else {
-        title = '📊 안정적인 가계 관리';
-        message = '${transactionCount}건의 거래로 총 ${_formatCurrency(totalSpending)} 지출하며 안정적으로 관리하고 계시네요. ';
-        
-        if (topCategory != null) {
-          final categorySpending = _getCategorySpending(topCategory, spendingAnalysis);
-          message += '${_getCategoryDisplayName(topCategory)}에 ${_formatCurrency(categorySpending)}(${((categorySpending / totalSpending) * 100).toInt()}%) 지출이 가장 많아요.';
-          
-          actionItems.addAll(_getOptimizationAdviceForCategory(topCategory, categorySpending, dailyAverage));
-        }
-        
-        actionItems.addAll([
-          '월간 예산 설정으로 더 체계적 관리하기',
-          '저축 목표 설정해보기'
-        ]);
-        type = InsightType.general;
-      }
-    }
-    
-    return AiCoachingInsight(
-      id: 'data_driven_${DateTime.now().millisecondsSinceEpoch}',
-      createdAt: DateTime.now(),
-      style: user.preferredCoachingStyle,
-      title: title,
-      message: message,
-      type: type,
-      analysisData: {
-        'spendingAnalysis': spendingAnalysis,
-        'budgetAnalysis': budgetAnalysis,
-        'opportunities': opportunities,
-        'transactionCount': transactionCount,
-        'totalSpending': totalSpending,
-        'dailyAverage': dailyAverage,
-      },
-      confidenceScore: transactionCount < 5 ? 0.6 : 0.9,
-      actionItems: actionItems,
-    );
-  }
-
   /// 환영 코칭 생성
   AiCoachingInsight _createWelcomeCoaching(UserModel user) {
     return AiCoachingInsight(
@@ -824,17 +684,6 @@ class AiCoachingService {
   }
 
   /// 카테고리 표시명 가져오기
-  String _getCategoryDisplayName(TransactionCategory category) {
-    return category.displayName;
-  }
-
-  /// 카테고리 지출 금액 추출
-  double _getCategorySpending(TransactionCategory category, Map<String, dynamic> spendingAnalysis) {
-    final categoryBreakdown = spendingAnalysis['categoryBreakdown'] as Map<String, double>? ?? {};
-    return categoryBreakdown[category.name] ?? 0.0;
-  }
-
-  /// 최고 지출 카테고리에 대한 상세 조언
   List<String> _getDetailedAdviceForTopCategory(TransactionCategory category, double totalAmount, double dailyAverage, int transactionCount) {
     final monthlyAverage = dailyAverage * 30;
     
@@ -935,107 +784,4 @@ class AiCoachingService {
     }
   }
 
-  /// 코칭 스타일에 맞는 메시지 톤 적용
-  String _applyCoachingStyle(String baseMessage, CoachingStyle style) {
-    switch (style) {
-      case CoachingStyle.strict:
-        return baseMessage.replaceAll('해보세요', '하십시오')
-                          .replaceAll('어떨까요', '권장합니다')
-                          .replaceAll('!', '.')
-                          .replaceAll('👏', '')
-                          .replaceAll('🎉', '');
-        
-      case CoachingStyle.kind:
-        return baseMessage + ' 함께 천천히 해나가요! 😊';
-        
-      case CoachingStyle.friendly:
-        return baseMessage.replaceAll('하세요', '해봐!')
-                          .replaceAll('해보세요', '해봐~')
-                          .replaceAll('.', '!');
-        
-      case CoachingStyle.motivational:
-        return baseMessage + ' 💪 당신은 할 수 있어요! 화이팅!';
-        
-      case CoachingStyle.analytical:
-        return baseMessage.replaceAll('많이', '통계적으로 높은 비율로')
-                          .replaceAll('적게', '상대적으로 낮은 수준으로')
-                          .replaceAll('!', '.');
-    }
-  }
-
-  /// 실제 거래 데이터 기반 즉시 실행 가능한 조언 생성
-  List<String> _generateActionableAdvice(
-    List<Transaction> transactions,
-    TransactionCategory? topCategory,
-    double totalSpending,
-  ) {
-    List<String> advice = [];
-    final now = DateTime.now();
-    
-    // 최근 7일 거래 분석
-    final recentTransactions = transactions.where(
-      (t) => now.difference(t.date).inDays <= 7 && t.type == TransactionType.expense
-    ).toList();
-    
-    if (recentTransactions.isNotEmpty) {
-      final recentSpending = recentTransactions.fold<double>(0, (sum, t) => sum + t.amount);
-      final dailyRecent = recentSpending / 7;
-      
-      if (dailyRecent > 30000) {
-        advice.add('최근 일일 ${_formatCurrency(dailyRecent)} 지출 중이에요. 내일은 2만원대로 도전해보세요');
-      }
-      
-      // 자주 쓰는 곳 분석
-      final frequentPlaces = <String, int>{};
-      for (final t in recentTransactions) {
-        if (t.description.isNotEmpty) {
-          final place = t.description.split(' ').first;
-          frequentPlaces[place] = (frequentPlaces[place] ?? 0) + 1;
-        }
-      }
-      
-      final mostFrequent = frequentPlaces.entries
-          .where((e) => e.value >= 3)
-          .map((e) => e.key)
-          .toList();
-      
-      if (mostFrequent.isNotEmpty) {
-        advice.add('${mostFrequent.join(', ')}을 자주 이용하시네요. 대안 찾기 도전!');
-      }
-    }
-    
-    // 고정 지출 패턴 찾기
-    final subscriptions = transactions
-        .where((t) => 
-            t.type == TransactionType.expense && 
-            (t.description.contains('구독') || t.description.contains('멤버십') || t.amount == t.amount.roundToDouble()))
-        .toList();
-    
-    if (subscriptions.length > 3) {
-      final subTotal = subscriptions.fold<double>(0, (sum, t) => sum + t.amount);
-      advice.add('구독/정기 서비스로 월 ${_formatCurrency(subTotal)} 지출 중. 3개월 안쓴 서비스 해지하기');
-    }
-    
-    // 카테고리별 즉시 실행 가능한 팁
-    if (topCategory != null) {
-      switch (topCategory) {
-        case TransactionCategory.food:
-          advice.add('내일 점심은 도시락이나 간단한 샌드위치로 도전!');
-          advice.add('이번 주말 1시간 투자해서 반찬 3개 만들기');
-          break;
-        case TransactionCategory.transport:
-          advice.add('내일부터 3일간 대중교통 앱으로 최단경로 찾기');
-          advice.add('1km 이내 거리는 무조건 걷기 도전');
-          break;
-        case TransactionCategory.shopping:
-          advice.add('온라인 쇼핑카트에 담은 물건 24시간 후 재검토하기');
-          advice.add('이번 주는 꼭 필요한 것만 리스트 작성 후 구매');
-          break;
-        default:
-          advice.add('이번 주는 ${topCategory.displayName}에서 하나 줄여보기');
-      }
-    }
-    
-    return advice.take(3).toList();
-  }
 }

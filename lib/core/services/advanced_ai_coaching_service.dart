@@ -154,7 +154,7 @@ class AdvancedAiCoachingService {
       
       if (topCategory != null) {
         final categoryName = _getCategoryDisplayName(topCategory);
-        message += '${categoryName}에 가장 많이 지출하고 계시네요.';
+        message += '$categoryName에 가장 많이 지출하고 계시네요.';
         
         // 최고 지출 카테고리별 맞춤 조언
         actionItems.addAll(_getSpecificAdviceForCategory(topCategory, totalSpending, dailyAverage));
