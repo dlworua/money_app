@@ -104,7 +104,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
           children: [
             Icon(
               _isCorrect! ? Icons.check_circle : Icons.cancel,
-              color: _isCorrect! ? Colors.green : Colors.red,
+              color: _isCorrect! ? AppTheme.green(context) : AppTheme.red(context),
               size: 28,
             ),
             const SizedBox(width: 8),
@@ -122,14 +122,14 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isCorrect! ? Colors.green[50] : Colors.orange[50],
+                color: _isCorrect! ? AppTheme.green(context, 50) : AppTheme.orange(context, 50),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.stars,
-                    color: _isCorrect! ? Colors.green[600] : Colors.orange[600],
+                    color: _isCorrect! ? AppTheme.green(context, 600) : AppTheme.orange(context, 600),
                     size: 24,
                   ),
                   const SizedBox(width: 8),
@@ -139,8 +139,8 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: _isCorrect!
-                            ? Colors.green[800]
-                            : Colors.orange[800],
+                            ? AppTheme.green(context, 800)
+                            : AppTheme.orange(context, 800),
                         fontSize: 14,
                       ),
                       maxLines: 2,
@@ -161,9 +161,9 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.blue[50],
+                color: AppTheme.blue(context, 50),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue[200]!, width: 1),
+                border: Border.all(color: AppTheme.blue(context, 200), width: 1),
               ),
               child: Text(
                 currentQuestion['explanation'] ?? '해설이 준비되지 않았습니다.',
@@ -230,20 +230,20 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppTheme.white(context).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.celebration,
-                  color: Colors.white,
+                  color: AppTheme.white(context),
                   size: 24,
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 '퀴즈 완료!',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppTheme.white(context),
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
@@ -262,23 +262,23 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.amber[100]!, Colors.orange[100]!],
+                    colors: [AppTheme.amber(context, 100), AppTheme.orange(context, 100)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.amber[300]!, width: 2),
+                  border: Border.all(color: AppTheme.amber(context, 300), width: 2),
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.stars, color: Colors.amber[600], size: 40),
+                    Icon(Icons.stars, color: AppTheme.amber(context, 600), size: 40),
                     const SizedBox(height: 8),
                     Text(
                       '$_score점',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.amber[800],
+                        color: AppTheme.amber(context, 800),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -287,7 +287,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.amber[700],
+                        color: AppTheme.amber(context, 700),
                       ),
                     ),
                   ],
@@ -317,7 +317,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppTheme.white(context),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -336,8 +336,8 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                       Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[600],
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.getGreyColor(context, 600),
+                      foregroundColor: AppTheme.white(context),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -357,13 +357,13 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
   Color _getDifficultyColor(String? difficulty) {
     switch (difficulty) {
       case '기초':
-        return Colors.green;
+        return AppTheme.green(context);
       case '중급':
-        return Colors.orange;
+        return AppTheme.orange(context);
       case '고급':
-        return Colors.red;
+        return AppTheme.red(context);
       default:
-        return Colors.blue;
+        return AppTheme.blue(context);
     }
   }
 
@@ -374,7 +374,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.pink[50]!, Colors.purple[50]!, Colors.white],
+              colors: [AppTheme.pink(context, 50), AppTheme.purple(context, 50), AppTheme.white(context)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -388,17 +388,17 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           '금융 퀴즈',
           style: TextStyle(
-            color: Colors.white,
+            color: AppTheme.white(context),
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         backgroundColor: AppTheme.pink(context, 600),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: AppTheme.white(context)),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
@@ -421,19 +421,19 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       '진행도',
-                      style: TextStyle(fontSize: 11, color: Colors.white),
+                      style: TextStyle(fontSize: 11, color: AppTheme.white(context)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${_currentQuestionIndex + 1}/$_totalQuestions',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppTheme.white(context),
                       ),
                     ),
                   ],
@@ -441,19 +441,19 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       '획득 포인트',
-                      style: TextStyle(fontSize: 11, color: Colors.white),
+                      style: TextStyle(fontSize: 11, color: AppTheme.white(context)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '$_score',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppTheme.white(context),
                       ),
                     ),
                   ],
@@ -467,8 +467,8 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.pink[50]!,
-              Colors.purple[50]!,
+              AppTheme.pink(context, 50),
+              AppTheme.purple(context, 50),
               AppTheme.getBackgroundColor(context),
             ],
             begin: Alignment.topCenter,
@@ -486,9 +486,9 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.white,
-                      Colors.purple[50]!.withValues(alpha: 0.3),
-                      Colors.blue[50]!.withValues(alpha: 0.3),
+                      AppTheme.white(context),
+                      AppTheme.purple(context, 50).withValues(alpha: 0.3),
+                      AppTheme.blue(context, 50).withValues(alpha: 0.3),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -496,7 +496,7 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.purple.withValues(alpha: 0.1),
+                      color: AppTheme.purple(context).withValues(alpha: 0.1),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -532,10 +532,10 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                       ),
                       child: Text(
                         '📊 ${currentQuestion['category'] ?? '금융'} • ${currentQuestion['difficulty'] ?? '기초'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppTheme.white(context),
                         ),
                       ),
                     ),
@@ -543,10 +543,10 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                     // 문제 텍스트 - 크기 조정
                     Text(
                       currentQuestion['question'],
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                        color: AppTheme.black(context).withValues(alpha: 0.87),
                         height: 1.3,
                       ),
                       textAlign: TextAlign.center,
@@ -574,11 +574,11 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                       BoxShadow(
                         color: _hasAnswered
                             ? (isCorrect
-                                  ? Colors.green.withValues(alpha: 0.2)
+                                  ? AppTheme.green(context).withValues(alpha: 0.2)
                                   : (isSelected && !isCorrect
-                                        ? Colors.red.withValues(alpha: 0.2)
-                                        : Colors.black.withValues(alpha: 0.05)))
-                            : Colors.black.withValues(alpha: 0.05),
+                                        ? AppTheme.red(context).withValues(alpha: 0.2)
+                                        : AppTheme.black(context).withValues(alpha: 0.05)))
+                            : AppTheme.black(context).withValues(alpha: 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -599,35 +599,35 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                               ? (isCorrect
                                     ? LinearGradient(
                                         colors: [
-                                          Colors.green[100]!,
-                                          Colors.green[50]!,
+                                          AppTheme.green(context, 100),
+                                          AppTheme.green(context, 50),
                                         ],
                                       )
                                     : (isSelected && !isCorrect
                                           ? LinearGradient(
                                               colors: [
-                                                Colors.red[100]!,
-                                                Colors.red[50]!,
+                                                AppTheme.red(context, 100),
+                                                AppTheme.red(context, 50),
                                               ],
                                             )
                                           : LinearGradient(
                                               colors: [
-                                                Colors.grey[100]!,
-                                                Colors.grey[50]!,
+                                                AppTheme.getGreyColor(context, 100),
+                                                AppTheme.getGreyColor(context, 50),
                                               ],
                                             )))
                               : LinearGradient(
-                                  colors: [Colors.white, Colors.grey[50]!],
+                                  colors: [AppTheme.white(context), AppTheme.getGreyColor(context, 50)],
                                 ),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: _hasAnswered
                                 ? (isCorrect
-                                      ? Colors.green[300]!
+                                      ? AppTheme.green(context, 300)
                                       : (isSelected && !isCorrect
-                                            ? Colors.red[300]!
-                                            : Colors.grey[300]!))
-                                : Colors.grey[200]!,
+                                            ? AppTheme.red(context, 300)
+                                            : AppTheme.getGreyColor(context, 300)))
+                                : AppTheme.getGreyColor(context, 200),
                             width: 2,
                           ),
                         ),
@@ -639,11 +639,11 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                               decoration: BoxDecoration(
                                 color: _hasAnswered
                                     ? (isCorrect
-                                          ? Colors.green[500]
+                                          ? AppTheme.green(context, 500)
                                           : (isSelected && !isCorrect
-                                                ? Colors.red[500]
-                                                : Colors.grey[400]))
-                                    : Colors.pink[400],
+                                                ? AppTheme.red(context, 500)
+                                                : AppTheme.getGreyColor(context, 400)))
+                                    : AppTheme.pink(context, 400),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Center(
@@ -655,15 +655,15 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                                                   ? Icons.close
                                                   : Icons
                                                         .radio_button_unchecked),
-                                        color: Colors.white,
+                                        color: AppTheme.white(context),
                                         size: 20,
                                       )
                                     : Text(
                                         String.fromCharCode(
                                           (65 + index) as int,
                                         ), // A, B, C, D
-                                        style: const TextStyle(
-                                          color: Colors.white,
+                                        style: TextStyle(
+                                          color: AppTheme.white(context),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                         ),
@@ -679,11 +679,11 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                                   fontWeight: FontWeight.w600,
                                   color: _hasAnswered
                                       ? (isCorrect
-                                            ? Colors.green[800]
+                                            ? AppTheme.green(context, 800)
                                             : (isSelected && !isCorrect
-                                                  ? Colors.red[800]
-                                                  : Colors.grey[700]))
-                                      : Colors.grey[800],
+                                                  ? AppTheme.red(context, 800)
+                                                  : AppTheme.getGreyColor(context, 700)))
+                                      : AppTheme.getGreyColor(context, 800),
                                 ),
                               ),
                             ),
@@ -712,10 +712,10 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
       child: Container(
         height: _bannerAd!.size.height.toDouble(),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.white(context),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppTheme.black(context).withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
