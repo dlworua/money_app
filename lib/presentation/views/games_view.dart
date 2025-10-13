@@ -67,7 +67,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
     final user = state.user;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: user == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -523,7 +523,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppTheme.cardShadow,
       ),
@@ -1038,7 +1038,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
       return Container(
         height: _gamesBannerAd!.size.height.toDouble(),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),

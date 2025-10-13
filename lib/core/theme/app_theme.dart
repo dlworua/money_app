@@ -192,6 +192,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       scaffoldBackgroundColor: backgroundColor,
+      canvasColor: backgroundColor,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         brightness: Brightness.light,
@@ -200,6 +201,14 @@ class AppTheme {
         tertiary: accentColor,
         surface: surfaceColor,
         error: errorColor,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: onSurfaceColor,
+      ),
+      // Dialog 테마 설정
+      dialogTheme: const DialogThemeData(
+        backgroundColor: surfaceColor,
+        surfaceTintColor: Colors.transparent,
       ),
       fontFamily: 'SF Pro Display', // iOS 스타일 폰트
       textTheme: const TextTheme(
@@ -273,6 +282,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: darkBackgroundColor,
+      canvasColor: darkBackgroundColor,
       colorScheme: ColorScheme.fromSeed(
         seedColor: darkPrimaryColor,
         brightness: Brightness.dark,
@@ -281,8 +291,14 @@ class AppTheme {
         tertiary: darkAccentColor,
         surface: darkSurfaceColor,
         error: errorColor,
+        onPrimary: darkBackgroundColor,
+        onSecondary: darkBackgroundColor,
         onSurface: darkOnSurfaceColor,
-        onBackground: darkOnBackgroundColor,
+      ),
+      // Dialog 테마 설정
+      dialogTheme: const DialogThemeData(
+        backgroundColor: darkSurfaceColor,
+        surfaceTintColor: Colors.transparent,
       ),
       fontFamily: 'SF Pro Display',
       textTheme: TextTheme(

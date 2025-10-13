@@ -42,7 +42,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final viewModel = ref.read(homeViewModelProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: state.isLoading
           ? const _LoadingView()
           : state.user == null
