@@ -903,13 +903,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 Icon(
                   Icons.analytics_outlined,
                   size: 48,
-                  color: Colors.grey.shade400,
+                  color: AppTheme.getGreyColor(context, 400),
                 ),
                 const SizedBox(height: AppTheme.spaceM),
                 Text(
                   '아직 이번 달 소비 데이터가 없어요',
                   style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.grey.shade600,
+                    color: AppTheme.getSecondaryTextColor(context),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -917,7 +917,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 Text(
                   '소비를 기록하면 분석이 표시됩니다',
                   style: AppTheme.bodySmall.copyWith(
-                    color: Colors.grey.shade500,
+                    color: AppTheme.getSecondaryTextColor(context),
                   ),
                 ),
               ],
@@ -1035,13 +1035,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Icon(
                       Icons.receipt_outlined,
                       size: 48,
-                      color: Colors.grey.shade400,
+                      color: AppTheme.getGreyColor(context, 400),
                     ),
                     const SizedBox(height: AppTheme.spaceM),
                     Text(
                       '아직 소비 내역이 없어요',
                       style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.grey.shade600,
+                        color: AppTheme.getSecondaryTextColor(context),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -1049,7 +1049,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Text(
                       '소비를 기록하면 내역이 표시됩니다',
                       style: AppTheme.bodySmall.copyWith(
-                        color: Colors.grey.shade500,
+                        color: AppTheme.getSecondaryTextColor(context),
                       ),
                     ),
                   ],
@@ -1173,14 +1173,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
             children: [
               Icon(
                 Icons.workspace_premium_rounded,
-                color: Colors.white,
+                color: AppTheme.white(context),
                 size: 28,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
                 '프리미엄으로 업그레이드',
                 style: AppTheme.headingSmall.copyWith(
-                  color: Colors.white,
+                  color: AppTheme.white(context),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -1190,7 +1190,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           Text(
             '• 광고 제거\n• 3배 빠른 포인트 적립\n• 무제한 절약 기록\n• 고급 통계 분석',
             style: AppTheme.bodyMedium.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: AppTheme.white(context).withValues(alpha: 0.9),
               height: 1.4,
             ),
           ),
@@ -1214,10 +1214,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
       return Container(
         height: state.bannerAd!.size.height.toDouble(),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.getSurfaceColor(context),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppTheme.black(context).withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -1270,7 +1270,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             const SizedBox(height: 16),
             Text(
               '일일 예산을 설정하여 지출을 효과적으로 관리하세요',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 12, color: AppTheme.getSecondaryTextColor(context)),
             ),
           ],
         ),
@@ -1320,7 +1320,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             const SizedBox(height: 16),
             Text(
               '월 절약 목표를 설정하여 절약 습관을 만들어보세요',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 12, color: AppTheme.getSecondaryTextColor(context)),
             ),
           ],
         ),
@@ -1376,11 +1376,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
           final insights = homeState.recentInsights;
           
           return AlertDialog(
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.psychology, color: Colors.blue),
-                SizedBox(width: 8),
-                Text('AI 절약 코칭'),
+                Icon(Icons.psychology, color: AppTheme.blue(context)),
+                const SizedBox(width: 8),
+                const Text('AI 절약 코칭'),
               ],
             ),
             content: SingleChildScrollView(
@@ -1436,19 +1436,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: AppTheme.blue(context, 50),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade100),
+        border: Border.all(color: AppTheme.blue(context, 100)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Colors.blue,
+              color: AppTheme.blue(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -1456,7 +1456,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             content,
             style: TextStyle(
               fontSize: 13,
-              color: Colors.grey.shade700,
+              color: AppTheme.getTextColor(context),
               height: 1.4,
             ),
           ),
@@ -1470,11 +1470,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.psychology_rounded, color: Colors.blue),
-              SizedBox(width: 8),
-              Text('AI 말투 설정'),
+              Icon(Icons.psychology_rounded, color: AppTheme.blue(context)),
+              const SizedBox(width: 8),
+              const Text('AI 말투 설정'),
             ],
           ),
           content: Column(
@@ -1485,29 +1485,29 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: isSelected ? Colors.blue : Colors.grey.shade300,
+                    color: isSelected ? AppTheme.blue(context) : AppTheme.getGreyColor(context, 300),
                     width: isSelected ? 2 : 1,
                   ),
                   borderRadius: BorderRadius.circular(8),
-                  color: isSelected ? Colors.blue.shade50 : null,
+                  color: isSelected ? AppTheme.blue(context, 50) : null,
                 ),
                 child: ListTile(
                   leading: Icon(
                     _getCoachingStyleIcon(style),
-                    color: isSelected ? Colors.blue : Colors.grey.shade600,
+                    color: isSelected ? AppTheme.blue(context) : AppTheme.getSecondaryTextColor(context),
                   ),
                   title: Text(
                     _getCoachingStyleName(style),
                     style: TextStyle(
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                      color: isSelected ? Colors.blue : null,
+                      color: isSelected ? AppTheme.blue(context) : AppTheme.getTextColor(context),
                     ),
                   ),
                   subtitle: Text(
                     _getCoachingStyleDescription(style),
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: AppTheme.getSecondaryTextColor(context),
                     ),
                   ),
                   onTap: () async {
@@ -1601,12 +1601,12 @@ class _EmptyState extends StatelessWidget {
           Icon(
             Icons.account_balance_wallet_outlined,
             size: 64,
-            color: Colors.grey.shade400,
+            color: AppTheme.getGreyColor(context, 400),
           ),
           const SizedBox(height: AppTheme.spaceM),
           Text(
             '데이터를 불러올 수 없습니다',
-            style: AppTheme.headingSmall.copyWith(color: Colors.grey.shade600),
+            style: AppTheme.headingSmall.copyWith(color: AppTheme.getSecondaryTextColor(context)),
           ),
         ],
       ),
