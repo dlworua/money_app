@@ -89,10 +89,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '프로필',
-          style: TextStyle(color: AppTheme.white(context)),
-        ),
+        title: Text('프로필', style: TextStyle(color: AppTheme.white(context))),
         backgroundColor: Colors.green.shade400,
         foregroundColor: AppTheme.white(context),
         systemOverlayStyle: const SystemUiOverlayStyle(
@@ -147,10 +144,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.green.shade50,
-            Colors.teal.shade50,
-          ],
+          colors: [Colors.green.shade50, Colors.teal.shade50],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.green.shade400.withValues(alpha: 0.2)),
@@ -249,10 +243,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
@@ -371,72 +362,71 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         ),
         const SizedBox(height: 8),
         // 캘린더 그리드
-        ...List.generate(6, (weekIndex) {
-          return Row(
-            children: List.generate(7, (dayIndex) {
-              final dayNumber = weekIndex * 7 + dayIndex - firstWeekday + 1;
-              if (dayNumber < 1 || dayNumber > daysInMonth) {
-                return const Expanded(child: SizedBox(height: 45));
-              }
+        ...List.generate(
+          ((daysInMonth + firstWeekday) / 7).ceil(),
+          (weekIndex) {
+            return Row(
+              children: List.generate(7, (dayIndex) {
+                final dayNumber = weekIndex * 7 + dayIndex - firstWeekday + 1;
+                if (dayNumber < 1 || dayNumber > daysInMonth) {
+                  return const Expanded(child: SizedBox(height: 45));
+                }
 
-              final date = DateTime(
-                _currentMonth.year,
-                _currentMonth.month,
-                dayNumber,
-              );
-              final dayData = _getDayData(date);
+                final date = DateTime(
+                  _currentMonth.year,
+                  _currentMonth.month,
+                  dayNumber,
+                );
+                final dayData = _getDayData(date);
 
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    // 해당 날짜의 거래 내역 다이얼로그 표시
-                    _showTransactionsForDate(context, date);
-                  },
-                  child: Container(
-                    height: 45,
-                    margin: const EdgeInsets.all(1),
-                    decoration: BoxDecoration(
-                      color: _getDayColor(dayData),
-                      borderRadius: BorderRadius.circular(8),
-                      border:
-                          date.day == DateTime.now().day &&
-                              date.month == DateTime.now().month &&
-                              date.year == DateTime.now().year
-                          ? Border.all(color: Colors.green.shade400, width: 2)
-                          : null,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$dayNumber',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: _getTextColor(dayData),
-                          ),
-                        ),
-                        if (dayData['hasData'] == true)
-                          Container(
-                            width: 4,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: _getIndicatorColor(dayData),
-                              shape: BoxShape.circle,
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      // 해당 날짜의 거래 내역 다이얼로그 표시
+                      _showTransactionsForDate(context, date);
+                    },
+                    child: Container(
+                      height: 45,
+                      margin: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        color: _getDayColor(dayData),
+                        borderRadius: BorderRadius.circular(8),
+                        border:
+                            date.day == DateTime.now().day &&
+                                date.month == DateTime.now().month &&
+                                date.year == DateTime.now().year
+                            ? Border.all(color: Colors.green.shade400, width: 2)
+                            : null,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '$dayNumber',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: _getTextColor(dayData),
                             ),
                           ),
-                      ],
+                          if (dayData['hasData'] == true)
+                            Container(
+                              width: 4,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: _getIndicatorColor(dayData),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
-          );
-        }).where((row) {
-          return (row.children as List).any(
-            (child) => child is Expanded && child.child is Container,
-          );
-        }),
+                );
+              }),
+            );
+          },
+        ),
       ],
     );
   }
@@ -747,10 +737,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       const SizedBox(height: 4),
                       Text(
                         '총 ${dayTransactions.length}건의 거래',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -838,9 +825,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       decoration: BoxDecoration(
         color: typeColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: typeColor.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: typeColor.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -851,11 +836,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
               color: typeColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              typeIcon,
-              color: typeColor,
-              size: 20,
-            ),
+            child: Icon(typeIcon, color: typeColor, size: 20),
           ),
           const SizedBox(width: 12),
 
@@ -887,10 +868,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     const SizedBox(width: 6),
                     Text(
                       transaction.category.displayName,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -902,14 +880,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                if (transaction.note != null && transaction.note!.isNotEmpty) ...[
+                if (transaction.note != null &&
+                    transaction.note!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     transaction.note!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1214,9 +1190,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('회원 탈퇴'),
-                  content: const Text(
-                    '정말 탈퇴하시겠습니까?\n모든 데이터가 삭제되며 복구할 수 없습니다.',
-                  ),
+                  content: const Text('정말 탈퇴하시겠습니까?\n모든 데이터가 삭제되며 복구할 수 없습니다.'),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -1229,9 +1203,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                           const SnackBar(content: Text('회원탈퇴 기능 준비 중입니다')),
                         );
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.red,
-                      ),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
                       child: const Text('탈퇴'),
                     ),
                   ],
@@ -1262,8 +1234,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: (iconColor ?? Colors.green.shade400)
-                    .withValues(alpha: 0.1),
+                color: (iconColor ?? Colors.green.shade400).withValues(
+                  alpha: 0.1,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -1287,19 +1260,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: Colors.grey[400],
-              size: 20,
-            ),
+            Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
           ],
         ),
       ),
@@ -1341,7 +1307,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     ? Icon(Icons.check_circle, color: Colors.green.shade400)
                     : null,
                 onTap: () {
-                  ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.light);
+                  ref
+                      .read(themeViewModelProvider.notifier)
+                      .setThemeMode(ThemeMode.light);
                   Navigator.pop(context);
                 },
               ),
@@ -1354,7 +1322,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     ? Icon(Icons.check_circle, color: Colors.green.shade400)
                     : null,
                 onTap: () {
-                  ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.dark);
+                  ref
+                      .read(themeViewModelProvider.notifier)
+                      .setThemeMode(ThemeMode.dark);
                   Navigator.pop(context);
                 },
               ),
@@ -1367,7 +1337,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     ? Icon(Icons.check_circle, color: Colors.green.shade400)
                     : null,
                 onTap: () {
-                  ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.system);
+                  ref
+                      .read(themeViewModelProvider.notifier)
+                      .setThemeMode(ThemeMode.system);
                   Navigator.pop(context);
                 },
               ),
