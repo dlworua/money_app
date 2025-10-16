@@ -90,7 +90,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
     final user = state.user;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -160,7 +160,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
         // 월 선택기
         Container(
           padding: const EdgeInsets.all(16),
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           child: Row(
             children: [
               IconButton(
@@ -556,14 +556,14 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                         Icon(
                           Icons.bar_chart_outlined,
                           size: 64,
-                          color: Colors.grey.shade400,
+                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           '이번 달 지출 내역이 없습니다.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -571,7 +571,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                           '거래를 추가하면 통계를 확인할 수 있어요!',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade500,
+                            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -660,7 +660,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: percentage,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: Theme.of(context).chipTheme.backgroundColor,
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
           const SizedBox(height: 8),
@@ -742,14 +742,14 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                           Icon(
                             Icons.account_balance_wallet_outlined,
                             size: 64,
-                            color: Colors.grey.shade400,
+                            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             '설정된 예산이 없습니다.',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey.shade600,
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -757,7 +757,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                             '첫 예산을 추가해보세요!',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey.shade500,
+                              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
@@ -786,14 +786,14 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                         Icon(
                           Icons.error_outline,
                           size: 64,
-                          color: Colors.grey.shade400,
+                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           '예산 데이터를 불러올 수 없습니다.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -801,7 +801,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                           '잠시 후 다시 시도해주세요.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade500,
+                            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -894,7 +894,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: percentage > 1.0 ? 1.0 : percentage,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: Theme.of(context).chipTheme.backgroundColor,
             valueColor: AlwaysStoppedAnimation<Color>(
               isOverBudget ? Colors.red : Colors.blue,
             ),
@@ -961,14 +961,14 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                         Icon(
                           Icons.flag_outlined,
                           size: 64,
-                          color: Colors.grey.shade400,
+                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           '설정된 목표가 없습니다.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -976,7 +976,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                           '첫 절약 목표를 추가해보세요!',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade500,
+                            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -1084,7 +1084,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: percentage,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: Theme.of(context).chipTheme.backgroundColor,
             valueColor: AlwaysStoppedAnimation<Color>(
               goal.isCompleted ? Colors.green.shade600 : Colors.blue.shade600,
             ),
