@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../viewmodels/providers.dart';
+import '../dialogs/add_transaction_dialog.dart';
 import '../../data/models/transaction.dart';
 import '../../data/models/budget.dart';
 import '../../data/models/saving_goal.dart';
@@ -1146,7 +1147,10 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
   }
 
   void _showAddTransactionDialog() {
-    showDialog(context: context, builder: (context) => _AddTransactionDialog());
+    showDialog(
+      context: context,
+      builder: (context) => const AddTransactionDialog(),
+    );
   }
 
   void _showAddBudgetDialog() {
@@ -1319,262 +1323,6 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
   }
 }
 
-// 거래 추가 다이얼로그
-class _AddTransactionDialog extends ConsumerStatefulWidget {
-  @override
-  ConsumerState<_AddTransactionDialog> createState() =>
-      _AddTransactionDialogState();
-}
-
-class _AddTransactionDialogState extends ConsumerState<_AddTransactionDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _descriptionController = TextEditingController();
-  final _amountController = TextEditingController();
-  final _noteController = TextEditingController();
-
-  TransactionType _selectedType = TransactionType.expense;
-  TransactionCategory _selectedCategory = TransactionCategory.food;
-  DateTime _selectedDate = DateTime.now();
-
-  @override
-  void initState() {
-    super.initState();
-    // 초기 거래 유형에 맞는 카테고리로 설정
-    final availableCategories = _getCategoriesForType(_selectedType);
-    if (availableCategories.isNotEmpty) {
-      _selectedCategory = availableCategories.first;
-    }
-  }
-
-  // 거래 유형별 카테고리 필터링 헬퍼 메서드
-  List<TransactionCategory> _getCategoriesForType(TransactionType type) {
-    switch (type) {
-      case TransactionType.income:
-        return [
-          TransactionCategory.salary,
-          TransactionCategory.bonus,
-          TransactionCategory.investment,
-          TransactionCategory.freelance,
-          TransactionCategory.sideJob,
-          TransactionCategory.gift,
-          TransactionCategory.other,
-        ];
-      case TransactionType.expense:
-        return [
-          TransactionCategory.food,
-          TransactionCategory.transport,
-          TransactionCategory.shopping,
-          TransactionCategory.utilities,
-          TransactionCategory.healthcare,
-          TransactionCategory.entertainment,
-          TransactionCategory.education,
-          TransactionCategory.housing,
-          TransactionCategory.insurance,
-          TransactionCategory.other,
-        ];
-      case TransactionType.saving:
-        return [
-          TransactionCategory.mealSaving,
-          TransactionCategory.transportSaving,
-          TransactionCategory.shoppingSaving,
-          TransactionCategory.utilitySaving,
-          TransactionCategory.entertainmentSaving,
-          TransactionCategory.customSaving,
-        ];
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('거래 추가', style: TextStyle(fontSize: 20)),
-      content: SizedBox(
-        width: 400,
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 거래 유형 선택
-                DropdownButtonFormField<TransactionType>(
-                  value: _selectedType,
-                  decoration: InputDecoration(
-                    labelText: '거래 유형',
-                    labelStyle: TextStyle(fontSize: 14),
-                  ),
-                  items: TransactionType.values.map((type) {
-                    String text;
-                    switch (type) {
-                      case TransactionType.income:
-                        text = '수입';
-                        break;
-                      case TransactionType.expense:
-                        text = '지출';
-                        break;
-                      case TransactionType.saving:
-                        text = '절약';
-                        break;
-                    }
-                    return DropdownMenuItem(value: type, child: Text(text));
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedType = value!;
-                      // 거래 유형이 변경될 때 해당 유형의 첫 번째 카테고리로 설정
-                      final availableCategories = _getCategoriesForType(
-                        _selectedType,
-                      );
-                      if (availableCategories.isNotEmpty) {
-                        _selectedCategory = availableCategories.first;
-                      }
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // 카테고리 선택
-                DropdownButtonFormField<TransactionCategory>(
-                  value: _selectedCategory,
-                  decoration: InputDecoration(
-                    labelText: '카테고리',
-                    labelStyle: TextStyle(fontSize: 14),
-                  ),
-                  items: _getCategoriesForType(_selectedType).map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Row(
-                        children: [
-                          Text(category.emoji),
-                          const SizedBox(width: 8),
-                          Text(category.displayName),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) =>
-                      setState(() => _selectedCategory = value!),
-                ),
-                const SizedBox(height: 16),
-
-                // 금액
-                TextFormField(
-                  controller: _amountController,
-                  decoration: InputDecoration(
-                    labelText: '금액',
-                    suffixText: '원',
-                    labelStyle: TextStyle(fontSize: 14),
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [CurrencyInputFormatter()],
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) return '금액을 입력해주세요';
-                    // 컴마 제거 후 숫자 변환
-                    final numericValue = value!.replaceAll(',', '');
-                    if (double.tryParse(numericValue) == null) {
-                      return '올바른 금액을 입력해주세요';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // 설명
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: InputDecoration(
-                    labelText: '설명',
-                    labelStyle: TextStyle(fontSize: 14),
-                  ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) return '설명을 입력해주세요';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // 날짜
-                ListTile(
-                  title: const Text('날짜'),
-                  subtitle: Text(
-                    '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}',
-                  ),
-                  trailing: const Icon(Icons.calendar_today),
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
-                    );
-                    if (date != null) setState(() => _selectedDate = date);
-                  },
-                ),
-
-                // 메모 (선택사항)
-                TextFormField(
-                  controller: _noteController,
-                  decoration: const InputDecoration(
-                    labelText: '메모 (선택사항)',
-                    hintText: '추가 정보를 입력하세요',
-                  ),
-                  maxLines: 2,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('취소'),
-        ),
-        ElevatedButton(onPressed: _saveTransaction, child: const Text('저장')),
-      ],
-    );
-  }
-
-  void _saveTransaction() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      try {
-        final amount = double.parse(_amountController.text.replaceAll(',', ''));
-
-        // HomeViewModel의 addTransaction 메서드 호출
-        final homeViewModel = ref.read(homeViewModelProvider.notifier);
-        await homeViewModel.addTransaction(
-          type: _selectedType,
-          category: _selectedCategory,
-          amount: amount,
-          description: _descriptionController.text,
-          date: _selectedDate,
-          note: _noteController.text.isEmpty ? null : _noteController.text,
-        );
-
-        if (!mounted) return;
-        Navigator.pop(context);
-
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('거래가 추가되었습니다!')));
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('오류가 발생했습니다: $e')));
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    _amountController.dispose();
-    _noteController.dispose();
-    super.dispose();
-  }
-}
-
 // 예산 추가 다이얼로그
 class _AddBudgetDialog extends ConsumerStatefulWidget {
   @override
@@ -1591,101 +1339,361 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('예산 추가'),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: '예산 이름'),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return '예산 이름을 입력해주세요';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+    // 예산 관리 테마 색상 (그린/틸 계열)
+    final themeColor = Colors.green.shade600;
 
-              DropdownButtonFormField<TransactionCategory>(
-                value: _selectedCategory,
-                decoration: const InputDecoration(labelText: '카테고리'),
-                items: TransactionCategory.values
-                    .where(
-                      (cat) => [
-                        TransactionCategory.food,
-                        TransactionCategory.transport,
-                        TransactionCategory.shopping,
-                        TransactionCategory.utilities,
-                        TransactionCategory.healthcare,
-                        TransactionCategory.entertainment,
-                        TransactionCategory.education,
-                        TransactionCategory.housing,
-                      ].contains(cat),
-                    )
-                    .map((category) {
-                      return DropdownMenuItem(
-                        value: category,
-                        child: Row(
-                          children: [
-                            Text(category.emoji),
-                            const SizedBox(width: 8),
-                            Text(category.displayName),
-                          ],
-                        ),
-                      );
-                    })
-                    .toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedCategory = value!),
-              ),
-              const SizedBox(height: 16),
-
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: '예산 금액',
-                  suffixText: '원',
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 헤더
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [themeColor, themeColor.withValues(alpha: 0.7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [CurrencyInputFormatter()],
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return '예산 금액을 입력해주세요';
-                  // 컴마 제거 후 숫자 변환
-                  final numericValue = value!.replaceAll(',', '');
-                  if (double.tryParse(numericValue) == null) {
-                    return '올바른 금액을 입력해주세요';
-                  }
-                  return null;
-                },
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
               ),
-              const SizedBox(height: 16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_wallet,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '예산 추가',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '지출 관리를 위한 예산 설정',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
 
-              DropdownButtonFormField<BudgetPeriod>(
-                value: _selectedPeriod,
-                decoration: const InputDecoration(labelText: '예산 기간'),
-                items: BudgetPeriod.values.map((period) {
-                  return DropdownMenuItem(
-                    value: period,
-                    child: Text(period.displayName),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedPeriod = value!),
+            // 본문
+            Flexible(
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 예산 이름
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: '예산 이름',
+                          labelStyle: TextStyle(color: themeColor),
+                          prefixIcon: Icon(
+                            Icons.edit_outlined,
+                            color: themeColor,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: themeColor, width: 2),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) return '예산 이름을 입력해주세요';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 카테고리 선택
+                      Text(
+                        '카테고리',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: TransactionCategory.values
+                            .where(
+                              (cat) => [
+                                TransactionCategory.food,
+                                TransactionCategory.transport,
+                                TransactionCategory.shopping,
+                                TransactionCategory.utilities,
+                                TransactionCategory.healthcare,
+                                TransactionCategory.entertainment,
+                                TransactionCategory.education,
+                                TransactionCategory.housing,
+                              ].contains(cat),
+                            )
+                            .map((category) {
+                              final isSelected = _selectedCategory == category;
+                              return InkWell(
+                                onTap: () =>
+                                    setState(() => _selectedCategory = category),
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? themeColor.withValues(alpha: 0.1)
+                                        : Theme.of(context).brightness == Brightness.dark
+                                            ? Colors.grey[800]
+                                            : Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? themeColor
+                                          : Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.grey[700]!
+                                              : Colors.grey[300]!,
+                                      width: isSelected ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        category.emoji,
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        category.displayName,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.w500,
+                                          color: isSelected
+                                              ? themeColor
+                                              : Theme.of(context).textTheme.bodyMedium?.color,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            })
+                            .toList(),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // 예산 금액
+                      TextFormField(
+                        controller: _amountController,
+                        decoration: InputDecoration(
+                          labelText: '예산 금액',
+                          labelStyle: TextStyle(color: themeColor),
+                          suffixText: '원',
+                          prefixIcon: Icon(
+                            Icons.attach_money,
+                            color: themeColor,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: themeColor, width: 2),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [CurrencyInputFormatter()],
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) return '예산 금액을 입력해주세요';
+                          final numericValue = value!.replaceAll(',', '');
+                          if (double.tryParse(numericValue) == null) {
+                            return '올바른 금액을 입력해주세요';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 예산 기간
+                      Text(
+                        '예산 기간',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: BudgetPeriod.values.map((period) {
+                          final isSelected = _selectedPeriod == period;
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              child: InkWell(
+                                onTap: () =>
+                                    setState(() => _selectedPeriod = period),
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? themeColor.withValues(alpha: 0.1)
+                                        : Theme.of(context).brightness == Brightness.dark
+                                            ? Colors.grey[800]
+                                            : Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? themeColor
+                                          : Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.grey[700]!
+                                              : Colors.grey[300]!,
+                                      width: isSelected ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    period.displayName,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      color: isSelected
+                                          ? themeColor
+                                          : Theme.of(context).textTheme.bodyMedium?.color,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
+            ),
+
+            // 하단 버튼
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.grey[50],
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[700]!
+                              : Colors.grey[400]!,
+                        ),
+                      ),
+                      child: const Text(
+                        '취소',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: _saveBudget,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        '저장',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('취소'),
-        ),
-        ElevatedButton(onPressed: _saveBudget, child: const Text('저장')),
-      ],
     );
   }
 
@@ -1743,81 +1751,298 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('절약 목표 추가'),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: '목표 이름'),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return '목표 이름을 입력해주세요';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
+    // 절약 목표 테마 색상 (틸/블루 계열)
+    final themeColor = Colors.teal.shade600;
 
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: '목표 금액',
-                  suffixText: '원',
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 헤더
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [themeColor, themeColor.withValues(alpha: 0.7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [CurrencyInputFormatter()],
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return '목표 금액을 입력해주세요';
-                  // 컴마 제거 후 숫자 변환
-                  final numericValue = value!.replaceAll(',', '');
-                  if (double.tryParse(numericValue) == null) {
-                    return '올바른 금액을 입력해주세요';
-                  }
-                  return null;
-                },
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
               ),
-              const SizedBox(height: 16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.flag,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '절약 목표 추가',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '목표 달성을 위한 계획 세우기',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
 
-              ListTile(
-                title: const Text('목표 날짜'),
-                subtitle: Text(
-                  '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}',
-                ),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _selectedDate,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
-                  );
-                  if (date != null) setState(() => _selectedDate = date);
-                },
-              ),
+            // 본문
+            Flexible(
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 목표 이름
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: '목표 이름',
+                          labelStyle: TextStyle(color: themeColor),
+                          hintText: '예: 여행 자금, 비상금 등',
+                          prefixIcon: Icon(
+                            Icons.star_outline,
+                            color: themeColor,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: themeColor, width: 2),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) return '목표 이름을 입력해주세요';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
 
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: '목표 설명 (선택사항)',
-                  hintText: '예: 여행 자금, 비상금 등',
+                      // 목표 금액
+                      TextFormField(
+                        controller: _amountController,
+                        decoration: InputDecoration(
+                          labelText: '목표 금액',
+                          labelStyle: TextStyle(color: themeColor),
+                          suffixText: '원',
+                          prefixIcon: Icon(
+                            Icons.attach_money,
+                            color: themeColor,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: themeColor, width: 2),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [CurrencyInputFormatter()],
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) return '목표 금액을 입력해주세요';
+                          final numericValue = value!.replaceAll(',', '');
+                          if (double.tryParse(numericValue) == null) {
+                            return '올바른 금액을 입력해주세요';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 목표 날짜
+                      InkWell(
+                        onTap: () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: _selectedDate,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365 * 2),
+                            ),
+                          );
+                          if (date != null) {
+                            setState(() => _selectedDate = date);
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[300]!,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today, color: themeColor),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '목표 날짜',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context).textTheme.bodySmall?.color,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${_selectedDate.year}년 ${_selectedDate.month}월 ${_selectedDate.day}일',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 목표 설명
+                      TextFormField(
+                        controller: _descriptionController,
+                        decoration: InputDecoration(
+                          labelText: '목표 설명 (선택사항)',
+                          labelStyle: TextStyle(color: themeColor),
+                          hintText: '목표에 대한 추가 설명을 입력하세요',
+                          prefixIcon: Icon(
+                            Icons.note_outlined,
+                            color: themeColor,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: themeColor, width: 2),
+                          ),
+                        ),
+                        maxLines: 3,
+                      ),
+                    ],
+                  ),
                 ),
-                maxLines: 2,
               ),
-            ],
-          ),
+            ),
+
+            // 하단 버튼
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.grey[50],
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[700]!
+                              : Colors.grey[400]!,
+                        ),
+                      ),
+                      child: const Text(
+                        '취소',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: _saveGoal,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        '저장',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('취소'),
-        ),
-        ElevatedButton(onPressed: _saveGoal, child: const Text('저장')),
-      ],
     );
   }
 
