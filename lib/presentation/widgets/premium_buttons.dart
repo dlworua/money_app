@@ -50,7 +50,7 @@ class PremiumButton extends StatelessWidget {
     return FilledButton(
       onPressed: isDisabled ? null : onPressed,
       style: FilledButton.styleFrom(
-        backgroundColor: isDisabled ? Colors.grey.shade300 : AppTheme.primaryColor,
+        backgroundColor: isDisabled ? AppTheme.getGreyColor(context, 300) : Colors.green.shade400,
         foregroundColor: Colors.white,
         padding: _getPadding(),
         shape: RoundedRectangleBorder(
@@ -66,8 +66,8 @@ class PremiumButton extends StatelessWidget {
     return FilledButton(
       onPressed: isDisabled ? null : onPressed,
       style: FilledButton.styleFrom(
-        backgroundColor: isDisabled ? Colors.grey.shade200 : AppTheme.onSurfaceColor.withValues(alpha: 0.08),
-        foregroundColor: isDisabled ? Colors.grey.shade500 : AppTheme.onSurfaceColor,
+        backgroundColor: isDisabled ? AppTheme.getGreyColor(context, 200) : AppTheme.onSurfaceColor.withValues(alpha: 0.08),
+        foregroundColor: isDisabled ? AppTheme.getGreyColor(context, 500) : AppTheme.onSurfaceColor,
         padding: _getPadding(),
         shape: RoundedRectangleBorder(
           borderRadius: AppTheme.radiusMedium,
@@ -82,10 +82,10 @@ class PremiumButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: isDisabled ? null : onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: isDisabled ? Colors.grey.shade500 : AppTheme.primaryColor,
+        foregroundColor: isDisabled ? AppTheme.getGreyColor(context, 500) : Colors.green.shade400,
         padding: _getPadding(),
         side: BorderSide(
-          color: isDisabled ? Colors.grey.shade300 : AppTheme.primaryColor,
+          color: isDisabled ? AppTheme.getGreyColor(context, 300) : Colors.green.shade400,
           width: 1.5,
         ),
         shape: RoundedRectangleBorder(
@@ -100,7 +100,7 @@ class PremiumButton extends StatelessWidget {
     return TextButton(
       onPressed: isDisabled ? null : onPressed,
       style: TextButton.styleFrom(
-        foregroundColor: isDisabled ? Colors.grey.shade500 : AppTheme.primaryColor,
+        foregroundColor: isDisabled ? AppTheme.getGreyColor(context, 500) : Colors.green.shade400,
         padding: _getPadding(),
         shape: RoundedRectangleBorder(
           borderRadius: AppTheme.radiusMedium,
@@ -113,12 +113,16 @@ class PremiumButton extends StatelessWidget {
   Widget _buildGradientButton(BuildContext context, bool isDisabled) {
     return Container(
       decoration: BoxDecoration(
-        gradient: isDisabled ? null : AppTheme.primaryGradient,
-        color: isDisabled ? Colors.grey.shade300 : null,
+        gradient: isDisabled ? null : LinearGradient(
+          colors: [Colors.green.shade400, Colors.teal.shade400],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        color: isDisabled ? AppTheme.getGreyColor(context, 300) : null,
         borderRadius: AppTheme.radiusMedium,
         boxShadow: isDisabled ? null : [
           BoxShadow(
-            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            color: Colors.green.shade400.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -150,7 +154,7 @@ class PremiumButton extends StatelessWidget {
             child: CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation<Color>(
-                textColor ?? AppTheme.primaryColor,
+                textColor ?? Colors.green.shade400,
               ),
             ),
           ),
@@ -220,8 +224,8 @@ class FloatingActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppTheme.primaryColor;
-    
+    final effectiveColor = color ?? Colors.green.shade400;
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(

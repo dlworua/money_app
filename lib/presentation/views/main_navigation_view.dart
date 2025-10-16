@@ -45,19 +45,19 @@ class _MainNavigationViewState extends ConsumerState<MainNavigationView> {
       icon: Icons.home_outlined,
       activeIcon: Icons.home,
       label: '홈',
-      color: AppTheme.primaryColor,
+      color: Colors.green.shade400,
     ),
     NavigationItem(
       icon: Icons.sports_esports_outlined,
       activeIcon: Icons.sports_esports,
       label: '게임',
-      color: AppTheme.secondaryColor,
+      color: Colors.teal.shade400,
     ),
     NavigationItem(
       icon: Icons.person_outline,
       activeIcon: Icons.person,
       label: '프로필',
-      color: AppTheme.accentColor,
+      color: Colors.green.shade400,
     ),
   ];
 

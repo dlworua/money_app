@@ -14,7 +14,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('🤖 AI 절약 코치'),
-          backgroundColor: AppTheme.primaryColor,
+          backgroundColor: Colors.green.shade400,
           foregroundColor: Colors.white,
           systemOverlayStyle: const SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
@@ -136,7 +136,11 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
+        gradient: LinearGradient(
+          colors: [Colors.green.shade400, Colors.teal.shade400],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppTheme.elevatedShadow,
       ),
@@ -203,16 +207,16 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.analytics_outlined,
-                color: AppTheme.primaryColor,
+                color: Colors.green.shade400,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
                 '종합 분석 결과',
                 style: AppTheme.headingSmall.copyWith(
-                  color: AppTheme.primaryColor,
+                  color: Colors.green.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -226,7 +230,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
               color: AppTheme.backgroundColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                color: Colors.green.shade400.withValues(alpha: 0.1),
               ),
             ),
             child: Text(
@@ -256,16 +260,16 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.lightbulb_outline,
-                color: AppTheme.accentColor,
+                color: Colors.green.shade400,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
                 '맞춤형 전략',
                 style: AppTheme.headingSmall.copyWith(
-                  color: AppTheme.accentColor,
+                  color: Colors.green.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -276,10 +280,10 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
             margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
             padding: const EdgeInsets.all(AppTheme.spaceM),
             decoration: BoxDecoration(
-              color: AppTheme.accentColor.withValues(alpha: 0.05),
+              color: Colors.green.shade50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppTheme.accentColor.withValues(alpha: 0.2),
+                color: Colors.green.shade400.withValues(alpha: 0.2),
               ),
             ),
             child: Column(
@@ -292,7 +296,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
                         strategy.title,
                         style: AppTheme.bodyLarge.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.accentColor,
+                          color: Colors.green.shade400,
                         ),
                       ),
                     ),
@@ -342,13 +346,13 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
                     Icon(
                       Icons.schedule_outlined,
                       size: 16,
-                      color: AppTheme.secondaryColor,
+                      color: Colors.teal.shade400,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       strategy.timeframe,
                       style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.secondaryColor,
+                        color: Colors.teal.shade400,
                       ),
                     ),
                   ],
@@ -503,7 +507,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
                   '💡 ${opportunity['suggestion']}',
                   style: AppTheme.bodySmall.copyWith(
                     fontStyle: FontStyle.italic,
-                    color: AppTheme.primaryColor,
+                    color: Colors.green.shade400,
                   ),
                 ),
               ],
@@ -529,16 +533,16 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.psychology_outlined,
-                color: AppTheme.secondaryColor,
+                color: Colors.teal.shade400,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
                 'AI 예측 분석',
                 style: AppTheme.headingSmall.copyWith(
-                  color: AppTheme.secondaryColor,
+                  color: Colors.teal.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -630,7 +634,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
       case 'LOW':
         return AppTheme.successColor;
       default:
-        return AppTheme.primaryColor;
+        return Colors.green.shade400;
     }
   }
 

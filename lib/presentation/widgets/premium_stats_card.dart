@@ -13,18 +13,18 @@ class PremiumStatsCard extends StatelessWidget {
   final bool showTrend;
   final VoidCallback? onTap;
 
-  const PremiumStatsCard({
+  PremiumStatsCard({
     super.key,
     required this.title,
     required this.value,
     required this.subtitle,
     required this.icon,
-    this.iconColor = AppTheme.primaryColor,
+    Color? iconColor,
     this.valueColor,
     this.trend,
     this.showTrend = false,
     this.onTap,
-  });
+  }) : iconColor = iconColor ?? Colors.green.shade400;
 
   @override
   Widget build(BuildContext context) {
@@ -114,16 +114,16 @@ class PremiumProgressCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
 
-  const PremiumProgressCard({
+  PremiumProgressCard({
     super.key,
     required this.title,
     required this.currentValue,
     required this.targetValue,
     required this.progress,
-    this.progressColor = AppTheme.primaryColor,
+    Color? progressColor,
     required this.icon,
     this.onTap,
-  });
+  }) : progressColor = progressColor ?? Colors.green.shade400;
 
   @override
   Widget build(BuildContext context) {

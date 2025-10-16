@@ -89,9 +89,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('프로필'),
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
+        title: Text(
+          '프로필',
+          style: TextStyle(color: AppTheme.white(context)),
+        ),
+        backgroundColor: Colors.green.shade400,
+        foregroundColor: AppTheme.white(context),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
@@ -145,12 +148,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppTheme.primaryColor.withValues(alpha: 0.1),
-            AppTheme.secondaryColor.withValues(alpha: 0.1),
+            Colors.green.shade50,
+            Colors.teal.shade50,
           ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
+        border: Border.all(color: Colors.green.shade400.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -160,7 +163,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
               // 프로필 아바타
               CircleAvatar(
                 radius: 28,
-                backgroundColor: AppTheme.primaryColor,
+                backgroundColor: Colors.green.shade400,
                 child: const Text('💰', style: TextStyle(fontSize: 24)),
               ),
               const SizedBox(width: 12),
@@ -182,7 +185,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       children: [
                         Icon(
                           Icons.monetization_on,
-                          color: Colors.amber[600],
+                          color: AppTheme.amber(context, 600),
                           size: 16,
                         ),
                         const SizedBox(width: 4),
@@ -191,7 +194,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.amber[700],
+                            color: AppTheme.amber(context, 700),
                           ),
                         ),
                       ],
@@ -207,7 +210,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           // 구분선
           Container(
             height: 1,
-            color: AppTheme.primaryColor.withValues(alpha: 0.1),
+            color: Colors.green.shade400.withValues(alpha: 0.1),
           ),
 
           const SizedBox(height: 12),
@@ -242,7 +245,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
   Widget _buildCompactStatItem(IconData icon, String value, String label) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.primaryColor, size: 20),
+        Icon(icon, color: Colors.green.shade400, size: 20),
         const SizedBox(height: 4),
         Text(
           value,
@@ -255,7 +258,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           label,
           style: TextStyle(
             fontSize: 10,
-            color: Colors.grey[600],
+            color: AppTheme.getSecondaryTextColor(context),
           ),
         ),
       ],
@@ -266,12 +269,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.getSurfaceColor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: AppTheme.getGreyColor(context, 300)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: AppTheme.getGreyColor(context).withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -358,7 +361,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
+                        color: AppTheme.getSecondaryTextColor(context),
                       ),
                     ),
                   ),
@@ -399,7 +402,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                           date.day == DateTime.now().day &&
                               date.month == DateTime.now().month &&
                               date.year == DateTime.now().year
-                          ? Border.all(color: AppTheme.primaryColor, width: 2)
+                          ? Border.all(color: Colors.green.shade400, width: 2)
                           : null,
                     ),
                     child: Column(
@@ -735,10 +738,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     children: [
                       Text(
                         '${date.year}년 ${date.month}월 ${date.day}일',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryColor,
+                          color: Colors.green.shade400,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -1259,13 +1262,13 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: (iconColor ?? AppTheme.primaryColor)
+                color: (iconColor ?? Colors.green.shade400)
                     .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                color: iconColor ?? AppTheme.primaryColor,
+                color: iconColor ?? Colors.green.shade400,
                 size: 24,
               ),
             ),
@@ -1320,11 +1323,11 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.palette_outlined, color: AppTheme.primaryColor),
-              SizedBox(width: 8),
-              Text('테마 설정'),
+              Icon(Icons.palette_outlined, color: Colors.green.shade400),
+              const SizedBox(width: 8),
+              const Text('테마 설정'),
             ],
           ),
           content: Column(
@@ -1335,7 +1338,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 leading: const Icon(Icons.light_mode, color: Colors.amber),
                 title: const Text('라이트 모드'),
                 trailing: currentThemeMode == ThemeMode.light
-                    ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                    ? Icon(Icons.check_circle, color: Colors.green.shade400)
                     : null,
                 onTap: () {
                   ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.light);
@@ -1348,7 +1351,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 leading: const Icon(Icons.dark_mode, color: Colors.indigo),
                 title: const Text('다크 모드'),
                 trailing: currentThemeMode == ThemeMode.dark
-                    ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                    ? Icon(Icons.check_circle, color: Colors.green.shade400)
                     : null,
                 onTap: () {
                   ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.dark);
@@ -1361,7 +1364,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 leading: const Icon(Icons.settings_suggest, color: Colors.grey),
                 title: const Text('시스템 설정 따르기'),
                 trailing: currentThemeMode == ThemeMode.system
-                    ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                    ? Icon(Icons.check_circle, color: Colors.green.shade400)
                     : null,
                 onTap: () {
                   ref.read(themeViewModelProvider.notifier).setThemeMode(ThemeMode.system);

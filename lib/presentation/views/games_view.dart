@@ -79,7 +79,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   Text(
                     '게임 & 활동',
                     style: AppTheme.getHeadingLarge(context).copyWith(
-                      color: AppTheme.primaryColor,
+                      color: Colors.green.shade400,
                       fontWeight: FontWeight.w800,
                       fontSize: ResponsiveUtils.getResponsiveFontSize(
                         context,
@@ -155,14 +155,14 @@ class _GamesViewState extends ConsumerState<GamesView> {
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppTheme.primaryColor, AppTheme.secondaryColor],
+          colors: [Colors.green.shade400, Colors.teal.shade400],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            color: Colors.green.shade400.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -300,7 +300,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   label: const Text('티켓 3개'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.green.shade400,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 10,
@@ -340,7 +340,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   label: const Text('P 50개'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white.withValues(alpha: 0.9),
-                    foregroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.green.shade400,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 10,
@@ -372,7 +372,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
               Text(
                 title,
                 style: AppTheme.getHeadingMedium(context).copyWith(
-                  color: AppTheme.primaryColor,
+                  color: Colors.green.shade400,
                   fontWeight: FontWeight.w800,
                   fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
                 ),
@@ -442,7 +442,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
           subtitle: '1~10 숫자 맞추기',
           reward: '0~20',
           icon: Icons.casino_rounded,
-          gradientColors: [AppTheme.primaryColor, AppTheme.secondaryColor],
+          gradientColors: [Colors.green.shade400, Colors.teal.shade400],
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const NumberGuessPage()),
@@ -636,7 +636,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   child: Text(
                     title,
                     style: AppTheme.getHeadingSmall(context).copyWith(
-                      color: AppTheme.primaryColor,
+                      color: Colors.green.shade400,
                       fontWeight: FontWeight.w700,
                       fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
                         context,
@@ -744,14 +744,14 @@ class _GamesViewState extends ConsumerState<GamesView> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppTheme.primaryColor.withValues(alpha: 0.05),
-            AppTheme.accentColor.withValues(alpha: 0.05),
+            Colors.green.shade50,
+            Colors.teal.shade50,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.green.shade400.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -766,12 +766,12 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   ),
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.accentColor.withValues(alpha: 0.1),
+                  color: Colors.green.shade400.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.lightbulb_rounded,
-                  color: AppTheme.accentColor,
+                  color: Colors.green.shade400,
                   size: ResponsiveUtils.getResponsiveIconSize(context, 20),
                 ),
               ),
@@ -784,7 +784,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
               Text(
                 '게임 팁',
                 style: AppTheme.getHeadingSmall(context).copyWith(
-                  color: AppTheme.primaryColor,
+                  color: Colors.green.shade400,
                   fontWeight: FontWeight.w700,
                   fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
                 ),
@@ -851,7 +851,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                           '포인트 내역',
                           style: AppTheme.getHeadingSmall(context).copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.primaryColor,
+                            color: Colors.green.shade400,
                           ),
                         ),
                         Text(
@@ -895,20 +895,20 @@ class _GamesViewState extends ConsumerState<GamesView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history, size: 64, color: Colors.grey.shade400),
+          Icon(Icons.history, size: 64, color: AppTheme.getGreyColor(context, 400)),
           const SizedBox(height: AppTheme.spaceM),
           Text(
             '아직 포인트 내역이 없어요',
             style: AppTheme.getHeadingSmall(
               context,
-            ).copyWith(color: Colors.grey.shade600),
+            ).copyWith(color: AppTheme.getSecondaryTextColor(context)),
           ),
           const SizedBox(height: AppTheme.spaceS),
           Text(
             '게임을 플레이해서 포인트를 모아보세요!',
             style: AppTheme.getBodyMedium(
               context,
-            ).copyWith(color: Colors.grey.shade500),
+            ).copyWith(color: AppTheme.getGreyColor(context, 500)),
             textAlign: TextAlign.center,
           ),
         ],
@@ -1005,7 +1005,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
 
     switch (source) {
       case PointHistorySource.numberGuessGame:
-        return AppTheme.primaryColor;
+        return Colors.green.shade400;
       case PointHistorySource.financialQuiz:
         return Colors.pink[500]!;
       case PointHistorySource.cardFlipGame:
@@ -1017,14 +1017,14 @@ class _GamesViewState extends ConsumerState<GamesView> {
       case PointHistorySource.colorReaction:
         return Colors.red[500]!;
       case PointHistorySource.adWatch:
-        return AppTheme.secondaryColor;
+        return Colors.teal.shade400;
       case PointHistorySource.dailyBonus:
       case PointHistorySource.streakBonus:
         return AppTheme.warningColor;
       case PointHistorySource.premiumFeature:
         return AppTheme.errorColor;
       case PointHistorySource.other:
-        return AppTheme.primaryColor;
+        return Colors.green.shade400;
     }
   }
 
@@ -1041,7 +1041,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
           color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppTheme.black(context).withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
