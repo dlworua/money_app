@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:money_app/core/theme/app_theme.dart';
 
 import '../../data/models/transaction.dart';
 import '../viewmodels/providers.dart';
@@ -18,9 +19,12 @@ class CurrencyInputFormatter extends TextInputFormatter {
 
     // 숫자만 추출
     String digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-    
+
     if (digits.isEmpty) {
-      return const TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
+      return const TextEditingValue(
+        text: '',
+        selection: TextSelection.collapsed(offset: 0),
+      );
     }
 
     // 천 단위 컴마 추가
@@ -34,7 +38,7 @@ class CurrencyInputFormatter extends TextInputFormatter {
 
   String _addCommas(String digits) {
     if (digits.length <= 3) return digits;
-    
+
     return digits.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]},',
@@ -45,11 +49,12 @@ class CurrencyInputFormatter extends TextInputFormatter {
 // 거래 추가 다이얼로그
 class AddTransactionDialog extends ConsumerStatefulWidget {
   final TransactionType? initialType;
-  
+
   const AddTransactionDialog({super.key, this.initialType});
 
   @override
-  ConsumerState<AddTransactionDialog> createState() => _AddTransactionDialogState();
+  ConsumerState<AddTransactionDialog> createState() =>
+      _AddTransactionDialogState();
 }
 
 class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
@@ -57,7 +62,7 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
-  
+
   late TransactionType _selectedType;
   late TransactionCategory _selectedCategory;
   DateTime _selectedDate = DateTime.now();
@@ -174,12 +179,12 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 거래 유형 선택 (버튼 스타일)
-                      const Text(
+                      Text(
                         '거래 유형',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey,
+                          color: AppTheme.getGreyColor(context, 600),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -210,27 +215,35 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
 
                           return Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
                               child: InkWell(
                                 onTap: () {
                                   setState(() {
                                     _selectedType = type;
-                                    final availableCategories = _getCategoriesForType(_selectedType);
+                                    final availableCategories =
+                                        _getCategoriesForType(_selectedType);
                                     if (availableCategories.isNotEmpty) {
-                                      _selectedCategory = availableCategories.first;
+                                      _selectedCategory =
+                                          availableCategories.first;
                                     }
                                   });
                                 },
                                 borderRadius: BorderRadius.circular(12),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? color.withValues(alpha: 0.1)
-                                        : Colors.grey[100],
+                                        : AppTheme.getGreyColor(context, 100),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: isSelected ? color : Colors.grey[300]!,
+                                      color: isSelected
+                                          ? color
+                                          : AppTheme.getGreyColor(context, 300),
                                       width: isSelected ? 2 : 1,
                                     ),
                                   ),
@@ -238,7 +251,9 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                                     children: [
                                       Icon(
                                         icon,
-                                        color: isSelected ? color : Colors.grey[600],
+                                        color: isSelected
+                                            ? color
+                                            : AppTheme.getSecondaryTextColor(context),
                                         size: 24,
                                       ),
                                       const SizedBox(height: 4),
@@ -246,8 +261,14 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                                         label,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                          color: isSelected ? color : Colors.grey[600],
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.w500,
+                                          color: isSelected
+                                              ? color
+                                              : AppTheme.getSecondaryTextColor(
+                                                  context,
+                                                ),
                                         ),
                                       ),
                                     ],
@@ -262,46 +283,61 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                       const SizedBox(height: 24),
 
                       // 카테고리 선택 (그리드 스타일)
-                      const Text(
+                      Text(
                         '카테고리',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey,
+                          color: AppTheme.getGreyColor(context, 600),
                         ),
                       ),
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: _getCategoriesForType(_selectedType).map((category) {
+                        children: _getCategoriesForType(_selectedType).map((
+                          category,
+                        ) {
                           final isSelected = _selectedCategory == category;
                           return InkWell(
-                            onTap: () => setState(() => _selectedCategory = category),
+                            onTap: () =>
+                                setState(() => _selectedCategory = category),
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? typeColor.withValues(alpha: 0.1)
-                                    : Colors.grey[100],
+                                    : AppTheme.getGreyColor(context, 100),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: isSelected ? typeColor : Colors.grey[300]!,
+                                  color: isSelected
+                                      ? typeColor
+                                      : AppTheme.getGreyColor(context, 300),
                                   width: isSelected ? 2 : 1,
                                 ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(category.emoji, style: const TextStyle(fontSize: 16)),
+                                  Text(
+                                    category.emoji,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     category.displayName,
                                     style: TextStyle(
                                       fontSize: 13,
-                                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                      color: isSelected ? typeColor : Colors.grey[700],
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      color: isSelected
+                                          ? typeColor
+                                          : AppTheme.getGreyColor(context, 700),
                                     ),
                                   ),
                                 ],
@@ -320,7 +356,10 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                           labelText: '금액',
                           labelStyle: TextStyle(color: typeColor),
                           suffixText: '원',
-                          prefixIcon: Icon(Icons.attach_money, color: typeColor),
+                          prefixIcon: Icon(
+                            Icons.attach_money,
+                            color: typeColor,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -331,11 +370,16 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                         ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [CurrencyInputFormatter()],
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                         validator: (value) {
                           if (value?.isEmpty ?? true) return '금액을 입력해주세요';
                           final numericValue = value!.replaceAll(',', '');
-                          if (double.tryParse(numericValue) == null) return '올바른 금액을 입력해주세요';
+                          if (double.tryParse(numericValue) == null) {
+                            return '올바른 금액을 입력해주세요';
+                          }
                           return null;
                         },
                       ),
@@ -348,7 +392,10 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                         decoration: InputDecoration(
                           labelText: '설명',
                           labelStyle: TextStyle(color: typeColor),
-                          prefixIcon: Icon(Icons.description_outlined, color: typeColor),
+                          prefixIcon: Icon(
+                            Icons.description_outlined,
+                            color: typeColor,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -372,15 +419,21 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                             context: context,
                             initialDate: _selectedDate,
                             firstDate: DateTime(2020),
-                            lastDate: DateTime.now().add(const Duration(days: 365)),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
                           );
-                          if (date != null) setState(() => _selectedDate = date);
+                          if (date != null) {
+                            setState(() => _selectedDate = date);
+                          }
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey[300]!),
+                            border: Border.all(
+                              color: AppTheme.getGreyColor(context, 300),
+                            ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -394,7 +447,9 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                                     '날짜',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: Colors.grey[600],
+                                      color: AppTheme.getSecondaryTextColor(
+                                        context,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -420,7 +475,10 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                         decoration: InputDecoration(
                           labelText: '메모 (선택사항)',
                           hintText: '추가 정보를 입력하세요',
-                          prefixIcon: Icon(Icons.note_outlined, color: typeColor),
+                          prefixIcon: Icon(
+                            Icons.note_outlined,
+                            color: typeColor,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -441,7 +499,7 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: AppTheme.getGreyColor(context, 50),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
@@ -457,11 +515,16 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: BorderSide(color: Colors.grey[400]!),
+                        side: BorderSide(
+                          color: AppTheme.getGreyColor(context, 400),
+                        ),
                       ),
                       child: const Text(
                         '취소',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -481,7 +544,10 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                       ),
                       child: const Text(
                         '저장',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

@@ -122,7 +122,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 width: ResponsiveUtils.getResponsiveIconSize(context, 48),
                 height: ResponsiveUtils.getResponsiveIconSize(context, 48),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                  gradient: LinearGradient(
+                    colors: [Colors.green.shade400, Colors.teal.shade400],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: AppTheme.radiusMedium,
                 ),
                 child: Icon(
@@ -184,7 +188,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     UserModel user,
   ) {
     return GradientCard(
-      gradient: AppTheme.primaryGradient,
+      gradient: LinearGradient(
+        colors: [Colors.green.shade400, Colors.teal.shade400],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -398,7 +406,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             value: progress,
             backgroundColor: AppTheme.onSurfaceColor.withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation<Color>(
-              isOverBudget ? AppTheme.errorColor : AppTheme.primaryColor,
+              isOverBudget ? AppTheme.errorColor : Colors.green.shade400,
             ),
             minHeight: 6,
             borderRadius: BorderRadius.circular(3),
@@ -853,7 +861,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       case '기타':
         return AppTheme.getGreyColor(context, 500);
       default:
-        return AppTheme.primaryColor;
+        return Colors.green.shade400;
     }
   }
 
@@ -1319,7 +1327,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
             const SizedBox(height: 16),
             Text(
-              '월 절약 목표를 설정하여 절약 습관을 만들어보세요',
+              '월 절약 목표를 설정���여 절약 습관을 만들어보세요',
               style: TextStyle(fontSize: 12, color: AppTheme.getSecondaryTextColor(context)),
             ),
           ],
