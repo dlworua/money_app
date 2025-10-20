@@ -221,54 +221,107 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 .where((t) => t.type == TransactionType.saving)
                 .fold<double>(0, (sum, t) => sum + t.amount);
 
-            return Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.green.shade50, Colors.teal.shade50],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            return Column(
+              children: [
+                // 월 요약 카드
+                Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green.shade50, Colors.teal.shade50],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withValues(alpha: 0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildSummaryItem(
+                          '수입',
+                          income,
+                          Icons.trending_up,
+                          Colors.blue,
+                        ),
+                      ),
+                      Container(width: 1, height: 40.0, color: Colors.grey.shade300),
+                      Expanded(
+                        child: _buildSummaryItem(
+                          '지출',
+                          expense,
+                          Icons.trending_down,
+                          Colors.red,
+                        ),
+                      ),
+                      Container(width: 1, height: 40.0, color: Colors.grey.shade300),
+                      Expanded(
+                        child: _buildSummaryItem(
+                          '절약',
+                          saving,
+                          Icons.savings,
+                          Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildSummaryItem(
-                      '수입',
-                      income,
-                      Icons.trending_up,
-                      Colors.blue,
+
+                // 이번달 절약 요약 카드
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green.shade50, Colors.teal.shade50],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.green.shade200,
+                      width: 1,
                     ),
                   ),
-                  Container(width: 1, height: 40.0, color: Colors.grey.shade300),
-                  Expanded(
-                    child: _buildSummaryItem(
-                      '지출',
-                      expense,
-                      Icons.trending_down,
-                      Colors.red,
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.savings, color: Colors.green.shade600, size: 32),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '이번달 절약',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.green.shade800,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatCurrency(saving),
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(width: 1, height: 40.0, color: Colors.grey.shade300),
-                  Expanded(
-                    child: _buildSummaryItem(
-                      '절약',
-                      saving,
-                      Icons.savings,
-                      Colors.green,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         ),
@@ -341,7 +394,13 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
       children: [
         Icon(icon, color: color, size: 24.0),
         const SizedBox(height: 4),
-        Text(title, style: TextStyle(color: Colors.grey.shade600, fontSize: 12.0)),
+        Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+            fontSize: 12.0,
+          ),
+        ),
         const SizedBox(height: 2),
         FittedBox(
           fit: BoxFit.scaleDown,
@@ -419,8 +478,25 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 const SizedBox(height: 4),
                 Text(
                   '${transaction.category.displayName} • ${_formatTransactionDate(transaction.date)}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  ),
                 ),
+                // 메모 표시 추가
+                if (transaction.note != null && transaction.note!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    transaction.note!,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                      fontStyle: FontStyle.italic,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),
@@ -521,7 +597,10 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                     const SizedBox(height: 8),
                     Text(
                       '수입 ${_formatCurrency(income).replaceAll('원', '')} - 지출 ${_formatCurrency(expense).replaceAll('원', '')}',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        fontSize: 14,
+                      ),
                     ),
                     if (saving > 0) ...[
                       const SizedBox(height: 4),
@@ -871,7 +950,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: isOverBudget ? Colors.red : Colors.grey.shade600,
+                      color: isOverBudget
+                          ? Colors.red
+                          : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -1039,7 +1120,10 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                       const SizedBox(height: 2),
                       Text(
                         goal.description ?? '',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        ),
                       ),
                     ],
                   ],
@@ -1111,7 +1195,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   '목표: ${_formatCurrency(goal.targetAmount)}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey.shade600,
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -1125,7 +1209,10 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             children: [
               Text(
                 '${_formatCurrency(goal.remainingAmount)} 남음',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                ),
               ),
               Text(
                 'D-${goal.remainingDays}',
@@ -1133,7 +1220,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   fontSize: 12,
                   color: goal.remainingDays <= 7
                       ? Colors.red.shade600
-                      : Colors.grey.shade600,
+                      : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontWeight: goal.remainingDays <= 7
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -1181,7 +1268,10 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
             const SizedBox(height: 8),
             Text(
               '삭제된 예산은 복구할 수 없습니다.',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+              ),
             ),
           ],
         ),
@@ -1250,7 +1340,7 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
               '포기하면 지금까지의 노력이 사라집니다.\n정말 삭제하시겠습니까?',
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey.shade700,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                 height: 1.4,
               ),
             ),
@@ -1346,14 +1436,14 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxHeight: MediaQuery.of(context).size.height * 0.80,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // 헤더
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [themeColor, themeColor.withValues(alpha: 0.7)],
@@ -1367,19 +1457,16 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
               ),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
                     child: const Icon(
                       Icons.account_balance_wallet,
                       color: Colors.white,
-                      size: 28,
+                      size: 24,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1388,16 +1475,16 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                           '예산 추가',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 2),
                         Text(
                           '지출 관리를 위한 예산 설정',
                           style: TextStyle(
                             color: Colors.white70,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -1405,7 +1492,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
                   ),
                 ],
               ),
@@ -1416,7 +1503,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
               child: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1425,11 +1512,14 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                         controller: _nameController,
                         decoration: InputDecoration(
                           labelText: '예산 이름',
-                          labelStyle: TextStyle(color: themeColor),
+                          labelStyle: TextStyle(color: themeColor, fontSize: 13),
+                          hintStyle: TextStyle(fontSize: 12),
                           prefixIcon: Icon(
                             Icons.edit_outlined,
                             color: themeColor,
+                            size: 20,
                           ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1438,26 +1528,27 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                             borderSide: BorderSide(color: themeColor, width: 2),
                           ),
                         ),
+                        style: TextStyle(fontSize: 14),
                         validator: (value) {
                           if (value?.isEmpty ?? true) return '예산 이름을 입력해주세요';
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
                       // 카테고리 선택
                       Text(
                         '카테고리',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).textTheme.bodyMedium?.color,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 6,
+                        runSpacing: 6,
                         children: TransactionCategory.values
                             .where(
                               (cat) => [
@@ -1476,10 +1567,11 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                               return InkWell(
                                 onTap: () =>
                                     setState(() => _selectedCategory = category),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 child: Container(
+                                  height: 36,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
+                                    horizontal: 10,
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
@@ -1488,7 +1580,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                                         : Theme.of(context).brightness == Brightness.dark
                                             ? Colors.grey[800]
                                             : Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       color: isSelected
                                           ? themeColor
@@ -1503,13 +1595,13 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                                     children: [
                                       Text(
                                         category.emoji,
-                                        style: const TextStyle(fontSize: 16),
+                                        style: const TextStyle(fontSize: 14),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         category.displayName,
                                         style: TextStyle(
-                                          fontSize: 13,
+                                          fontSize: 12,
                                           fontWeight: isSelected
                                               ? FontWeight.w600
                                               : FontWeight.w500,
@@ -1525,19 +1617,23 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                             })
                             .toList(),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 18),
 
                       // 예산 금액
                       TextFormField(
                         controller: _amountController,
                         decoration: InputDecoration(
                           labelText: '예산 금액',
-                          labelStyle: TextStyle(color: themeColor),
+                          labelStyle: TextStyle(color: themeColor, fontSize: 13),
+                          hintStyle: TextStyle(fontSize: 12),
                           suffixText: '원',
+                          suffixStyle: TextStyle(fontSize: 13),
                           prefixIcon: Icon(
                             Icons.attach_money,
                             color: themeColor,
+                            size: 20,
                           ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1549,7 +1645,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [CurrencyInputFormatter()],
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                         validator: (value) {
@@ -1561,31 +1657,32 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
                       // 예산 기간
                       Text(
                         '예산 기간',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).textTheme.bodyMedium?.color,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       Row(
                         children: BudgetPeriod.values.map((period) {
                           final isSelected = _selectedPeriod == period;
                           return Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 3),
                               child: InkWell(
                                 onTap: () =>
                                     setState(() => _selectedPeriod = period),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 child: Container(
+                                  height: 36,
                                   padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
+                                    vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSelected
@@ -1593,7 +1690,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                                         : Theme.of(context).brightness == Brightness.dark
                                             ? Colors.grey[800]
                                             : Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       color: isSelected
                                           ? themeColor
@@ -1603,17 +1700,19 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                                       width: isSelected ? 2 : 1,
                                     ),
                                   ),
-                                  child: Text(
-                                    period.displayName,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.w500,
-                                      color: isSelected
-                                          ? themeColor
-                                          : Theme.of(context).textTheme.bodyMedium?.color,
+                                  child: Center(
+                                    child: Text(
+                                      period.displayName,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w500,
+                                        color: isSelected
+                                            ? themeColor
+                                            : Theme.of(context).textTheme.bodyMedium?.color,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1630,7 +1729,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
 
             // 하단 버튼
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.grey[900]
@@ -1646,7 +1745,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1659,13 +1758,13 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                       child: const Text(
                         '취소',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     flex: 2,
                     child: ElevatedButton(
@@ -1673,7 +1772,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: themeColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1682,7 +1781,7 @@ class _AddBudgetDialogState extends ConsumerState<_AddBudgetDialog> {
                       child: const Text(
                         '저장',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1758,14 +1857,14 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxHeight: MediaQuery.of(context).size.height * 0.80,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // 헤더
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [themeColor, themeColor.withValues(alpha: 0.7)],
@@ -1779,19 +1878,16 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
               ),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
                     child: const Icon(
                       Icons.flag,
                       color: Colors.white,
-                      size: 28,
+                      size: 24,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1800,16 +1896,16 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                           '절약 목표 추가',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 2),
                         Text(
                           '목표 달성을 위한 계획 세우기',
                           style: TextStyle(
                             color: Colors.white70,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -1817,7 +1913,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
                   ),
                 ],
               ),
@@ -1828,7 +1924,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
               child: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1837,12 +1933,15 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                         controller: _nameController,
                         decoration: InputDecoration(
                           labelText: '목표 이름',
-                          labelStyle: TextStyle(color: themeColor),
+                          labelStyle: TextStyle(color: themeColor, fontSize: 13),
                           hintText: '예: 여행 자금, 비상금 등',
+                          hintStyle: TextStyle(fontSize: 12),
                           prefixIcon: Icon(
                             Icons.star_outline,
                             color: themeColor,
+                            size: 20,
                           ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1851,24 +1950,29 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                             borderSide: BorderSide(color: themeColor, width: 2),
                           ),
                         ),
+                        style: TextStyle(fontSize: 14),
                         validator: (value) {
                           if (value?.isEmpty ?? true) return '목표 이름을 입력해주세요';
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
                       // 목표 금액
                       TextFormField(
                         controller: _amountController,
                         decoration: InputDecoration(
                           labelText: '목표 금액',
-                          labelStyle: TextStyle(color: themeColor),
+                          labelStyle: TextStyle(color: themeColor, fontSize: 13),
+                          hintStyle: TextStyle(fontSize: 12),
                           suffixText: '원',
+                          suffixStyle: TextStyle(fontSize: 13),
                           prefixIcon: Icon(
                             Icons.attach_money,
                             color: themeColor,
+                            size: 20,
                           ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1880,7 +1984,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [CurrencyInputFormatter()],
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                         validator: (value) {
@@ -1892,7 +1996,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
                       // 목표 날짜
                       InkWell(
@@ -1911,7 +2015,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Theme.of(context).brightness == Brightness.dark
@@ -1922,23 +2026,23 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.calendar_today, color: themeColor),
-                              const SizedBox(width: 12),
+                              Icon(Icons.calendar_today, color: themeColor, size: 20),
+                              const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     '목표 날짜',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       color: Theme.of(context).textTheme.bodySmall?.color,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(
                                     '${_selectedDate.year}년 ${_selectedDate.month}월 ${_selectedDate.day}일',
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -1948,19 +2052,22 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
                       // 목표 설명
                       TextFormField(
                         controller: _descriptionController,
                         decoration: InputDecoration(
                           labelText: '목표 설명 (선택사항)',
-                          labelStyle: TextStyle(color: themeColor),
+                          labelStyle: TextStyle(color: themeColor, fontSize: 13),
                           hintText: '목표에 대한 추가 설명을 입력하세요',
+                          hintStyle: TextStyle(fontSize: 12),
                           prefixIcon: Icon(
                             Icons.note_outlined,
                             color: themeColor,
+                            size: 20,
                           ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1969,6 +2076,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                             borderSide: BorderSide(color: themeColor, width: 2),
                           ),
                         ),
+                        style: TextStyle(fontSize: 13),
                         maxLines: 3,
                       ),
                     ],
@@ -1979,7 +2087,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
 
             // 하단 버튼
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.grey[900]
@@ -1995,7 +2103,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -2008,13 +2116,13 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                       child: const Text(
                         '취소',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     flex: 2,
                     child: ElevatedButton(
@@ -2022,7 +2130,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: themeColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -2031,7 +2139,7 @@ class _AddGoalDialogState extends ConsumerState<_AddGoalDialog> {
                       child: const Text(
                         '저장',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
