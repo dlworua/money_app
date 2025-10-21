@@ -1070,16 +1070,16 @@ class _GamesViewState extends ConsumerState<GamesView> {
 }
 
 /// 티켓 타이머 위젯 - 15분 카운트다운을 실시간으로 표시
-class _TicketTimerWidget extends StatefulWidget {
+class _TicketTimerWidget extends ConsumerStatefulWidget {
   final DateTime? lastRefillTime;
 
   const _TicketTimerWidget({this.lastRefillTime});
 
   @override
-  State<_TicketTimerWidget> createState() => _TicketTimerWidgetState();
+  ConsumerState<_TicketTimerWidget> createState() => _TicketTimerWidgetState();
 }
 
-class _TicketTimerWidgetState extends State<_TicketTimerWidget> {
+class _TicketTimerWidgetState extends ConsumerState<_TicketTimerWidget> {
   Timer? _timer;
   int _secondsRemaining = 0;
 
@@ -1114,6 +1114,15 @@ class _TicketTimerWidgetState extends State<_TicketTimerWidget> {
     const refillInterval = 900; // 15분 = 900초
     final secondsSinceLastRefill = timeSinceLastRefill.inSeconds % refillInterval;
     final secondsRemaining = refillInterval - secondsSinceLastRefill;
+
+    // 타이머가 5초 이하일 때 티켓 업데이트 트리거
+    if (secondsRemaining <= 5 && _secondsRemaining > 5) {
+      // 타이머가 5초 이하로 떨어질 때 한 번만 실행
+      Future.microtask(() async {
+        final viewModel = ref.read(homeViewModelProvider.notifier);
+        await viewModel.updateTickets();
+      });
+    }
 
     if (mounted) {
       setState(() {
