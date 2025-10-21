@@ -1132,8 +1132,8 @@ class HomeViewModel extends StateNotifier<HomeState> {
     final lastRefill = user.lastTicketRefillTime ?? now;
     final timeSinceLastRefill = now.difference(lastRefill);
     
-    // 10분(600초)마다 1개씩 충전, 최대 maxTickets개
-    final ticketsToAdd = (timeSinceLastRefill.inSeconds / 600).floor();
+    // 15분(900초)마다 1개씩 충전, 최대 maxTickets개
+    final ticketsToAdd = (timeSinceLastRefill.inSeconds / 900).floor();
     
     if (ticketsToAdd > 0) {
       var newTickets = user.gameTickets + ticketsToAdd;

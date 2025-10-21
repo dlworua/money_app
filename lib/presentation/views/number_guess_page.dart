@@ -24,6 +24,40 @@ class _NumberGuessPageState extends ConsumerState<NumberGuessPage> {
     super.initState();
     _loadBannerAd();
     _enterFullscreen();
+    _checkAndConsumeTicket();
+  }
+
+  /// 티켓 확인 및 소모
+  Future<void> _checkAndConsumeTicket() async {
+    final viewModel = ref.read(homeViewModelProvider.notifier);
+    final hasTicket = await viewModel.consumeTicket();
+
+    if (!hasTicket && mounted) {
+      // 티켓이 없으면 게임 페이지 닫기
+      _showNoTicketDialog();
+    }
+  }
+
+  /// 티켓 부족 다이얼로그
+  void _showNoTicketDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('🎫 티켓 부족'),
+        content: const Text('게임을 플레이하려면 티켓이 필요합니다.\n티켓은 15분마다 1개씩 자동 충전됩니다.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // 다이얼로그 닫기
+              _exitFullscreen();
+              Navigator.pop(context); // 게임 페이지 닫기
+            },
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _enterFullscreen() {
