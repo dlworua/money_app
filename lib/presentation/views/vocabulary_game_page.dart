@@ -30,7 +30,6 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
   void initState() {
     super.initState();
     _initializeBannerAd();
-    _initializeGame();
     // 안드로이드 네비게이션 바 숨김 유지
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SystemChrome.setEnabledSystemUIMode(
@@ -38,6 +37,40 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
         overlays: [],
       );
     });
+    _checkAndConsumeTicket();
+  }
+
+  /// 티켓 확인 및 소모
+  Future<void> _checkAndConsumeTicket() async {
+    final viewModel = ref.read(homeViewModelProvider.notifier);
+    final hasTicket = await viewModel.consumeTicket();
+
+    if (!hasTicket && mounted) {
+      _showNoTicketDialog();
+    } else {
+      _initializeGame();
+    }
+  }
+
+  /// 티켓 부족 다이얼로그
+  void _showNoTicketDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('🎫 티켓 부족'),
+        content: const Text('게임을 플레이하려면 티켓이 필요합니다.\n티켓은 15분마다 1개씩 자동 충전됩니다.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // 다이얼로그 닫기
+              Navigator.pop(context); // 게임 페이지 닫기
+            },
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _initializeBannerAd() {
@@ -145,9 +178,18 @@ class _VocabularyGamePageState extends ConsumerState<VocabularyGamePage> {
               child: const Text('확인'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop(); // 결과 다이얼로그
-                _initializeGame(); // 게임 재시작
+
+                // 티켓 확인 및 소모
+                final viewModel = ref.read(homeViewModelProvider.notifier);
+                final hasTicket = await viewModel.consumeTicket();
+
+                if (!hasTicket && mounted) {
+                  _showNoTicketDialog();
+                } else {
+                  _initializeGame(); // 게임 재시작
+                }
               },
               child: const Text('다시하기'),
             ),

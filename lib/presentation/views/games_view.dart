@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -27,10 +28,20 @@ class _GamesViewState extends ConsumerState<GamesView> {
   BannerAd? _gamesBannerAd;
   bool _isGamesAdLoaded = false;
 
+  // 티켓 타이머 (1초마다 UI 업데이트)
+  Timer? _ticketTimer;
+
   @override
   void initState() {
     super.initState();
     _initializeGamesBannerAd();
+
+    // 1초마다 티켓 타이머 UI 업데이트
+    _ticketTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   /// 게임 탭 전용 배너 광고 초기화
@@ -57,6 +68,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
 
   @override
   void dispose() {
+    _ticketTimer?.cancel();
     _gamesBannerAd?.dispose();
     super.dispose();
   }
@@ -259,6 +271,8 @@ class _GamesViewState extends ConsumerState<GamesView> {
                             fontSize: 16,
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        _buildTicketTimer(user),
                       ],
                     ),
                   ],
@@ -352,6 +366,58 @@ class _GamesViewState extends ConsumerState<GamesView> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 티켓 충전 타이머 위젯 (15분 카운트다운)
+  Widget _buildTicketTimer(user) {
+    if (user.gameTickets >= 10) {
+      // 티켓이 최대치면 타이머 표시 안 함
+      return const SizedBox.shrink();
+    }
+
+    final now = DateTime.now();
+    final lastRefill = user.lastTicketRefillTime ?? now;
+    final timeSinceLastRefill = now.difference(lastRefill);
+
+    // 15분(900초) 중 남은 시간 계산
+    const refillInterval = 900; // 15분 = 900초
+    final secondsSinceLastRefill = timeSinceLastRefill.inSeconds % refillInterval;
+    final secondsRemaining = refillInterval - secondsSinceLastRefill;
+
+    final minutesRemaining = secondsRemaining ~/ 60;
+    final secondsRemainingDisplay = secondsRemaining % 60;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.timer,
+            size: 14,
+            color: Colors.white.withValues(alpha: 0.9),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '${minutesRemaining.toString().padLeft(2, '0')}:${secondsRemainingDisplay.toString().padLeft(2, '0')}',
+            style: AppTheme.getBodySmall(context).copyWith(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              fontFeatures: [const FontFeature.tabularFigures()],
+            ),
           ),
         ],
       ),

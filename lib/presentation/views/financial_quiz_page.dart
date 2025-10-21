@@ -31,7 +31,6 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
   void initState() {
     super.initState();
     _loadBannerAd();
-    _selectRandomQuestions();
     // 안드로이드 네비게이션 바 숨김 유지
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SystemChrome.setEnabledSystemUIMode(
@@ -39,6 +38,40 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
         overlays: [],
       );
     });
+    _checkAndConsumeTicket();
+  }
+
+  /// 티켓 확인 및 소모
+  Future<void> _checkAndConsumeTicket() async {
+    final viewModel = ref.read(homeViewModelProvider.notifier);
+    final hasTicket = await viewModel.consumeTicket();
+
+    if (!hasTicket && mounted) {
+      _showNoTicketDialog();
+    } else {
+      _selectRandomQuestions();
+    }
+  }
+
+  /// 티켓 부족 다이얼로그
+  void _showNoTicketDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('🎫 티켓 부족'),
+        content: const Text('게임을 플레이하려면 티켓이 필요합니다.\n티켓은 15분마다 1개씩 자동 충전됩니다.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // 다이얼로그 닫기
+              Navigator.pop(context); // 게임 페이지 닫기
+            },
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _selectRandomQuestions() {
@@ -303,17 +336,26 @@ class _FinancialQuizPageState extends ConsumerState<FinancialQuizPage> {
                 child: Container(
                   margin: const EdgeInsets.only(right: 8),
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop();
-                      setState(() {
-                        _currentQuestionIndex = 0;
-                        _score = 0;
-                        _hasAnswered = false;
-                        _selectedAnswer = null;
-                        _selectedAnswerIndex = null;
-                        _isCorrect = null;
-                      });
-                      _selectRandomQuestions();
+
+                      // 티켓 확인 및 소모
+                      final viewModel = ref.read(homeViewModelProvider.notifier);
+                      final hasTicket = await viewModel.consumeTicket();
+
+                      if (!hasTicket && mounted) {
+                        _showNoTicketDialog();
+                      } else {
+                        setState(() {
+                          _currentQuestionIndex = 0;
+                          _score = 0;
+                          _hasAnswered = false;
+                          _selectedAnswer = null;
+                          _selectedAnswerIndex = null;
+                          _isCorrect = null;
+                        });
+                        _selectRandomQuestions();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,

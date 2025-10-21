@@ -196,7 +196,17 @@ class _NumberGuessPageState extends ConsumerState<NumberGuessPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(), // 결과 다이얼로그만 닫기
+            onPressed: () async {
+              Navigator.of(context).pop(); // 결과 다이얼로그만 닫기
+
+              // 티켓 확인 및 소모
+              final viewModel = ref.read(homeViewModelProvider.notifier);
+              final hasTicket = await viewModel.consumeTicket();
+
+              if (!hasTicket && mounted) {
+                _showNoTicketDialog();
+              }
+            },
             child: Text('다시 게임하기', style: AppTheme.getBodyMedium(context)),
           ),
           TextButton(
