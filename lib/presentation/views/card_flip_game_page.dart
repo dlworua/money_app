@@ -204,27 +204,42 @@ class _CardFlipGamePageState extends ConsumerState<CardFlipGamePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('라운드 ${_currentRound-1} 완료!'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.celebration, color: Colors.orange, size: 48),
-            const SizedBox(height: 16),
-            Text('$roundCoins 포인트 획득!'),
-            Text('총 획득: $_totalEarnedCoins 포인트'),
-            if (_currentRound <= 5) Text('다음 라운드로 진행하시겠습니까?'),
+      builder: (dialogContext) {
+        final isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+        return AlertDialog(
+          title: Text(
+            '라운드 ${_currentRound-1} 완료!',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.celebration, color: Colors.orange, size: 48),
+              const SizedBox(height: 16),
+              Text(
+                '$roundCoins 포인트 획득!',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+              Text(
+                '총 획득: $_totalEarnedCoins 포인트',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+              if (_currentRound <= 5) Text(
+                '다음 라운드로 진행하시겠습니까?',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+            ],
+          ),
+          actions: [
+            if (_currentRound <= 5) ...[
+              TextButton(onPressed: _exitGame, child: const Text('그만하기')),
+              ElevatedButton(onPressed: _nextRound, child: const Text('계속하기')),
+            ] else ...[
+              ElevatedButton(onPressed: _exitGame, child: const Text('완료')),
+            ],
           ],
-        ),
-        actions: [
-          if (_currentRound <= 5) ...[
-            TextButton(onPressed: _exitGame, child: const Text('그만하기')),
-            ElevatedButton(onPressed: _nextRound, child: const Text('계속하기')),
-          ] else ...[
-            ElevatedButton(onPressed: _exitGame, child: const Text('완료')),
-          ],
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -241,27 +256,39 @@ class _CardFlipGamePageState extends ConsumerState<CardFlipGamePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('시간 종료!'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.timer_off, color: Colors.red, size: 48),
-            const SizedBox(height: 16),
-            const Text('시간이 초과되었습니다.'),
-            const Text('획득 포인트: 0'),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // 결과 다이얼로그
-              Navigator.of(context).pop(); // 게임 페이지
-            },
-            child: const Text('확인'),
+      builder: (dialogContext) {
+        final isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+        return AlertDialog(
+          title: Text(
+            '시간 종료!',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
           ),
-        ],
-      ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.timer_off, color: Colors.red, size: 48),
+              const SizedBox(height: 16),
+              Text(
+                '시간이 초과되었습니다.',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+              Text(
+                '획득 포인트: 0',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // 결과 다이얼로그
+                Navigator.of(context).pop(); // 게임 페이지
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
     );
   }
 

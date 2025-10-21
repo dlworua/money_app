@@ -98,58 +98,67 @@ class _NumberGuessPageState extends ConsumerState<NumberGuessPage> {
             ),
           ],
         ),
-        content: Container(
-          padding: ResponsiveUtils.getResponsivePaddingCustom(context, all: 16),
-          decoration: BoxDecoration(
-            color: isCorrect ? Colors.green[50] : Colors.orange[50],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                isCorrect ? Icons.stars : Icons.refresh,
-                color: isCorrect ? Colors.green[600] : Colors.orange[600],
-                size: ResponsiveUtils.getResponsiveIconSize(context, 40),
+        content: Builder(
+          builder: (context) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
+              padding: ResponsiveUtils.getResponsivePaddingCustom(context, all: 16),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? (isCorrect ? Colors.green[900] : Colors.orange[900])
+                    : (isCorrect ? Colors.green[50] : Colors.orange[50]),
+                borderRadius: BorderRadius.circular(12),
               ),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, 8)),
-              Flexible(
-                child: Text(
-                  isCorrect
-                      ? '축하합니다! 20 포인트을 획득했습니다!'
-                      : '아쉽지만 틀렸네요. 다음에 다시 도전해보세요!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
-                    color: isCorrect ? Colors.green[800] : Colors.orange[800],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isCorrect ? Icons.stars : Icons.refresh,
+                    color: isCorrect ? Colors.green[600] : Colors.orange[600],
+                    size: ResponsiveUtils.getResponsiveIconSize(context, 40),
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              if (isCorrect) ...[
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber[200],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '+20 포인트',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber[800],
-                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 14),
+                  SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, 8)),
+                  Flexible(
+                    child: Text(
+                      isCorrect
+                          ? '축하합니다! 20 포인트을 획득했습니다!'
+                          : '아쉽지만 틀렸네요. 다음에 다시 도전해보세요!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 16),
+                        color: isDark
+                            ? (isCorrect ? Colors.green[200] : Colors.orange[200])
+                            : (isCorrect ? Colors.green[800] : Colors.orange[800]),
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
-              ],
-            ],
-          ),
+                  if (isCorrect) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber[200],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '+20 포인트',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber[800],
+                          fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
         ),
         actions: [
           TextButton(
