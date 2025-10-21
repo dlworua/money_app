@@ -137,6 +137,8 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
   /// 프로필 섹션 - 컴팩트 디자인
   Widget _buildProfileSection(user) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -144,10 +146,16 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.green.shade50, Colors.teal.shade50],
+          colors: isDark
+              ? [Colors.grey.shade800, Colors.grey.shade900]
+              : [Colors.green.shade50, Colors.teal.shade50],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.shade400.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: isDark
+              ? Colors.grey.shade700
+              : Colors.green.shade400.withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         children: [
@@ -167,11 +175,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       '머니 마스터',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -204,7 +213,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           // 구분선
           Container(
             height: 1,
-            color: Colors.green.shade400.withValues(alpha: 0.1),
+            color: isDark
+                ? Colors.grey.shade700
+                : Colors.green.shade400.withValues(alpha: 0.1),
           ),
 
           const SizedBox(height: 12),
@@ -237,19 +248,25 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
   /// 컴팩트한 통계 아이템
   Widget _buildCompactStatItem(IconData icon, String value, String label) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         Icon(icon, color: Colors.green.shade400, size: 20),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
         Text(
           label,
           style: TextStyle(
             fontSize: 10,
-            color: AppTheme.getSecondaryTextColor(context),
+            color: isDark ? Colors.grey.shade400 : AppTheme.getSecondaryTextColor(context),
           ),
         ),
       ],
