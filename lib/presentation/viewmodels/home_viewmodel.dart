@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -79,6 +80,9 @@ class HomeViewModel extends StateNotifier<HomeState> {
   final AiCoachingService _aiCoaching;
   final TransactionRepository _transactionRepository;
 
+  // 티켓 자동 충전 타이머 (1분마다 체크)
+  Timer? _ticketRefillTimer;
+
   HomeViewModel(
     this._userService,
     this._adService,
@@ -86,6 +90,14 @@ class HomeViewModel extends StateNotifier<HomeState> {
     this._transactionRepository,
   ) : super(HomeState()) {
     _init();
+    _startTicketRefillTimer();
+  }
+
+  /// 티켓 자동 충전 타이머 시작 (1분마다 체크)
+  void _startTicketRefillTimer() {
+    _ticketRefillTimer = Timer.periodic(const Duration(minutes: 1), (_) async {
+      await updateTickets();
+    });
   }
 
   Future<void> _init() async {
@@ -110,6 +122,9 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
       // 데이터 로드를 먼저 완료
       await _loadAllData();
+
+      // 티켓 자동 충전 확인
+      await updateTickets();
 
       // 데이터가 로드된 후 AI 코칭 초기화
       await _initializeAiCoaching();
@@ -1131,14 +1146,15 @@ class HomeViewModel extends StateNotifier<HomeState> {
     final now = DateTime.now();
     final lastRefill = user.lastTicketRefillTime ?? now;
     final timeSinceLastRefill = now.difference(lastRefill);
-    
+
     // 15분(900초)마다 1개씩 충전, 최대 maxTickets개
-    final ticketsToAdd = (timeSinceLastRefill.inSeconds / 900).floor();
-    
-    if (ticketsToAdd > 0) {
+    const refillInterval = 900; // 15분
+    final ticketsToAdd = (timeSinceLastRefill.inSeconds / refillInterval).floor();
+
+    if (ticketsToAdd > 0 && user.gameTickets < user.maxTickets) {
       var newTickets = user.gameTickets + ticketsToAdd;
       var newMaxTickets = user.maxTickets;
-      
+
       // 티켓이 기본 최대치(10)를 초과하는 경우, maxTickets를 점진적으로 줄임
       if (newTickets > 10) {
         final excessTickets = newTickets - 10;
@@ -1147,13 +1163,16 @@ class HomeViewModel extends StateNotifier<HomeState> {
       } else {
         newTickets = newTickets.clamp(0, user.maxTickets);
       }
-      
+
+      // lastTicketRefillTime을 충전된 티켓 수만큼 앞으로 이동 (남은 초 유지)
+      final newLastRefillTime = lastRefill.add(Duration(seconds: ticketsToAdd * refillInterval));
+
       final updatedUser = user.copyWith(
         gameTickets: newTickets,
         maxTickets: newMaxTickets,
-        lastTicketRefillTime: now,
+        lastTicketRefillTime: newLastRefillTime,
       );
-      
+
       await _userService.saveUser(updatedUser);
       state = state.copyWith(user: updatedUser);
       
@@ -1285,6 +1304,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
   @override
   void dispose() {
+    _ticketRefillTimer?.cancel();
     state.bannerAd?.dispose();
     super.dispose();
   }
