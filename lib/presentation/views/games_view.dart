@@ -1113,7 +1113,12 @@ class _TicketTimerWidgetState extends ConsumerState<_TicketTimerWidget> {
     // 15분(900초) 중 남은 시간 계산
     const refillInterval = 900; // 15분 = 900초
     final secondsSinceLastRefill = timeSinceLastRefill.inSeconds % refillInterval;
-    final secondsRemaining = refillInterval - secondsSinceLastRefill;
+    var secondsRemaining = refillInterval - secondsSinceLastRefill;
+
+    // 900초(15:00)가 되면 0초로 표시 (다음 사이클 시작)
+    if (secondsRemaining >= refillInterval) {
+      secondsRemaining = 0;
+    }
 
     // 타이머가 5초 이하일 때 티켓 업데이트 트리거
     if (secondsRemaining <= 5 && _secondsRemaining > 5) {
