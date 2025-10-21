@@ -1204,15 +1204,20 @@ class HomeViewModel extends StateNotifier<HomeState> {
       LoggerService.info('🎫 티켓 부족: ${updatedUser.gameTickets}');
       return false;
     }
-    
+
+    final now = DateTime.now();
+    final wasMaxTickets = updatedUser.gameTickets >= updatedUser.maxTickets;
+
     final finalUser = updatedUser.copyWith(
       gameTickets: updatedUser.gameTickets - 1,
+      // 최대 티켓에서 소모한 경우, 타이머를 15분으로 리셋
+      lastTicketRefillTime: wasMaxTickets ? now : updatedUser.lastTicketRefillTime,
     );
-    
+
     await _userService.saveUser(finalUser);
     state = state.copyWith(user: finalUser);
-    
-    LoggerService.info('🎫 티켓 소모: ${updatedUser.gameTickets} → ${finalUser.gameTickets}');
+
+    LoggerService.info('🎫 티켓 소모: ${updatedUser.gameTickets} → ${finalUser.gameTickets}${wasMaxTickets ? ' (타이머 리셋)' : ''}');
     return true;
   }
   
