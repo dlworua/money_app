@@ -107,17 +107,28 @@ class HomeViewModel extends StateNotifier<HomeState> {
       final user = await _userService.getCurrentUser();
       if (user == null) {
         // 새 사용자 생성
+        final now = DateTime.now();
         final newUser = UserModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: now.millisecondsSinceEpoch.toString(),
           name: '절약왕',
           email: 'user@example.com',
           preferredCoachingStyle: CoachingStyle.kind,
           enableDailyCoaching: true,
+          lastTicketRefillTime: now, // 티켓 충전 시작 시간 설정
         );
         await _userService.saveUser(newUser);
         state = state.copyWith(user: newUser, isLoading: false);
       } else {
-        state = state.copyWith(user: user, isLoading: false);
+        // 기존 사용자이지만 lastTicketRefillTime이 null인 경우 초기화
+        if (user.lastTicketRefillTime == null) {
+          final updatedUser = user.copyWith(
+            lastTicketRefillTime: DateTime.now(),
+          );
+          await _userService.saveUser(updatedUser);
+          state = state.copyWith(user: updatedUser, isLoading: false);
+        } else {
+          state = state.copyWith(user: user, isLoading: false);
+        }
       }
 
       // 데이터 로드를 먼저 완료

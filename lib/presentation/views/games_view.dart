@@ -1098,7 +1098,16 @@ class _TicketTimerWidgetState extends State<_TicketTimerWidget> {
 
   void _calculateRemainingTime() {
     final now = DateTime.now();
-    final lastRefill = widget.lastRefillTime ?? now;
+
+    // lastRefillTime이 null이면 현재 시간 사용
+    if (widget.lastRefillTime == null) {
+      setState(() {
+        _secondsRemaining = 0;
+      });
+      return;
+    }
+
+    final lastRefill = widget.lastRefillTime!;
     final timeSinceLastRefill = now.difference(lastRefill);
 
     // 15분(900초) 중 남은 시간 계산
@@ -1106,9 +1115,11 @@ class _TicketTimerWidgetState extends State<_TicketTimerWidget> {
     final secondsSinceLastRefill = timeSinceLastRefill.inSeconds % refillInterval;
     final secondsRemaining = refillInterval - secondsSinceLastRefill;
 
-    setState(() {
-      _secondsRemaining = secondsRemaining;
-    });
+    if (mounted) {
+      setState(() {
+        _secondsRemaining = secondsRemaining;
+      });
+    }
   }
 
   @override
