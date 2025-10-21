@@ -28,20 +28,10 @@ class _GamesViewState extends ConsumerState<GamesView> {
   BannerAd? _gamesBannerAd;
   bool _isGamesAdLoaded = false;
 
-  // 티켓 타이머 (1초마다 UI 업데이트)
-  Timer? _ticketTimer;
-
   @override
   void initState() {
     super.initState();
     _initializeGamesBannerAd();
-
-    // 1초마다 티켓 타이머 UI 업데이트
-    _ticketTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
   }
 
   /// 게임 탭 전용 배너 광고 초기화
@@ -68,7 +58,6 @@ class _GamesViewState extends ConsumerState<GamesView> {
 
   @override
   void dispose() {
-    _ticketTimer?.cancel();
     _gamesBannerAd?.dispose();
     super.dispose();
   }
@@ -379,49 +368,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
       return const SizedBox.shrink();
     }
 
-    final now = DateTime.now();
-    final lastRefill = user.lastTicketRefillTime ?? now;
-    final timeSinceLastRefill = now.difference(lastRefill);
-
-    // 15분(900초) 중 남은 시간 계산
-    const refillInterval = 900; // 15분 = 900초
-    final secondsSinceLastRefill = timeSinceLastRefill.inSeconds % refillInterval;
-    final secondsRemaining = refillInterval - secondsSinceLastRefill;
-
-    final minutesRemaining = secondsRemaining ~/ 60;
-    final secondsRemainingDisplay = secondsRemaining % 60;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.timer,
-            size: 14,
-            color: Colors.white.withValues(alpha: 0.9),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            '${minutesRemaining.toString().padLeft(2, '0')}:${secondsRemainingDisplay.toString().padLeft(2, '0')}',
-            style: AppTheme.getBodySmall(context).copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              fontFeatures: [const FontFeature.tabularFigures()],
-            ),
-          ),
-        ],
-      ),
-    );
+    return _TicketTimerWidget(lastRefillTime: user.lastTicketRefillTime);
   }
 
   Widget _buildSectionHeader(
@@ -1119,5 +1066,92 @@ class _GamesViewState extends ConsumerState<GamesView> {
       // 광고 표시 오류 시 null 반환하여 광고 영역을 숨김
       return null;
     }
+  }
+}
+
+/// 티켓 타이머 위젯 - 15분 카운트다운을 실시간으로 표시
+class _TicketTimerWidget extends StatefulWidget {
+  final DateTime? lastRefillTime;
+
+  const _TicketTimerWidget({this.lastRefillTime});
+
+  @override
+  State<_TicketTimerWidget> createState() => _TicketTimerWidgetState();
+}
+
+class _TicketTimerWidgetState extends State<_TicketTimerWidget> {
+  Timer? _timer;
+  int _secondsRemaining = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateRemainingTime();
+
+    // 1초마다 타이머 업데이트
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        _calculateRemainingTime();
+      }
+    });
+  }
+
+  void _calculateRemainingTime() {
+    final now = DateTime.now();
+    final lastRefill = widget.lastRefillTime ?? now;
+    final timeSinceLastRefill = now.difference(lastRefill);
+
+    // 15분(900초) 중 남은 시간 계산
+    const refillInterval = 900; // 15분 = 900초
+    final secondsSinceLastRefill = timeSinceLastRefill.inSeconds % refillInterval;
+    final secondsRemaining = refillInterval - secondsSinceLastRefill;
+
+    setState(() {
+      _secondsRemaining = secondsRemaining;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final minutesRemaining = _secondsRemaining ~/ 60;
+    final secondsRemainingDisplay = _secondsRemaining % 60;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.timer,
+            size: 14,
+            color: Colors.white.withValues(alpha: 0.9),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '${minutesRemaining.toString().padLeft(2, '0')}:${secondsRemainingDisplay.toString().padLeft(2, '0')}',
+            style: AppTheme.getBodySmall(context).copyWith(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              fontFeatures: [const FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
