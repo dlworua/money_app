@@ -334,7 +334,9 @@ class _CardFlipGamePageState extends ConsumerState<CardFlipGamePage> {
         height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppTheme.backgroundColor, Colors.grey[50]!],
+            colors: Theme.of(context).brightness == Brightness.dark
+                ? [Colors.grey[900]!, Colors.grey[800]!]
+                : [AppTheme.backgroundColor, Colors.grey[50]!],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

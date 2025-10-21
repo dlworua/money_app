@@ -339,7 +339,9 @@ class _NumberGuessPageState extends ConsumerState<NumberGuessPage> {
         height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue[50]!, Colors.indigo[50]!, Colors.white],
+            colors: Theme.of(context).brightness == Brightness.dark
+                ? [Colors.grey[900]!, Colors.grey[850]!, Colors.grey[800]!]
+                : [Colors.blue[50]!, Colors.indigo[50]!, Colors.white],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -359,11 +361,17 @@ class _NumberGuessPageState extends ConsumerState<NumberGuessPage> {
                     padding: EdgeInsets.all(ResponsiveUtils.getIPhone16PlusSpacing(context, 24)),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Colors.white,
-                          Colors.blue[50]!.withValues(alpha: 0.3),
-                          Colors.indigo[50]!.withValues(alpha: 0.3),
-                        ],
+                        colors: Theme.of(context).brightness == Brightness.dark
+                            ? [
+                                Colors.grey[850]!,
+                                Colors.grey[800]!.withValues(alpha: 0.3),
+                                Colors.grey[900]!.withValues(alpha: 0.3),
+                              ]
+                            : [
+                                Colors.white,
+                                Colors.blue[50]!.withValues(alpha: 0.3),
+                                Colors.indigo[50]!.withValues(alpha: 0.3),
+                              ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
