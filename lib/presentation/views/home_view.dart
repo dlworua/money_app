@@ -144,13 +144,17 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     Text(
                       '안녕하세요! 👋',
                       style: AppTheme.getBodyMedium(context).copyWith(
-                        color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withValues(alpha: 0.9)
+                            : AppTheme.onSurfaceColor.withValues(alpha: 0.7),
                       ),
                     ),
                     Text(
                       user.name.isNotEmpty ? user.name : '스마트 절약러',
                       style: AppTheme.getHeadingSmall(context).copyWith(
-                        color: AppTheme.onSurfaceColor,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : AppTheme.onSurfaceColor,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -803,7 +807,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       child: Text(
                         category,
                         style: AppTheme.getBodyMedium(context).copyWith(
-                          color: AppTheme.onSurfaceColor,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade800
+                              : AppTheme.onSurfaceColor,
                           fontWeight: FontWeight.w500,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -821,7 +827,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     child: Text(
                       NumberFormatter.formatWon(amount),
                       style: AppTheme.getBodyMedium(context).copyWith(
-                        color: AppTheme.onSurfaceColor,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade800
+                            : AppTheme.onSurfaceColor,
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
@@ -830,7 +838,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   Text(
                     '${(percentage * 100).toStringAsFixed(1)}%',
                     style: AppTheme.getBodySmall(context).copyWith(
-                      color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey.shade700
+                          : AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -1464,7 +1474,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
             content,
             style: TextStyle(
               fontSize: 13,
-              color: AppTheme.getTextColor(context),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade800
+                  : AppTheme.getTextColor(context),
               height: 1.4,
             ),
           ),

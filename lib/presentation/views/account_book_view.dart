@@ -274,53 +274,6 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   ),
                 ),
 
-                // 이번달 절약 요약 카드
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.green.shade50, Colors.teal.shade50],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.green.shade200,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.savings, color: Colors.green.shade600, size: 32),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '이번달 절약',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.green.shade800,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _formatCurrency(saving),
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             );
           },
@@ -397,7 +350,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
         Text(
           title,
           style: TextStyle(
-            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade800
+                : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             fontSize: 12.0,
           ),
         ),
@@ -575,9 +530,12 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   children: [
                     Text(
                       '${now.month}월 수지',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade800
+                            : Colors.black,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -598,7 +556,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                     Text(
                       '수입 ${_formatCurrency(income).replaceAll('원', '')} - 지출 ${_formatCurrency(expense).replaceAll('원', '')}',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade700
+                            : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -607,7 +567,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                       Text(
                         '절약 ${_formatCurrency(saving, showSign: true)}',
                         style: TextStyle(
-                          color: Colors.green.shade600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade700
+                              : Colors.green.shade600,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -933,9 +895,12 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                     Expanded(
                       child: Text(
                         budget.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade800
+                              : Colors.black,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -952,7 +917,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                       fontWeight: FontWeight.bold,
                       color: isOverBudget
                           ? Colors.red
-                          : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                          : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade700
+                              : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8)),
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -1111,9 +1078,12 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   children: [
                     Text(
                       goal.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade800
+                            : Colors.black,
                       ),
                     ),
                     if (goal.description != null) ...[
@@ -1122,7 +1092,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                         goal.description ?? '',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade700
+                              : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -1185,6 +1157,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey.shade800
+                        : Colors.black,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -1195,7 +1170,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                   '목표: ${_formatCurrency(goal.targetAmount)}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey.shade700
+                        : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -1211,7 +1188,9 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 '${_formatCurrency(goal.remainingAmount)} 남음',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.shade700
+                      : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 ),
               ),
               Text(
@@ -1326,12 +1305,38 @@ class _AccountBookViewState extends ConsumerState<AccountBookView>
                 children: [
                   Text(
                     '💪 현재 진행률: ${(goal.progress * 100).round()}%',
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey.shade800
+                          : Colors.black,
+                    ),
                   ),
-                  Text('💰 모인 금액: ${_formatCurrency(goal.currentAmount)}'),
-                  Text('🎯 남은 금액: ${_formatCurrency(goal.remainingAmount)}'),
+                  Text(
+                    '💰 모인 금액: ${_formatCurrency(goal.currentAmount)}',
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey.shade800
+                          : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    '🎯 남은 금액: ${_formatCurrency(goal.remainingAmount)}',
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey.shade800
+                          : Colors.black,
+                    ),
+                  ),
                   if (goal.remainingDays > 0)
-                    Text('📅 남은 기간: ${goal.remainingDays}일'),
+                    Text(
+                      '📅 남은 기간: ${goal.remainingDays}일',
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade800
+                            : Colors.black,
+                      ),
+                    ),
                 ],
               ),
             ),

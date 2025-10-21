@@ -233,10 +233,15 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
                 color: Colors.green.shade400.withValues(alpha: 0.1),
               ),
             ),
-            child: Text(
-              insight.personalizedMessage,
-              style: AppTheme.bodyMedium.copyWith(
-                height: 1.6,
+            child: Builder(
+              builder: (context) => Text(
+                insight.personalizedMessage,
+                style: AppTheme.bodyMedium.copyWith(
+                  height: 1.6,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.shade800
+                      : Colors.black,
+                ),
               ),
             ),
           ),
@@ -421,23 +426,30 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
                 ),
                 const SizedBox(width: AppTheme.spaceS),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        advice.title,
-                        style: AppTheme.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
+                  child: Builder(
+                    builder: (context) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          advice.title,
+                          style: AppTheme.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey.shade800
+                                : Colors.black,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        advice.description,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppTheme.onBackgroundColor,
+                        const SizedBox(height: 4),
+                        Text(
+                          advice.description,
+                          style: AppTheme.bodySmall.copyWith(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey.shade700
+                                : AppTheme.onBackgroundColor,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
