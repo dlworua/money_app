@@ -77,13 +77,20 @@ class AiCoachingService {
       if (topCategory != null) {
         actionItems.addAll(_getBasicAdviceForCategory(topCategory));
       }
-      
+
+      // 말투 적용
+      final styledMessage = _applyCoachingTone(message, user.preferredCoachingStyle);
+      final styledActionItems = actionItems
+          .take(4)
+          .map((item) => _applyCoachingTone(item, user.preferredCoachingStyle))
+          .toList();
+
       return AiCoachingInsight(
         id: 'financial_${DateTime.now().millisecondsSinceEpoch}',
         createdAt: DateTime.now(),
         style: user.preferredCoachingStyle,
         title: title,
-        message: message,
+        message: styledMessage,
         type: InsightType.spendingPattern,
         analysisData: {
           'transactionCount': transactions.length,
@@ -92,7 +99,7 @@ class AiCoachingService {
           'dailyAverage': dailyAverage,
         },
         confidenceScore: transactions.length >= 5 ? 0.8 : 0.6,
-        actionItems: actionItems.take(4).toList(),
+        actionItems: styledActionItems,
       );
       
     } catch (error) {
@@ -753,7 +760,7 @@ class AiCoachingService {
   /// 카테고리별 최적화 조언
   List<String> _getOptimizationAdviceForCategory(TransactionCategory category, double categorySpending, double dailyAverage) {
     final monthlySpending = dailyAverage * 30;
-    
+
     switch (category) {
       case TransactionCategory.food:
         if (categorySpending > monthlySpending * 0.3) {
@@ -763,25 +770,129 @@ class AiCoachingService {
           ];
         }
         return ['현재 식비 관리 잘하고 계시네요!', '가끔 특가 상품 활용해보기'];
-        
+
       case TransactionCategory.transport:
         return [
           '정기권 할인 혜택 확인해보기',
           '가까운 거리는 걸어서 건강도 챙기기'
         ];
-        
+
       case TransactionCategory.shopping:
         return [
           '충동구매 방지를 위한 1일 고민 시간 갖기',
           '필요한 것과 원하는 것 구분해서 구매하기'
         ];
-        
+
       default:
         return [
           '${category.displayName} 지출 패턴 분석해보기',
           '더 저렴한 대안 옵션 찾아보기'
         ];
     }
+  }
+
+  // ========================================
+  // 말투 적용 시스템
+  // ========================================
+
+  /// 메시지에 말투 적용 (핵심 함수)
+  String _applyCoachingTone(String baseMessage, CoachingStyle style) {
+    switch (style) {
+      case CoachingStyle.strict:
+        return _makeStrict(baseMessage);
+      case CoachingStyle.kind:
+        return _makeKind(baseMessage);
+      case CoachingStyle.friendly:
+        return _makeFriendly(baseMessage);
+      case CoachingStyle.motivational:
+        return _makeMotivational(baseMessage);
+      case CoachingStyle.analytical:
+        return _makeAnalytical(baseMessage);
+    }
+  }
+
+  /// 엄격한 말투
+  String _makeStrict(String message) {
+    final patterns = {
+      '요': '.',
+      '네요': '니다',
+      '어요': '습니다',
+      '해요': '하십시오',
+      '세요': '하세요',
+      '!': '.',
+      '~': '',
+    };
+
+    var result = message;
+    patterns.forEach((key, value) {
+      result = result.replaceAll(key, value);
+    });
+
+    // 이모지 제거 (기본 이모지 범위)
+    result = result.replaceAll(RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true), '');
+
+    return result;
+  }
+
+  /// 친절한 말투
+  String _makeKind(String message) {
+    // 이미 친절한 기본 메시지에 약간의 감탄사 추가
+    if (!message.contains('!') && !message.contains('~')) {
+      if (message.contains('좋')) return '$message 😊';
+      if (message.contains('잘')) return '$message 👏';
+      if (message.contains('훌륭')) return '$message 🌟';
+    }
+    return message;
+  }
+
+  /// 친근한 말투
+  String _makeFriendly(String message) {
+    final patterns = {
+      '입니다': '이야',
+      '습니다': '어',
+      '하세요': '해봐',
+      '하십시오': '해',
+      '합니다': '해',
+      '.': '!',
+    };
+
+    var result = message;
+    patterns.forEach((key, value) {
+      result = result.replaceAll(key, value);
+    });
+
+    // 종결어미 추가
+    if (!result.endsWith('!') && !result.endsWith('~')) {
+      result = '$result!';
+    }
+
+    return result;
+  }
+
+  /// 동기부여 말투
+  String _makeMotivational(String message) {
+    // 이모지 추가
+    var result = message;
+    if (!result.contains('🔥') && !result.contains('💪')) {
+      result = '🔥 $result 💪';
+    }
+
+    return result;
+  }
+
+  /// 분석적 말투
+  String _makeAnalytical(String message) {
+    // 숫자와 통계 강조
+    var result = message;
+
+    // 이모지 제거하고 데이터 중심 표현 추가
+    result = result.replaceAll(RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true), '');
+
+    if (!result.contains('분석') && !result.contains('데이터')) {
+      result = '[분석] $result';
+    }
+
+    return result;
   }
 
 }
