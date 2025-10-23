@@ -815,14 +815,14 @@ class AiCoachingService {
     }
   }
 
-  /// 통화 포맷 헬퍼 메서드
+  /// 통화 포맷 헬퍼 메서드 (단위 포함)
   String _formatCurrency(double amount) {
     if (amount >= 10000) {
-      return '${(amount / 10000).toInt()}만원';
+      return '${(amount / 10000).toInt()}만';
     } else if (amount >= 1000) {
-      return '${(amount / 1000).toInt()}천원';
+      return '${(amount / 1000).toInt()}천';
     } else {
-      return '${amount.toInt()}원';
+      return '${amount.toInt()}';
     }
   }
 

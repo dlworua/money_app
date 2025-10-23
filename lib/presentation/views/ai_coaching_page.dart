@@ -5,83 +5,80 @@ import '../../core/theme/app_theme.dart';
 import '../../core/services/enhanced_ai_coach.dart';
 import '../viewmodels/providers.dart';
 
-class EnhancedAiCoachingDialog extends ConsumerWidget {
-  const EnhancedAiCoachingDialog({super.key});
+/// AI 맞춤 조언 독립 페이지
+class AiCoachingPage extends ConsumerWidget {
+  const AiCoachingPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Dialog.fullscreen(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('🤖 AI 절약 코치'),
-          backgroundColor: Colors.green.shade400,
-          foregroundColor: Colors.white,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark,
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('🤖 AI 절약 코치'),
+        backgroundColor: Colors.green.shade400,
+        foregroundColor: Colors.white,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
         ),
-        body: FutureBuilder<ComprehensiveInsight>(
-          future: _generateInsight(ref),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return _buildLoadingView();
-            }
-            
-            if (snapshot.hasError) {
-              return _buildErrorView(snapshot.error.toString());
-            }
-            
-            final insight = snapshot.data!;
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppTheme.spaceM),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeaderCard(insight),
+      ),
+      body: FutureBuilder<ComprehensiveInsight>(
+        future: _generateInsight(ref),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildLoadingView();
+          }
+
+          if (snapshot.hasError) {
+            return _buildErrorView(snapshot.error.toString());
+          }
+
+          final insight = snapshot.data!;
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(AppTheme.spaceM),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeaderCard(insight),
+                const SizedBox(height: AppTheme.spaceM),
+                _buildMainAnalysisCard(context, insight),
+                const SizedBox(height: AppTheme.spaceM),
+                _buildStrategiesCard(insight),
+                const SizedBox(height: AppTheme.spaceM),
+                _buildActionableAdviceCard(context, insight),
+                if (insight.opportunities.isNotEmpty) ...[
                   const SizedBox(height: AppTheme.spaceM),
-                  _buildMainAnalysisCard(insight),
-                  const SizedBox(height: AppTheme.spaceM),
-                  _buildStrategiesCard(insight),
-                  const SizedBox(height: AppTheme.spaceM),
-                  _buildActionableAdviceCard(insight),
-                  if (insight.opportunities.isNotEmpty) ...[
-                    const SizedBox(height: AppTheme.spaceM),
-                    _buildOpportunitiesCard(insight),
-                  ],
-                  if (insight.predictions['available'] == true) ...[
-                    const SizedBox(height: AppTheme.spaceM),
-                    _buildPredictionsCard(insight),
-                  ],
+                  _buildOpportunitiesCard(insight),
                 ],
-              ),
-            );
-          },
-        ),
+                if (insight.predictions['available'] == true) ...[
+                  const SizedBox(height: AppTheme.spaceM),
+                  _buildPredictionsCard(insight),
+                ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }
-  
+
   /// 🔄 실제 가계부 데이터를 로드하여 AI 인사이트 생성
   Future<ComprehensiveInsight> _generateInsight(WidgetRef ref) async {
     final state = ref.read(homeViewModelProvider);
     final coach = EnhancedAiCoach();
 
-    // state.user가 null일 경우를 처리
     final user = state.user;
     if (user == null) {
       throw Exception('사용자 정보를 찾을 수 없습니다');
     }
 
-    // 🎯 실제 거래 내역과 예산 데이터를 TransactionRepository에서 로드
     final transactionRepository = ref.read(transactionRepositoryProvider);
     final transactions = await transactionRepository.getTransactions();
     final budgets = await transactionRepository.getBudgets();
 
     return await coach.generateComprehensiveInsight(user, transactions, budgets);
   }
-  
+
   Widget _buildLoadingView() {
     return const Center(
       child: Column(
@@ -104,7 +101,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildErrorView(String error) {
     return Center(
       child: Column(
@@ -117,7 +114,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
           ),
           const SizedBox(height: AppTheme.spaceM),
           const Text(
-            '분석 중 문제가 발생했어요',
+            '분석 중 오류가 발생했어요',
             style: AppTheme.headingMedium,
             textAlign: TextAlign.center,
           ),
@@ -194,7 +191,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainAnalysisCard(ComprehensiveInsight insight) {
+  Widget _buildMainAnalysisCard(BuildContext context, ComprehensiveInsight insight) {
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
@@ -233,15 +230,13 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
                 color: Colors.green.shade400.withValues(alpha: 0.1),
               ),
             ),
-            child: Builder(
-              builder: (context) => Text(
-                _cleanMarkdown(insight.personalizedMessage),
-                style: AppTheme.bodyMedium.copyWith(
-                  height: 1.6,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey.shade800
-                      : Colors.black,
-                ),
+            child: Text(
+              _cleanMarkdown(insight.personalizedMessage),
+              style: AppTheme.bodyMedium.copyWith(
+                height: 1.6,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.black,
               ),
             ),
           ),
@@ -251,8 +246,6 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
   }
 
   Widget _buildStrategiesCard(ComprehensiveInsight insight) {
-    if (insight.strategies.isEmpty) return const SizedBox.shrink();
-    
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
@@ -267,100 +260,40 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
             children: [
               Icon(
                 Icons.lightbulb_outline,
-                color: Colors.green.shade400,
+                color: Colors.amber.shade400,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
-                '맞춤형 전략',
+                '절약 전략',
                 style: AppTheme.headingSmall.copyWith(
-                  color: Colors.green.shade400,
+                  color: Colors.amber.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppTheme.spaceM),
-          ...insight.strategies.map((strategy) => Container(
-            margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
-            padding: const EdgeInsets.all(AppTheme.spaceM),
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.green.shade400.withValues(alpha: 0.2),
-              ),
-            ),
-            child: Column(
+          ...insight.strategies.map((strategy) => Padding(
+            padding: const EdgeInsets.only(bottom: AppTheme.spaceS),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        strategy.title,
-                        style: AppTheme.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green.shade400,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getPriorityColor(strategy.priority),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        strategy.priority,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppTheme.spaceS),
-                Text(
-                  strategy.description,
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppTheme.onSurfaceColor,
+                Container(
+                  margin: const EdgeInsets.only(top: 6),
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade400,
+                    shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(height: AppTheme.spaceS),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.savings_outlined,
-                      size: 16,
-                      color: AppTheme.successColor,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '예상 절약: ${_formatCurrency(strategy.expectedSaving.toDouble())}',
-                      style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.successColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(width: AppTheme.spaceM),
-                    Icon(
-                      Icons.schedule_outlined,
-                      size: 16,
-                      color: Colors.teal.shade400,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      strategy.timeframe,
-                      style: AppTheme.bodySmall.copyWith(
-                        color: Colors.teal.shade400,
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: AppTheme.spaceS),
+                Expanded(
+                  child: Text(
+                    strategy.title,
+                    style: AppTheme.bodyMedium,
+                  ),
                 ),
               ],
             ),
@@ -370,9 +303,7 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionableAdviceCard(ComprehensiveInsight insight) {
-    if (insight.actionableAdvice.isEmpty) return const SizedBox.shrink();
-    
+  Widget _buildActionableAdviceCard(BuildContext context, ComprehensiveInsight insight) {
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
@@ -385,71 +316,76 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.check_circle_outline,
-                color: AppTheme.successColor,
+              Icon(
+                Icons.checklist_rounded,
+                color: Colors.blue.shade400,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
                 '실행 가능한 조언',
                 style: AppTheme.headingSmall.copyWith(
-                  color: AppTheme.successColor,
+                  color: Colors.blue.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppTheme.spaceM),
-          ...insight.actionableAdvice.take(5).map((advice) => Container(
+          ...insight.actionableAdvice.asMap().entries.map((entry) => Container(
             margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
             padding: const EdgeInsets.all(AppTheme.spaceM),
             decoration: BoxDecoration(
-              color: AppTheme.successColor.withValues(alpha: 0.05),
+              color: Colors.blue.shade50,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.blue.shade100,
+              ),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  margin: const EdgeInsets.only(top: 2),
-                  padding: const EdgeInsets.all(4),
+                  width: 28,
+                  height: 28,
                   decoration: BoxDecoration(
-                    color: AppTheme.successColor,
+                    color: Colors.blue.shade400,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    size: 12,
-                    color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      '${entry.key + 1}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: AppTheme.spaceS),
+                const SizedBox(width: AppTheme.spaceM),
                 Expanded(
-                  child: Builder(
-                    builder: (context) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          advice.title,
-                          style: AppTheme.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).brightness == Brightness.dark
-                                ? Colors.grey.shade800
-                                : Colors.black,
-                          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entry.value.title,
+                        style: AppTheme.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade800
+                              : Colors.black,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          advice.description,
-                          style: AppTheme.bodySmall.copyWith(
-                            color: Theme.of(context).brightness == Brightness.dark
-                                ? Colors.grey.shade700
-                                : AppTheme.onBackgroundColor,
-                          ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        entry.value.description,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade700
+                              : AppTheme.onBackgroundColor,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -473,55 +409,82 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.trending_up_outlined,
-                color: AppTheme.warningColor,
+              Icon(
+                Icons.trending_up,
+                color: Colors.green.shade400,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
                 '절약 기회',
                 style: AppTheme.headingSmall.copyWith(
-                  color: AppTheme.warningColor,
+                  color: Colors.green.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppTheme.spaceM),
-          ...insight.opportunities.take(3).map((opportunity) => Container(
+          ...insight.opportunities.map((opportunity) => Container(
             margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
             padding: const EdgeInsets.all(AppTheme.spaceM),
             decoration: BoxDecoration(
-              color: AppTheme.warningColor.withValues(alpha: 0.05),
+              color: Colors.green.shade50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppTheme.warningColor.withValues(alpha: 0.2),
+                color: _getPriorityColor(opportunity['priority'] ?? 'LOW')
+                    .withValues(alpha: 0.3),
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  opportunity['title'] as String,
-                  style: AppTheme.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.warningColor,
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spaceXS),
-                Text(
-                  opportunity['message'] as String,
-                  style: AppTheme.bodySmall,
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getPriorityColor(opportunity['priority'] ?? 'LOW'),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        opportunity['priority'] ?? 'LOW',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spaceS),
+                    Expanded(
+                      child: Text(
+                        opportunity['title'] ?? '',
+                        style: AppTheme.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppTheme.spaceS),
                 Text(
-                  '💡 ${opportunity['suggestion']}',
-                  style: AppTheme.bodySmall.copyWith(
-                    fontStyle: FontStyle.italic,
-                    color: Colors.green.shade400,
-                  ),
+                  opportunity['message'] ?? '',
+                  style: AppTheme.bodySmall,
                 ),
+                if (opportunity['potentialSaving'] != null) ...[
+                  const SizedBox(height: AppTheme.spaceS),
+                  Text(
+                    '예상 절약액: ${_formatCurrency(opportunity['potentialSaving'] as double)}',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ],
             ),
           )),
@@ -532,7 +495,6 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
 
   Widget _buildPredictionsCard(ComprehensiveInsight insight) {
     final predictions = insight.predictions;
-    
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
@@ -546,94 +508,63 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
           Row(
             children: [
               Icon(
-                Icons.psychology_outlined,
-                color: Colors.teal.shade400,
+                Icons.query_stats,
+                color: Colors.purple.shade400,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spaceS),
               Text(
-                'AI 예측 분석',
+                '미래 예측',
                 style: AppTheme.headingSmall.copyWith(
-                  color: Colors.teal.shade400,
+                  color: Colors.purple.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppTheme.spaceM),
-          
-          // 목표 달성 확률
-          if (predictions['goalAchievementProbability'] != null) ...[
-            Container(
-              padding: const EdgeInsets.all(AppTheme.spaceM),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppTheme.successColor.withValues(alpha: 0.1),
-                    AppTheme.successColor.withValues(alpha: 0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '목표 달성 확률',
-                    style: AppTheme.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: AppTheme.spaceS),
-                  Text(
-                    '${((predictions['goalAchievementProbability'] as double) * 100).round()}%',
-                    style: AppTheme.headingLarge.copyWith(
-                      color: AppTheme.successColor,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          
-          // 위험 요소
-          if (predictions['riskFactors'] != null && 
-              (predictions['riskFactors'] as List).isNotEmpty) ...[
-            const SizedBox(height: AppTheme.spaceM),
-            Text(
-              '주의사항',
-              style: AppTheme.bodyMedium.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppTheme.errorColor,
-              ),
+          if (predictions['nextMonthSpending'] != null) ...[
+            _buildPredictionItem(
+              '다음 달 예상 지출',
+              _formatCurrency(predictions['nextMonthSpending'] as double),
+              Icons.calendar_month,
             ),
             const SizedBox(height: AppTheme.spaceS),
-            ...(predictions['riskFactors'] as List<String>).map((risk) => 
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.warning_amber_outlined,
-                      size: 16,
-                      color: AppTheme.errorColor,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        risk,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppTheme.errorColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
+          ],
+          if (predictions['savingOpportunity'] != null) ...[
+            _buildPredictionItem(
+              '절약 가능 금액',
+              _formatCurrency(predictions['savingOpportunity'] as double),
+              Icons.savings,
             ),
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildPredictionItem(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: Colors.purple.shade400,
+          size: 20,
+        ),
+        const SizedBox(width: AppTheme.spaceS),
+        Text(
+          label,
+          style: AppTheme.bodyMedium,
+        ),
+        const Spacer(),
+        Text(
+          value,
+          style: AppTheme.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Colors.purple.shade700,
+          ),
+        ),
+      ],
     );
   }
 
