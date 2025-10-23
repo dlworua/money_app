@@ -120,14 +120,6 @@ class AiCoachingService {
 
       final dailyAverage = totalSpending / 30;
 
-      // 분석 데이터 기반 말투별 메시지 생성
-      final analysisData = {
-        'transactionCount': transactions.length,
-        'totalSpending': totalSpending,
-        'topCategory': topCategory?.displayName ?? '기타',
-        'dailyAverage': dailyAverage,
-      };
-
       String title;
       String message;
       List<String> actionItems = [];
