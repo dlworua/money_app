@@ -6,15 +6,80 @@ import '../enums/coaching_style.dart';
 import 'ai_coach_generator.dart';
 import 'financial_analysis_service.dart';
 
+/// 인사이트 타입 (내부용)
+enum _InsightType {
+  categoryAnalysis,  // 카테고리별 분석
+  budgetComparison,  // 예산 비교
+  trendAnalysis,     // 트렌드 분석
+  savingOpportunity, // 절약 기회
+}
+
 class AiCoachingService {
   final AiCoachGenerator _generator = AiCoachGenerator();
   final FinancialAnalysisService _analysisService = FinancialAnalysisService();
   
   /// 실제 계부 데이터와 완전히 연동된 맞춤 코칭 제공
+  ///
+  /// 다양한 인사이트를 순환하면서 제공:
+  /// 1. 카테고리별 지출 분석
+  /// 2. 예산 대비 지출 비교
+  /// 3. 최근 지출 트렌드 분석
+  /// 4. 절약 기회 발견
   Future<AiCoachingInsight> getFinancialCoaching(
-    UserModel user, 
+    UserModel user,
     List<Transaction> transactions,
     List<Budget> budgets
+  ) async {
+    try {
+      // 데이터가 없으면 기본 메시지
+      if (transactions.isEmpty) {
+        return _createWelcomeCoaching(user);
+      }
+
+      // 인사이트 타입을 순환하면서 제공
+      final insightTypes = [
+        _InsightType.categoryAnalysis,
+        _InsightType.budgetComparison,
+        _InsightType.trendAnalysis,
+        _InsightType.savingOpportunity,
+      ];
+
+      // 마지막으로 제공한 인사이트 타입 추적 (향후 UserModel에 저장)
+      final lastInsightIndex = DateTime.now().millisecondsSinceEpoch % insightTypes.length;
+      final currentInsightType = insightTypes[lastInsightIndex];
+
+      // 인사이트 타입에 따라 다른 분석 제공
+      switch (currentInsightType) {
+        case _InsightType.categoryAnalysis:
+          return _generateCategoryInsight(user, transactions, budgets);
+        case _InsightType.budgetComparison:
+          // 예산 초과 경고가 있으면 제공
+          final budgetAlert = await getBudgetOverspendAlert(user, transactions, budgets);
+          if (budgetAlert != null) {
+            return budgetAlert;
+          }
+          return _generateCategoryInsight(user, transactions, budgets);
+        case _InsightType.trendAnalysis:
+          return getMonthlyFinancialReport(user, transactions, budgets);
+        case _InsightType.savingOpportunity:
+          // 절약 기회가 있으면 제공
+          final savingOpps = await getSavingOpportunityAlerts(user, transactions, budgets);
+          if (savingOpps.isNotEmpty) {
+            return savingOpps.first;
+          }
+          return _generateCategoryInsight(user, transactions, budgets);
+      }
+    } catch (error) {
+      // 에러 발생시 기존 분석 제공
+      return _generateCategoryInsight(user, transactions, budgets);
+    }
+  }
+
+  /// 카테고리별 지출 분석 인사이트
+  Future<AiCoachingInsight> _generateCategoryInsight(
+    UserModel user,
+    List<Transaction> transactions,
+    List<Budget> budgets,
   ) async {
     try {
       // 데이터가 없으면 기본 메시지
