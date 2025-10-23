@@ -248,7 +248,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
   /// 컴팩트한 통계 아이템
   Widget _buildCompactStatItem(IconData icon, String value, String label) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       children: [
@@ -259,15 +259,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black,
+            color: AppTheme.getTextColor(context),
           ),
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 10,
-            color: isDark ? Colors.grey.shade400 : AppTheme.getSecondaryTextColor(context),
-          ),
+          style: TextStyle(fontSize: 10, color: AppTheme.getTextColor(context)),
         ),
       ],
     );
@@ -369,7 +366,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: AppTheme.getSecondaryTextColor(context),
+                        color: AppTheme.getTextColor(context),
                       ),
                     ),
                   ),
@@ -379,71 +376,70 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
         ),
         const SizedBox(height: 8),
         // 캘린더 그리드
-        ...List.generate(
-          ((daysInMonth + firstWeekday) / 7).ceil(),
-          (weekIndex) {
-            return Row(
-              children: List.generate(7, (dayIndex) {
-                final dayNumber = weekIndex * 7 + dayIndex - firstWeekday + 1;
-                if (dayNumber < 1 || dayNumber > daysInMonth) {
-                  return const Expanded(child: SizedBox(height: 45));
-                }
+        ...List.generate(((daysInMonth + firstWeekday) / 7).ceil(), (
+          weekIndex,
+        ) {
+          return Row(
+            children: List.generate(7, (dayIndex) {
+              final dayNumber = weekIndex * 7 + dayIndex - firstWeekday + 1;
+              if (dayNumber < 1 || dayNumber > daysInMonth) {
+                return const Expanded(child: SizedBox(height: 45));
+              }
 
-                final date = DateTime(
-                  _currentMonth.year,
-                  _currentMonth.month,
-                  dayNumber,
-                );
-                final dayData = _getDayData(date);
+              final date = DateTime(
+                _currentMonth.year,
+                _currentMonth.month,
+                dayNumber,
+              );
+              final dayData = _getDayData(date);
 
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      // 해당 날짜의 거래 내역 다이얼로그 표시
-                      _showTransactionsForDate(context, date);
-                    },
-                    child: Container(
-                      height: 45,
-                      margin: const EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                        color: _getDayColor(dayData),
-                        borderRadius: BorderRadius.circular(8),
-                        border:
-                            date.day == DateTime.now().day &&
-                                date.month == DateTime.now().month &&
-                                date.year == DateTime.now().year
-                            ? Border.all(color: Colors.green.shade400, width: 2)
-                            : null,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '$dayNumber',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: _getTextColor(dayData),
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    // 해당 날짜의 거래 내역 다이얼로그 표시
+                    _showTransactionsForDate(context, date);
+                  },
+                  child: Container(
+                    height: 45,
+                    margin: const EdgeInsets.all(1),
+                    decoration: BoxDecoration(
+                      color: _getDayColor(dayData),
+                      borderRadius: BorderRadius.circular(8),
+                      border:
+                          date.day == DateTime.now().day &&
+                              date.month == DateTime.now().month &&
+                              date.year == DateTime.now().year
+                          ? Border.all(color: Colors.green.shade400, width: 2)
+                          : null,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '$dayNumber',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: _getTextColor(dayData),
+                          ),
+                        ),
+                        if (dayData['hasData'] == true)
+                          Container(
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: _getIndicatorColor(dayData),
+                              shape: BoxShape.circle,
                             ),
                           ),
-                          if (dayData['hasData'] == true)
-                            Container(
-                              width: 4,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: _getIndicatorColor(dayData),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
-                );
-              }),
-            );
-          },
-        ),
+                ),
+              );
+            }),
+          );
+        }),
       ],
     );
   }
@@ -544,7 +540,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           ),
           Text(
             '분기별로 가계부 작성 현황을 확인해보세요!',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 12,
+              color: AppTheme.getTextColor(context),
+            ),
           ),
           const SizedBox(height: 16),
           _buildQuarterlyGrassGrid(),
@@ -694,7 +693,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('적음', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(
+          '적음',
+          style: TextStyle(fontSize: 12, color: AppTheme.getTextColor(context)),
+        ),
         Row(
           children: List.generate(5, (index) {
             return Container(
@@ -708,7 +710,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             );
           }),
         ),
-        Text('많음', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(
+          '많음',
+          style: TextStyle(fontSize: 12, color: AppTheme.getTextColor(context)),
+        ),
       ],
     );
   }
@@ -754,7 +759,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       const SizedBox(height: 4),
                       Text(
                         '총 ${dayTransactions.length}건의 거래',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppTheme.getTextColor(context),
+                        ),
                       ),
                     ],
                   ),
@@ -786,7 +794,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                           '이 날짜에는 거래 내역이 없습니다',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: AppTheme.getTextColor(context),
                           ),
                         ),
                       ],
@@ -1277,7 +1285,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.getTextColor(context),
+                    ),
                   ),
                 ],
               ),

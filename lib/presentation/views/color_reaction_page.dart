@@ -474,7 +474,10 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('F1 반응속도 테스트'),
+        title: Text(
+          '반응속도 테스트',
+          style: TextStyle(color: AppTheme.getSurfaceColor(context)),
+        ),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         systemOverlayStyle: const SystemUiOverlayStyle(
@@ -489,7 +492,8 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
           children: [
             // 게임 영역
             Expanded(
-              child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -503,7 +507,6 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
                 ),
               ),
             ),
-
           ],
         ),
       ),
@@ -537,8 +540,9 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
   Widget _buildStartScreen() {
     return Column(
       children: [
+        const SizedBox(height: 40),
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Colors.red[50],
             borderRadius: BorderRadius.circular(12),
@@ -546,38 +550,56 @@ class _ColorReactionPageState extends ConsumerState<ColorReactionPage> {
           ),
           child: Column(
             children: [
-              Icon(Icons.sports_motorsports, size: 60, color: Colors.red[600]),
-              const SizedBox(height: 12),
-              const Text(
+              Icon(Icons.sports_motorsports, size: 60, color: Colors.red[500]),
+              const SizedBox(height: 16),
+              Text(
                 '반응속도 테스트',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.getTextColor(context),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '전광판의 빨간불이 하나씩 모두 켜진 후',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.getTextColor(context),
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
-                '빨간불이 모두 켜진 후\n모든 불이 꺼지는 순간 탭하세요!\n\n⚠️ 너무 빨리 누르면 False Start!',
+              Text(
+                '모든 불이 꺼지는 순간 탭하세요!\n\n⚠️ 너무 빨리 누르면 False Start!',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.getTextColor(context),
+                ),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _startGame,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.purple(context),
+                  foregroundColor: AppTheme.white(context),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: const Text(
+                  '게임 시작',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
               ),
             ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _startGame,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[600],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              '게임 시작',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
           ),
         ),
       ],

@@ -10,26 +10,26 @@ class AppTheme {
   static const successColor = Color(0xFF059669);
   static const warningColor = Color(0xFFF59E0B);
   static const errorColor = Color(0xFFDC2626);
-  
+
   // 뉴트럴 컬러
   static const backgroundColor = Color(0xFFFAFAFA);
   static const surfaceColor = Color(0xFFFFFFFF);
   static const onSurfaceColor = Color(0xFF1F2937);
   static const onBackgroundColor = Color(0xFF374151);
-  
+
   // 그라데이션
   static const primaryGradient = LinearGradient(
     colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static const successGradient = LinearGradient(
     colors: [Color(0xFF10B981), Color(0xFF059669)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static const cardGradient = LinearGradient(
     colors: [Color(0xFFFFFFFF), Color(0xFFF9FAFB)],
     begin: Alignment.topCenter,
@@ -43,42 +43,42 @@ class AppTheme {
     letterSpacing: -0.5,
     height: 1.2,
   );
-  
+
   static TextStyle getHeadingMedium(BuildContext context) => TextStyle(
     fontSize: ResponsiveUtils.getResponsiveFontSize(context, 24),
     fontWeight: FontWeight.w600,
     letterSpacing: -0.3,
     height: 1.3,
   );
-  
+
   static TextStyle getHeadingSmall(BuildContext context) => TextStyle(
     fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
     fontWeight: FontWeight.w600,
     letterSpacing: -0.2,
     height: 1.4,
   );
-  
+
   static TextStyle getBodyLarge(BuildContext context) => TextStyle(
     fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
     fontWeight: FontWeight.w400,
     letterSpacing: 0,
     height: 1.5,
   );
-  
+
   static TextStyle getBodyMedium(BuildContext context) => TextStyle(
     fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
     fontWeight: FontWeight.w400,
     letterSpacing: 0.1,
     height: 1.4,
   );
-  
+
   static TextStyle getBodySmall(BuildContext context) => TextStyle(
     fontSize: ResponsiveUtils.getResponsiveFontSize(context, 12),
     fontWeight: FontWeight.w400,
     letterSpacing: 0.2,
     height: 1.3,
   );
-  
+
   static TextStyle getLabelLarge(BuildContext context) => TextStyle(
     fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
     fontWeight: FontWeight.w500,
@@ -93,42 +93,42 @@ class AppTheme {
     letterSpacing: -0.5,
     height: 1.2,
   );
-  
+
   static const TextStyle headingMedium = TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.3,
     height: 1.3,
   );
-  
+
   static const TextStyle headingSmall = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.2,
     height: 1.4,
   );
-  
+
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w400,
     letterSpacing: 0,
     height: 1.5,
   );
-  
+
   static const TextStyle bodyMedium = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,
     letterSpacing: 0.1,
     height: 1.4,
   );
-  
+
   static const TextStyle bodySmall = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,
     letterSpacing: 0.2,
     height: 1.3,
   );
-  
+
   static const TextStyle labelLarge = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w500,
@@ -138,36 +138,24 @@ class AppTheme {
 
   // 박스 쉐도우
   static const List<BoxShadow> cardShadow = [
-    BoxShadow(
-      color: Color(0x0A000000),
-      blurRadius: 10,
-      offset: Offset(0, 4),
-    ),
-    BoxShadow(
-      color: Color(0x0D000000),
-      blurRadius: 2,
-      offset: Offset(0, 1),
-    ),
+    BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 4)),
+    BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
   ];
-  
+
   static const List<BoxShadow> elevatedShadow = [
-    BoxShadow(
-      color: Color(0x14000000),
-      blurRadius: 20,
-      offset: Offset(0, 8),
-    ),
-    BoxShadow(
-      color: Color(0x0A000000),
-      blurRadius: 3,
-      offset: Offset(0, 2),
-    ),
+    BoxShadow(color: Color(0x14000000), blurRadius: 20, offset: Offset(0, 8)),
+    BoxShadow(color: Color(0x0A000000), blurRadius: 3, offset: Offset(0, 2)),
   ];
 
   // 보더 라디우스
   static const BorderRadius radiusSmall = BorderRadius.all(Radius.circular(8));
-  static const BorderRadius radiusMedium = BorderRadius.all(Radius.circular(12));
+  static const BorderRadius radiusMedium = BorderRadius.all(
+    Radius.circular(12),
+  );
   static const BorderRadius radiusLarge = BorderRadius.all(Radius.circular(16));
-  static const BorderRadius radiusXLarge = BorderRadius.all(Radius.circular(24));
+  static const BorderRadius radiusXLarge = BorderRadius.all(
+    Radius.circular(24),
+  );
 
   // 스페이싱
   static const double spaceXS = 4;
@@ -184,7 +172,7 @@ class AppTheme {
   static const darkBackgroundColor = Color(0xFF111827); // 다크 배경
   static const darkSurfaceColor = Color(0xFF1F2937); // 다크 서피스
   static const darkOnSurfaceColor = Color(0xFFF9FAFB); // 밝은 텍스트
-  static const darkOnBackgroundColor = Color(0xFFE5E7EB);
+  static const darkOnBackgroundColor = Color.fromARGB(255, 62, 64, 67);
 
   /// 라이트 테마
   static ThemeData get lightTheme {
@@ -319,7 +307,9 @@ class AppTheme {
         backgroundColor: darkSurfaceColor,
         surfaceTintColor: Colors.transparent,
         titleTextStyle: headingSmall.copyWith(color: darkOnSurfaceColor),
-        contentTextStyle: bodyMedium.copyWith(color: darkOnBackgroundColor),
+        contentTextStyle: bodyMedium.copyWith(
+          color: const Color.fromARGB(255, 143, 146, 149),
+        ),
       ),
       fontFamily: 'SF Pro Display',
       textTheme: TextTheme(

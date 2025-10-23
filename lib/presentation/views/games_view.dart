@@ -94,7 +94,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   Text(
                     '재미있게 포인트을 모아보세요!',
                     style: AppTheme.getBodyMedium(context).copyWith(
-                      color: AppTheme.onBackgroundColor,
+                      color: AppTheme.getTextColor(context),
                       fontSize: ResponsiveUtils.getResponsiveFontSize(
                         context,
                         16,
@@ -228,10 +228,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          '🎫',
-                          style: TextStyle(fontSize: 20),
-                        ),
+                        Text('🎫', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 6),
                         Text(
                           '티켓',
@@ -396,7 +393,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
               Text(
                 subtitle,
                 style: AppTheme.getBodyMedium(context).copyWith(
-                  color: AppTheme.onBackgroundColor,
+                  color: AppTheme.getTextColor(context),
                   fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
                 ),
               ),
@@ -671,7 +668,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
                   child: Text(
                     subtitle,
                     style: AppTheme.getBodySmall(context).copyWith(
-                      color: AppTheme.onBackgroundColor,
+                      color: AppTheme.getTextColor(context),
                       fontWeight: FontWeight.w500,
                       fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
                         context,
@@ -756,10 +753,7 @@ class _GamesViewState extends ConsumerState<GamesView> {
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.green.shade50,
-            Colors.teal.shade50,
-          ],
+          colors: [Colors.green.shade50, Colors.teal.shade50],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -908,7 +902,11 @@ class _GamesViewState extends ConsumerState<GamesView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history, size: 64, color: AppTheme.getGreyColor(context, 400)),
+          Icon(
+            Icons.history,
+            size: 64,
+            color: AppTheme.getGreyColor(context, 400),
+          ),
           const SizedBox(height: AppTheme.spaceM),
           Text(
             '아직 포인트 내역이 없어요',
@@ -1041,7 +1039,6 @@ class _GamesViewState extends ConsumerState<GamesView> {
     }
   }
 
-
   /// 게임 탭 전용 하단 배너 광고 위젯
   Widget? _buildBottomAd() {
     try {
@@ -1112,7 +1109,8 @@ class _TicketTimerWidgetState extends ConsumerState<_TicketTimerWidget> {
 
     // 15분(900초) 중 남은 시간 계산
     const refillInterval = 900; // 15분 = 900초
-    final secondsSinceLastRefill = timeSinceLastRefill.inSeconds % refillInterval;
+    final secondsSinceLastRefill =
+        timeSinceLastRefill.inSeconds % refillInterval;
     var secondsRemaining = refillInterval - secondsSinceLastRefill;
 
     // 900초(15:00)가 되면 0초로 표시 (다음 사이클 시작)

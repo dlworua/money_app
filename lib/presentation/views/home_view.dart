@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:money_app/presentation/dialogs/premium_dialog.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/number_formatter.dart';
@@ -67,32 +68,67 @@ class _HomeViewState extends ConsumerState<HomeView> {
             delegate: SliverChildListDelegate([
               // 메인 잔액 카드
               _buildBalanceCard(context, viewModel, user),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceL)),
+              SizedBox(
+                height: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceL,
+                ),
+              ),
 
               // 오늘의 소비 현황
               _buildTodaySpending(context, viewModel, user, state.transactions),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceL)),
+              SizedBox(
+                height: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceL,
+                ),
+              ),
 
               // 가계부 빠른 액션
               _buildAccountBookActions(context, viewModel),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
+              SizedBox(
+                height: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceM,
+                ),
+              ),
 
               // AI 코칭
               _buildAiCoaching(context, user, ref),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
+              SizedBox(
+                height: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceM,
+                ),
+              ),
 
               // 이번 달 소비 분석
               _buildMonthlySpendingAnalysis(context, user, state.transactions),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
+              SizedBox(
+                height: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceM,
+                ),
+              ),
 
               // 최근 소비 내역
               _buildRecentSpending(context, user, state.transactions),
-              SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
+              SizedBox(
+                height: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceM,
+                ),
+              ),
 
               // 프리미엄 배너 (비프리미엄 사용자만)
               if (!user.isPremium) ...[
                 _buildPremiumBanner(context),
-                SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceXL)),
+                SizedBox(
+                  height: ResponsiveUtils.getIPhone16PlusSpacing(
+                    context,
+                    AppTheme.spaceXL,
+                  ),
+                ),
               ],
             ]),
           ),
@@ -112,7 +148,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
         background: Container(
           padding: EdgeInsets.fromLTRB(
             ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM),
-            kToolbarHeight + ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM),
+            kToolbarHeight +
+                ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceM,
+                ),
             ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM),
             ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM),
           ),
@@ -135,7 +175,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   size: ResponsiveUtils.getResponsiveIconSize(context, 24),
                 ),
               ),
-              SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
+              SizedBox(
+                width: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceM,
+                ),
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,13 +208,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ),
               if (user.isPremium)
                 Container(
-                  padding: ResponsiveUtils.getResponsivePaddingCustom(context,
+                  padding: ResponsiveUtils.getResponsivePaddingCustom(
+                    context,
                     horizontal: AppTheme.spaceS,
                     vertical: AppTheme.spaceXS,
                   ),
                   decoration: BoxDecoration(
                     gradient: AppTheme.successGradient,
-                    borderRadius: BorderRadius.circular(ResponsiveUtils.getResponsiveSize(context, 20)),
+                    borderRadius: BorderRadius.circular(
+                      ResponsiveUtils.getResponsiveSize(context, 20),
+                    ),
                   ),
                   child: Text(
                     '프리미엄',
@@ -216,21 +264,34 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ),
             ],
           ),
-          SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceS)),
+          SizedBox(
+            height: ResponsiveUtils.getIPhone16PlusSpacing(
+              context,
+              AppTheme.spaceS,
+            ),
+          ),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               NumberFormatter.formatWon(user.currentMonthSaved),
               style: AppTheme.getHeadingLarge(context).copyWith(
                 color: AppTheme.white(context),
-                fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 36),
+                fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
+                  context,
+                  36,
+                ),
                 fontWeight: FontWeight.w700,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
           ),
-          SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceXS)),
+          SizedBox(
+            height: ResponsiveUtils.getIPhone16PlusSpacing(
+              context,
+              AppTheme.spaceXS,
+            ),
+          ),
           GestureDetector(
             onTap: () =>
                 _showMonthlyGoalSettingDialog(context, viewModel, user),
@@ -246,7 +307,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     maxLines: 1,
                   ),
                 ),
-                SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceXS)),
+                SizedBox(
+                  width: ResponsiveUtils.getIPhone16PlusSpacing(
+                    context,
+                    AppTheme.spaceXS,
+                  ),
+                ),
                 Icon(
                   Icons.edit,
                   size: ResponsiveUtils.getResponsiveIconSize(context, 14),
@@ -255,9 +321,17 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ],
             ),
           ),
-          SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
+          SizedBox(
+            height: ResponsiveUtils.getIPhone16PlusSpacing(
+              context,
+              AppTheme.spaceM,
+            ),
+          ),
           Container(
-            padding: ResponsiveUtils.getResponsivePaddingCustom(context, all: AppTheme.spaceS),
+            padding: ResponsiveUtils.getResponsivePaddingCustom(
+              context,
+              all: AppTheme.spaceS,
+            ),
             decoration: BoxDecoration(
               color: AppTheme.white(context).withValues(alpha: 0.15),
               borderRadius: AppTheme.radiusSmall,
@@ -269,7 +343,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   color: AppTheme.white(context).withValues(alpha: 0.9),
                   size: ResponsiveUtils.getResponsiveIconSize(context, 16),
                 ),
-                SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceXS)),
+                SizedBox(
+                  width: ResponsiveUtils.getIPhone16PlusSpacing(
+                    context,
+                    AppTheme.spaceXS,
+                  ),
+                ),
                 Flexible(
                   child: Text(
                     '이번 달 ${user.consecutiveDays}일 연속 절약 중',
@@ -366,7 +445,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
               ),
             ],
           ),
-          SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM)),
+          SizedBox(
+            height: ResponsiveUtils.getIPhone16PlusSpacing(
+              context,
+              AppTheme.spaceM,
+            ),
+          ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -382,17 +466,28 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           ? AppTheme.errorColor
                           : AppTheme.onSurfaceColor,
                       fontWeight: FontWeight.w700,
-                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(context, 28),
+                      fontSize: ResponsiveUtils.getSafeResponsiveFontSize(
+                        context,
+                        28,
+                      ),
                     ),
                     maxLines: 1,
                   ),
                 ),
               ),
-              SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceS)),
+              SizedBox(
+                width: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceS,
+                ),
+              ),
               Flexible(
                 flex: 1,
                 child: Padding(
-                  padding: ResponsiveUtils.getResponsivePaddingCustom(context, bottom: 4),
+                  padding: ResponsiveUtils.getResponsivePaddingCustom(
+                    context,
+                    bottom: 4,
+                  ),
                   child: Text(
                     '/ ${NumberFormatter.formatWon(dailyBudget)}',
                     style: AppTheme.getBodyMedium(context).copyWith(
@@ -616,8 +711,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   final homeState = ref.watch(homeViewModelProvider);
                   final currentCoaching = homeState.currentCoaching;
                   final transactions = homeState.transactions;
-                  
-                  
+
                   if (currentCoaching != null) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,7 +734,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       ],
                     );
                   }
-                  
+
                   // 기본 메시지 (데이터 없을 때)
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,7 +748,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        transactions.isEmpty 
+                        transactions.isEmpty
                             ? '가계부에 거래 내역을 추가하면 AI가 맞춤형 절약 팁을 제공해드려요! 📊✨'
                             : 'AI 코칭을 받으려면 "더 많은 조언 보기" 버튼을 눌러주세요! ${transactions.length}건의 거래 데이터를 분석해드릴게요.',
                         style: AppTheme.bodySmall.copyWith(
@@ -672,7 +766,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _requestAiCoachingAndShowDialog(context, ref),
+                    onPressed: () =>
+                        _requestAiCoachingAndShowDialog(context, ref),
                     icon: const Icon(Icons.lightbulb_outline, size: 18),
                     label: const Text('더 많은 조언 보기'),
                     style: ElevatedButton.styleFrom(
@@ -759,7 +854,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
               ],
             ),
-            SizedBox(height: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceL)),
+            SizedBox(
+              height: ResponsiveUtils.getIPhone16PlusSpacing(
+                context,
+                AppTheme.spaceL,
+              ),
+            ),
             ...categorySpending.entries.map(
               (entry) => _buildSpendingCategoryItem(
                 context,
@@ -802,7 +902,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    SizedBox(width: ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceS)),
+                    SizedBox(
+                      width: ResponsiveUtils.getIPhone16PlusSpacing(
+                        context,
+                        AppTheme.spaceS,
+                      ),
+                    ),
                     Expanded(
                       child: Text(
                         category,
@@ -1218,6 +1323,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
             type: ButtonType.secondary,
             onPressed: () {
               // TODO: 프리미엄 업그레이드
+              showDialog(
+                context: context,
+                builder: (context) => const PremiumDialog(),
+              );
             },
           ),
         ],
@@ -1288,7 +1397,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
             const SizedBox(height: 16),
             Text(
               '일일 예산을 설정하여 지출을 효과적으로 관리하세요',
-              style: TextStyle(fontSize: 12, color: AppTheme.getSecondaryTextColor(context)),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.getSecondaryTextColor(context),
+              ),
             ),
           ],
         ),
@@ -1338,7 +1450,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
             const SizedBox(height: 16),
             Text(
               '월 절약 목표를 설정���여 절약 습관을 만들어보세요',
-              style: TextStyle(fontSize: 12, color: AppTheme.getSecondaryTextColor(context)),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.getSecondaryTextColor(context),
+              ),
             ),
           ],
         ),
@@ -1360,17 +1475,18 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  void _requestAiCoachingAndShowDialog(BuildContext context, WidgetRef ref) async {
-    
+  void _requestAiCoachingAndShowDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     try {
       // 로딩 표시 (선택사항)
       // showDialog로 로딩 스피너 표시할 수 있지만 일단 생략
-      
+
       // 직접 AI 코칭 요청 - 이미 state가 업데이트됨
       final viewModel = ref.read(homeViewModelProvider.notifier);
       await viewModel.requestPersonalizedCoaching();
-      
-      
+
       // 다이얼로그 표시 (mounted 체크)
       if (context.mounted) {
         _showAiCoachingDialog(context);
@@ -1392,7 +1508,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         builder: (context, ref, child) {
           final homeState = ref.watch(homeViewModelProvider);
           final insights = homeState.recentInsights;
-          
+
           return AlertDialog(
             title: Row(
               children: [
@@ -1406,13 +1522,17 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: insights.isNotEmpty
-                    ? insights.map((insight) => Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: _buildCoachingCard(
-                          insight.title,
-                          insight.message,
-                        ),
-                      )).toList()
+                    ? insights
+                          .map(
+                            (insight) => Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: _buildCoachingCard(
+                                insight.title,
+                                insight.message,
+                              ),
+                            ),
+                          )
+                          .toList()
                     : [
                         _buildCoachingCard(
                           '🚀 시작해보세요!',
@@ -1485,7 +1605,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  void _showCoachingStyleDialog(BuildContext context, UserModel user, WidgetRef ref) {
+  void _showCoachingStyleDialog(
+    BuildContext context,
+    UserModel user,
+    WidgetRef ref,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1505,7 +1629,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: isSelected ? AppTheme.blue(context) : AppTheme.getGreyColor(context, 300),
+                    color: isSelected
+                        ? AppTheme.blue(context)
+                        : AppTheme.getGreyColor(context, 300),
                     width: isSelected ? 2 : 1,
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -1514,13 +1640,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 child: ListTile(
                   leading: Icon(
                     _getCoachingStyleIcon(style),
-                    color: isSelected ? AppTheme.blue(context) : AppTheme.getSecondaryTextColor(context),
+                    color: isSelected
+                        ? AppTheme.blue(context)
+                        : AppTheme.getSecondaryTextColor(context),
                   ),
                   title: Text(
                     _getCoachingStyleName(style),
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                      color: isSelected ? AppTheme.blue(context) : AppTheme.getTextColor(context),
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                      color: isSelected
+                          ? AppTheme.blue(context)
+                          : AppTheme.getTextColor(context),
                     ),
                   ),
                   subtitle: Text(
@@ -1532,7 +1664,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   ),
                   onTap: () async {
                     if (user.preferredCoachingStyle != style) {
-                      final viewModel = ref.read(homeViewModelProvider.notifier);
+                      final viewModel = ref.read(
+                        homeViewModelProvider.notifier,
+                      );
                       await viewModel.changeCoachingStyle(style);
                     }
                     if (context.mounted) {
@@ -1626,7 +1760,9 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: AppTheme.spaceM),
           Text(
             '데이터를 불러올 수 없습니다',
-            style: AppTheme.headingSmall.copyWith(color: AppTheme.getSecondaryTextColor(context)),
+            style: AppTheme.headingSmall.copyWith(
+              color: AppTheme.getSecondaryTextColor(context),
+            ),
           ),
         ],
       ),
