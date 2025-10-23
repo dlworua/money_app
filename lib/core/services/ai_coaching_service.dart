@@ -3,6 +3,7 @@ import '../../data/models/ai_coaching_insight.dart';
 import '../../data/models/transaction.dart';
 import '../../data/models/budget.dart';
 import '../enums/coaching_style.dart';
+import '../utils/number_formatter.dart';
 import 'ai_coach_generator.dart';
 import 'financial_analysis_service.dart';
 
@@ -815,14 +816,26 @@ class AiCoachingService {
     }
   }
 
-  /// 통화 포맷 헬퍼 메서드 (단위 포함)
+  /// 통화 포맷 헬퍼 메서드 (천 단위 콤마 포함)
   String _formatCurrency(double amount) {
-    if (amount >= 10000) {
-      return '${(amount / 10000).toInt()}만';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toInt()}천';
+    final intAmount = amount.toInt();
+
+    if (intAmount >= 10000) {
+      // 1만원 이상: "1,234만"
+      final man = intAmount ~/ 10000;
+      final rest = intAmount % 10000;
+      if (rest == 0) {
+        return '${NumberFormatter.formatNumber(man)}만';
+      } else {
+        // 나머지가 있으면 천 단위까지 표시
+        return '${NumberFormatter.formatNumber(man)}만 ${NumberFormatter.formatNumber(rest)}';
+      }
+    } else if (intAmount >= 1000) {
+      // 1천원 이상 1만원 미만: "5,000"
+      return NumberFormatter.formatNumber(intAmount);
     } else {
-      return '${amount.toInt()}';
+      // 1천원 미만: "500"
+      return intAmount.toString();
     }
   }
 

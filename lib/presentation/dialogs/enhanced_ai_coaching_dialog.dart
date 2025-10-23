@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/enhanced_ai_coach.dart';
+import '../../core/utils/number_formatter.dart';
 import '../viewmodels/providers.dart';
 
 class EnhancedAiCoachingDialog extends ConsumerWidget {
@@ -650,11 +651,27 @@ class EnhancedAiCoachingDialog extends ConsumerWidget {
     }
   }
 
+  /// 통화 포맷 헬퍼 메서드 (천 단위 콤마 포함)
   String _formatCurrency(double amount) {
-    if (amount >= 10000) {
-      return '${(amount / 10000).toStringAsFixed(1)}만원';
+    final intAmount = amount.toInt();
+
+    if (intAmount >= 10000) {
+      // 1만원 이상: "1,234만원"
+      final man = intAmount ~/ 10000;
+      final rest = intAmount % 10000;
+      if (rest == 0) {
+        return '${NumberFormatter.formatNumber(man)}만원';
+      } else {
+        // 나머지가 있으면 천 단위까지 표시
+        return '${NumberFormatter.formatNumber(man)}만 ${NumberFormatter.formatNumber(rest)}원';
+      }
+    } else if (intAmount >= 1000) {
+      // 1천원 이상 1만원 미만: "5,000원"
+      return '${NumberFormatter.formatNumber(intAmount)}원';
+    } else {
+      // 1천원 미만: "500원"
+      return '$intAmount원';
     }
-    return '${amount.toStringAsFixed(0)}원';
   }
 
   /// 마크다운 문법을 자연스러운 텍스트로 변환
