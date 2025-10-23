@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/number_formatter.dart';
 import '../viewmodels/providers.dart';
 import '../viewmodels/theme_viewmodel.dart';
 import '../../data/models/transaction.dart';
@@ -193,7 +194,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${user?.coins ?? 0} 코인',
+                          '${NumberFormatter.formatNumber(user?.coins ?? 0)} 코인',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -921,7 +922,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
           // 금액
           Text(
-            '${transaction.type == TransactionType.income ? '+' : '-'}${transaction.amount.toStringAsFixed(0)}원',
+            '${transaction.type == TransactionType.income ? '+' : '-'}${NumberFormatter.formatNumber(transaction.amount.toInt())}원',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
