@@ -145,44 +145,43 @@ class AiCoachingService {
         );
       } else if (transactions.length < 5) {
         title = _getTitleByStyle('early_stage', user.preferredCoachingStyle);
-        message =
-            '총 ${transactions.length}건 기록하셨네요! ${_formatCurrency(totalSpending)} 지출하시고, ${topCategory?.displayName ?? '기타'}에 가장 많이 쓰셨어요.';
-        actionItems.addAll([
-          '하루 3-5건 정도 꾸준히 기록하기',
-          '${topCategory?.displayName ?? '해당 카테고리'} 지출 줄여보기',
-          '1주일 더 기록하면 상세 분석 가능해요!',
-        ]);
+        message = _generateEarlyStageMessage(
+          user.preferredCoachingStyle,
+          transactions.length,
+          totalSpending,
+          topCategory?.displayName ?? '기타',
+        );
+        actionItems = _getEarlyStageActions(
+          user.preferredCoachingStyle,
+          topCategory?.displayName ?? '해당 카테고리',
+        );
       } else {
-        title = '💰 가계부 분석 결과';
-        message =
-            '${transactions.length}건 거래로 총 ${_formatCurrency(totalSpending)} 지출하셨어요. 일평균 ${_formatCurrency(dailyAverage)}이고, ${topCategory?.displayName ?? '기타'}에 가장 많이 쓰셨네요.';
-        actionItems.addAll([
-          '${topCategory?.displayName ?? '최고 지출 카테고리'}에서 20% 줄여보기',
-          '일일 예산을 ${_formatCurrency(dailyAverage * 0.8)}로 설정해보기',
-          '매주 가계부 리뷰하는 습관 만들기',
-        ]);
+        title = _getTitleByStyle('detailed_analysis', user.preferredCoachingStyle);
+        message = _generateDetailedAnalysisMessage(
+          user.preferredCoachingStyle,
+          transactions.length,
+          totalSpending,
+          dailyAverage,
+          topCategory?.displayName ?? '기타',
+        );
+        actionItems = _getDetailedAnalysisActions(
+          user.preferredCoachingStyle,
+          topCategory?.displayName ?? '최고 지출 카테고리',
+          dailyAverage,
+        );
       }
 
-      if (topCategory != null) {
+      // 카테고리별 추가 조언은 기본 조언만 추가 (말투는 이미 적용됨)
+      if (topCategory != null && actionItems.length < 4) {
         actionItems.addAll(_getBasicAdviceForCategory(topCategory));
       }
-
-      // 말투 적용
-      final styledMessage = _applyCoachingTone(
-        message,
-        user.preferredCoachingStyle,
-      );
-      final styledActionItems = actionItems
-          .take(4)
-          .map((item) => _applyCoachingTone(item, user.preferredCoachingStyle))
-          .toList();
 
       return AiCoachingInsight(
         id: 'financial_${DateTime.now().millisecondsSinceEpoch}',
         createdAt: DateTime.now(),
         style: user.preferredCoachingStyle,
         title: title,
-        message: styledMessage,
+        message: message,
         type: InsightType.spendingPattern,
         analysisData: {
           'transactionCount': transactions.length,
@@ -191,7 +190,7 @@ class AiCoachingService {
           'dailyAverage': dailyAverage,
         },
         confidenceScore: transactions.length >= 5 ? 0.8 : 0.6,
-        actionItems: styledActionItems,
+        actionItems: actionItems.take(4).toList(),
       );
     } catch (error) {
       // 에러 발생시 기본 코칭 제공
@@ -934,117 +933,7 @@ class AiCoachingService {
   }
 
   // ========================================
-  // 말투 적용 시스템
-  // ========================================
-
-  /// 메시지에 말투 적용 (핵심 함수)
-  String _applyCoachingTone(String baseMessage, CoachingStyle style) {
-    switch (style) {
-      case CoachingStyle.strict:
-        return _makeStrict(baseMessage);
-      case CoachingStyle.kind:
-        return _makeKind(baseMessage);
-      case CoachingStyle.friendly:
-        return _makeFriendly(baseMessage);
-      case CoachingStyle.motivational:
-        return _makeMotivational(baseMessage);
-      case CoachingStyle.analytical:
-        return _makeAnalytical(baseMessage);
-    }
-  }
-
-  /// 엄격한 말투
-  String _makeStrict(String message) {
-    final patterns = {
-      '요': '.',
-      '네요': '니다',
-      '어요': '습니다',
-      '해요': '하십시오',
-      '세요': '하세요',
-      '!': '.',
-      '~': '',
-    };
-
-    var result = message;
-    patterns.forEach((key, value) {
-      result = result.replaceAll(key, value);
-    });
-
-    // 이모지 제거 (기본 이모지 범위)
-    result = result.replaceAll(
-      RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true),
-      '',
-    );
-
-    return result;
-  }
-
-  /// 친절한 말투
-  String _makeKind(String message) {
-    // 이미 친절한 기본 메시지에 약간의 감탄사 추가
-    if (!message.contains('!') && !message.contains('~')) {
-      if (message.contains('좋')) return '$message 😊';
-      if (message.contains('잘')) return '$message 👏';
-      if (message.contains('훌륭')) return '$message 🌟';
-    }
-    return message;
-  }
-
-  /// 친근한 말투
-  String _makeFriendly(String message) {
-    final patterns = {
-      '입니다': '이야',
-      '습니다': '어',
-      '하세요': '해봐',
-      '하십시오': '해',
-      '합니다': '해',
-      '.': '!',
-    };
-
-    var result = message;
-    patterns.forEach((key, value) {
-      result = result.replaceAll(key, value);
-    });
-
-    // 종결어미 추가
-    if (!result.endsWith('!') && !result.endsWith('~')) {
-      result = '$result!';
-    }
-
-    return result;
-  }
-
-  /// 동기부여 말투
-  String _makeMotivational(String message) {
-    // 이모지 추가
-    var result = message;
-    if (!result.contains('🔥') && !result.contains('💪')) {
-      result = '🔥 $result 💪';
-    }
-
-    return result;
-  }
-
-  /// 분석적 말투
-  String _makeAnalytical(String message) {
-    // 숫자와 통계 강조
-    var result = message;
-
-    // 이모지 제거하고 데이터 중심 표현 추가
-    result = result.replaceAll(
-      RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true),
-      '',
-    );
-
-    if (!result.contains('분석') && !result.contains('데이터')) {
-      result = '[분석] $result';
-    }
-
-    return result;
-  }
-
-  // ========================================
-  // 말투별 메시지 템플릿 생성
+  // 말투별 메시지 템플릿 생성 (완전히 다른 메시지를 처음부터 생성)
   // ========================================
 
   /// 시나리오별 타이틀 생성
@@ -1141,6 +1030,151 @@ class AiCoachingService {
           '[액션1] 일일 거래 완전 기록 (정확도 향상)',
           '[액션2] ${category} 지출 패턴 모니터링',
           '[액션3] 7일 데이터 수집 완료 목표',
+        ];
+    }
+  }
+
+  /// 초기 단계 (거래 2-4건) 메시지 생성
+  String _generateEarlyStageMessage(
+    CoachingStyle style,
+    int transactionCount,
+    double totalSpending,
+    String topCategory,
+  ) {
+    final formattedAmount = _formatCurrency(totalSpending);
+
+    switch (style) {
+      case CoachingStyle.strict:
+        return '총 ${transactionCount}건의 거래가 기록되었습니다. ${formattedAmount}원을 지출했으며, ${topCategory}에 가장 많이 사용했습니다. 꾸준한 기록을 유지하십시오.';
+
+      case CoachingStyle.kind:
+        return '벌써 ${transactionCount}건이나 기록하셨네요! 정말 잘하고 계세요! 😊 총 ${formattedAmount}원을 지출하셨고, ${topCategory}에 가장 많이 쓰셨어요. 조금만 더 기록하면 더 자세한 분석을 받을 수 있어요!';
+
+      case CoachingStyle.friendly:
+        return '오 꽤 괜찮은데? ${transactionCount}건 기록했네! ${topCategory}에 ${formattedAmount}원 썼구나. 이 페이스 유지하면서 일주일만 더 꾸준히 해보자!';
+
+      case CoachingStyle.motivational:
+        return '🔥 훌륭합니다! 이미 ${transactionCount}건의 거래를 기록했어요! 총 ${formattedAmount}원의 지출 패턴이 보이기 시작했습니다. ${topCategory} 카테고리가 선두네요! 이 열정으로 계속 달려봅시다! 💪';
+
+      case CoachingStyle.analytical:
+        return '[초기 분석] 거래 수: ${transactionCount}건, 총 지출: ${formattedAmount}원. 주요 카테고리: ${topCategory}. 통계적 유의성 확보를 위해 최소 5건 이상의 데이터 필요. 현재 데이터 수집률: ${(transactionCount / 5 * 100).toInt()}%.';
+    }
+  }
+
+  /// 초기 단계 액션 아이템 생성
+  List<String> _getEarlyStageActions(
+    CoachingStyle style,
+    String category,
+  ) {
+    switch (style) {
+      case CoachingStyle.strict:
+        return [
+          '하루 최소 3-5건의 거래 기록 의무화',
+          '${category} 지출 즉시 삭감 검토',
+          '1주일 데이터 축적 완료',
+        ];
+
+      case CoachingStyle.kind:
+        return [
+          '하루에 3-5건 정도 편하게 기록해보세요 😊',
+          '${category} 지출을 조금씩 줄여볼까요?',
+          '1주일만 더 기록하면 상세 분석이 가능해져요!',
+        ];
+
+      case CoachingStyle.friendly:
+        return [
+          '하루 3-5건씩만 적어봐, 어렵지 않아!',
+          '${category} 좀 줄여볼까? 작은 것부터!',
+          '일주일만 더 하면 진짜 제대로 된 분석 나와!',
+        ];
+
+      case CoachingStyle.motivational:
+        return [
+          '🎯 하루 3-5건 기록으로 재무 관리 달인 되기!',
+          '💡 ${category} 지출 20% 절감 도전!',
+          '🔥 7일 연속 완벽 기록으로 절약 챔피언 등극!',
+        ];
+
+      case CoachingStyle.analytical:
+        return [
+          '[목표] 일일 3-5건 기록으로 표본 크기 확보',
+          '[분석] ${category} 지출 패턴 모니터링 시작',
+          '[마일스톤] 7일 데이터 수집 → 통계 분석 가능',
+        ];
+    }
+  }
+
+  /// 상세 분석 (거래 5건 이상) 메시지 생성
+  String _generateDetailedAnalysisMessage(
+    CoachingStyle style,
+    int transactionCount,
+    double totalSpending,
+    double dailyAverage,
+    String topCategory,
+  ) {
+    final formattedTotal = _formatCurrency(totalSpending);
+    final formattedDaily = _formatCurrency(dailyAverage);
+
+    switch (style) {
+      case CoachingStyle.strict:
+        return '${transactionCount}건의 거래가 분석되었습니다. 총 지출액 ${formattedTotal}원, 일평균 ${formattedDaily}원입니다. ${topCategory}에 가장 많이 지출했습니다. 지출 관리를 강화하십시오.';
+
+      case CoachingStyle.kind:
+        return '와! ${transactionCount}건이나 꾸준히 기록하셨네요! 정말 대단해요! 🎉 총 ${formattedTotal}원을 지출하셨고, 하루 평균 ${formattedDaily}원이에요. ${topCategory}에 가장 많이 쓰셨는데, 조금씩 줄여나가면 좋을 것 같아요!';
+
+      case CoachingStyle.friendly:
+        return '오 진짜 잘하고 있어! ${transactionCount}건 기록 완료! ${topCategory}에 제일 많이 썼는데 총 ${formattedTotal}원이야. 하루 평균 ${formattedDaily}원 정도 쓰는구나. 이제 본격적으로 절약 시작해볼까?';
+
+      case CoachingStyle.motivational:
+        return '🔥 환상적입니다! ${transactionCount}건의 완벽한 기록! 당신의 재무 현황이 명확하게 보입니다! 총 ${formattedTotal}원 지출, 일평균 ${formattedDaily}원! ${topCategory}가 주요 지출처네요. 이제 최적화 단계로 돌입합시다! 💪';
+
+      case CoachingStyle.analytical:
+        return '[상세 분석 결과] 표본 크기: ${transactionCount}건 (통계적 유의성 확보). 총 지출: ${formattedTotal}원, 일평균: ${formattedDaily}원. 주요 지출 카테고리: ${topCategory}. 패턴 분석 완료, 최적화 권장사항 생성 가능.';
+    }
+  }
+
+  /// 상세 분석 액션 아이템 생성
+  List<String> _getDetailedAnalysisActions(
+    CoachingStyle style,
+    String topCategory,
+    double dailyAverage,
+  ) {
+    final targetAmount = _formatCurrency(dailyAverage * 0.8);
+
+    switch (style) {
+      case CoachingStyle.strict:
+        return [
+          '${topCategory}에서 즉시 20% 지출 삭감',
+          '일일 예산 ${targetAmount}로 강제 제한',
+          '주간 가계부 점검 의무화',
+        ];
+
+      case CoachingStyle.kind:
+        return [
+          '${topCategory}에서 조금씩 절약해볼까요? 20% 목표로요! 😊',
+          '하루 예산을 ${targetAmount} 정도로 맞춰보시는 건 어떨까요?',
+          '매주 가계부를 가볍게 리뷰해보세요!',
+        ];
+
+      case CoachingStyle.friendly:
+        return [
+          '${topCategory} 좀 줄여보자! 20%만 줄이면 돼!',
+          '하루 ${targetAmount} 안으로 써보는 거 도전해볼래?',
+          '주말마다 가계부 확인하는 습관 만들자!',
+        ];
+
+      case CoachingStyle.motivational:
+        return [
+          '🎯 ${topCategory} 지출 20% 절감 미션 시작!',
+          '💡 일일 예산 ${targetAmount} 달성으로 절약 왕 등극!',
+          '🔥 주간 가계부 리뷰로 완벽한 재무 관리 체계 구축!',
+        ];
+
+      case CoachingStyle.analytical:
+        return [
+          '[최적화1] ${topCategory} 지출 20% 감축 (효율성 개선)',
+          '[목표2] 일일 예산 ${targetAmount} 설정 (지출 통제)',
+          '[습관3] 주간 단위 데이터 리뷰 (지속 가능성 확보)',
         ];
     }
   }

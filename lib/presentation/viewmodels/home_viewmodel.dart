@@ -756,14 +756,15 @@ class HomeViewModel extends StateNotifier<HomeState> {
       final updatedGoals = await _transactionRepository.updateAllGoalProgress();
       final transactions = await _transactionRepository.getTransactions();
 
+      // UI 먼저 즉시 업데이트 (빠른 반응성)
       state = state.copyWith(
         transactions: transactions,
         budgets: updatedBudgets,
         goals: updatedGoals,
       );
 
-      // 거래 데이터가 업데이트될 때마다 AI 코칭도 새로 생성
-      await _updateAiCoachingAfterTransaction();
+      // AI 코칭은 백그라운드에서 처리 (블로킹 없음)
+      _updateAiCoachingAfterTransaction();
     } catch (error) {
       LoggerService.error('연관 데이터 업데이트 실패: $error');
     }
