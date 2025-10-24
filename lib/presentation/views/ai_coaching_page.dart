@@ -607,25 +607,31 @@ class AiCoachingPage extends ConsumerWidget {
 
   /// 마크다운 문법을 자연스러운 텍스트로 변환
   String _cleanMarkdown(String text) {
-    // **굵은 글씨** 제거
-    var cleaned = text.replaceAll(RegExp(r'\*\*([^*]+)\*\*'), r'$1');
+    var cleaned = text;
 
-    // *기울임* 제거
+    // ** 굵은 글씨 ** 제거
+    cleaned = cleaned.replaceAll(RegExp(r'\*\*([^*]+)\*\*'), r'$1');
+
+    // * 기울임 * 제거 (단, ** 이후에 처리)
     cleaned = cleaned.replaceAll(RegExp(r'\*([^*]+)\*'), r'$1');
 
-    // \n을 실제 줄바꿈으로 변환
-    cleaned = cleaned.replaceAll(r'\n', '\n');
+    // # 제목 표시 제거 (###, ##, # 모두)
+    cleaned = cleaned.replaceAll(RegExp(r'^#{1,3}\s+', multiLine: true), '');
 
-    // ### 제목 처리
-    cleaned = cleaned.replaceAll(RegExp(r'###\s*'), '');
-    cleaned = cleaned.replaceAll(RegExp(r'##\s*'), '');
-    cleaned = cleaned.replaceAll(RegExp(r'#\s*'), '');
-
-    // - 리스트 기호를 자연스럽게
+    // - 리스트 기호를 • 로 변경
     cleaned = cleaned.replaceAll(RegExp(r'^\s*-\s+', multiLine: true), '• ');
 
     // ` 코드 블록 제거
     cleaned = cleaned.replaceAll(RegExp(r'`([^`]+)`'), r'$1');
+
+    // $ 기호 제거 (달러 표시처럼 보이는 문제 해결)
+    cleaned = cleaned.replaceAll(r'$', '');
+
+    // \n을 실제 줄바꿈으로 변환
+    cleaned = cleaned.replaceAll(r'\n', '\n');
+
+    // 연속된 줄바꿈을 하나로 정리
+    cleaned = cleaned.replaceAll(RegExp(r'\n{3,}'), '\n\n');
 
     return cleaned.trim();
   }
