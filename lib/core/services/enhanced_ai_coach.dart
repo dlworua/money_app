@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import '../../data/models/user_model.dart';
 import '../../data/models/transaction.dart';
 import '../../data/models/budget.dart';
+import '../utils/number_formatter.dart';
+import '../enums/coaching_style.dart';
 import 'financial_analysis_service.dart';
 import '../services/logger_service.dart';
 
@@ -416,79 +418,80 @@ class EnhancedAiCoach {
     List<PersonalizedStrategy> strategies,
   ) {
     final messages = <String>[];
+    final style = user.preferredCoachingStyle;
 
     // 개인화된 인사
-    messages.add(_generatePersonalGreeting(user));
+    messages.add(_applyTone(_generatePersonalGreeting(user), style));
 
     // 현재 상황 요약
     if (spendingAnalysis['isEmpty'] != true) {
       final totalSpending = spendingAnalysis['totalSpending'] as double;
       final dailyAvg = spendingAnalysis['dailyAverage'] as double;
 
-      messages.add('📊 **이번 달 분석 결과**');
-      messages.add('총 지출: ${_formatCurrency(totalSpending)}');
-      messages.add('일평균 지출: ${_formatCurrency(dailyAvg)}');
+      messages.add('📊 이번 달 분석 결과');
+      messages.add(_applyTone('총 지출: ${_formatCurrency(totalSpending)}', style));
+      messages.add(_applyTone('일평균 지출: ${_formatCurrency(dailyAvg)}', style));
 
       if (spendingAnalysis['topCategory'] != null) {
         final topCategory =
             spendingAnalysis['topCategory'] as TransactionCategory;
         final topAmount = spendingAnalysis['topCategoryAmount'] as double;
         messages.add(
-          '최대 지출 카테고리: ${topCategory.displayName} (${_formatCurrency(topAmount)})',
+          _applyTone('최대 지출 카테고리: ${topCategory.displayName} (${_formatCurrency(topAmount)})', style),
         );
       }
     }
 
     // 긍정적 피드백
-    messages.add('\\n✨ **잘하고 있는 점**');
+    messages.add('\n✨ 잘하고 있는 점');
     if (user.consecutiveDays > 0) {
-      messages.add('${user.consecutiveDays}일 연속 절약 기록을 유지하고 있어요! 🔥');
+      messages.add(_applyTone('${user.consecutiveDays}일 연속 절약 기록을 유지하고 있어요! 🔥', style));
     }
     if (user.level > 1) {
-      messages.add('레벨 ${user.level}까지 성장한 절약 실력이 대단해요! 💪');
+      messages.add(_applyTone('레벨 ${user.level}까지 성장한 절약 실력이 대단해요! 💪', style));
     }
 
     // 개인화된 조언
-    messages.add('\\n🎯 **맞춤형 조언**');
+    messages.add('\n🎯 맞춤형 조언');
     final personality =
         psychProfile['spendingPersonality'] as String? ?? 'balanced';
     switch (personality) {
       case 'impulsive':
-        messages.add('충동적인 소비 성향이 있으신 것 같아요. 구매 전 잠깐 멈춰서 생각해보는 습관을 길러보세요!');
+        messages.add(_applyTone('충동적인 소비 성향이 있으신 것 같아요. 구매 전 잠깐 멈춰서 생각해보는 습관을 길러보세요!', style));
         break;
       case 'cautious':
-        messages.add('신중한 소비자이시네요! 이런 장점을 살려 더 적극적인 절약에 도전해보세요!');
+        messages.add(_applyTone('신중한 소비자이시네요! 이런 장점을 살려 더 적극적인 절약에 도전해보세요!', style));
         break;
       default:
-        messages.add('균형잡힌 소비 패턴을 보여주고 계세요. 카테고리별 목표 설정으로 한 단계 업그레이드해보세요!');
+        messages.add(_applyTone('균형잡힌 소비 패턴을 보여주고 계세요. 카테고리별 목표 설정으로 한 단계 업그레이드해보세요!', style));
     }
 
     // 예측 및 목표
     if (predictions['available'] == true) {
       final goalProb =
           ((predictions['goalAchievementProbability'] as double) * 100).round();
-      messages.add('\\n🔮 **목표 달성 예측**');
-      messages.add('현재 패턴으로는 $goalProb% 확률로 목표를 달성할 수 있어요!');
+      messages.add('\n🔮 목표 달성 예측');
+      messages.add(_applyTone('현재 패턴으로는 $goalProb% 확률로 목표를 달성할 수 있어요!', style));
 
       if (goalProb < 70) {
-        messages.add('목표 달성을 위해 일일 절약 금액을 조금 더 늘려보시는 것을 추천드려요.');
+        messages.add(_applyTone('목표 달성을 위해 일일 절약 금액을 조금 더 늘려보시는 것을 추천드려요.', style));
       }
     }
 
     // 실행 계획
     if (strategies.isNotEmpty) {
-      messages.add('\\n🚀 **이번 주 실행 계획**');
+      messages.add('\n🚀 이번 주 실행 계획');
       for (int i = 0; i < math.min(3, strategies.length); i++) {
         final strategy = strategies[i];
-        messages.add('${i + 1}. ${strategy.title}');
-        messages.add('   ${strategy.description}');
+        messages.add(_applyTone('${i + 1}. ${strategy.title}', style));
+        messages.add(_applyTone('   ${strategy.description}', style));
         messages.add(
-          '   예상 절약: ${_formatCurrency(strategy.expectedSaving.toDouble())}, 난이도: ${strategy.difficulty}',
+          _applyTone('   예상 절약: ${_formatCurrency(strategy.expectedSaving.toDouble())}, 난이도: ${strategy.difficulty}', style),
         );
       }
     }
 
-    return messages.join('\\n');
+    return messages.join('\n');
   }
 
   /// 🎬 실행 가능한 조언 생성
@@ -636,11 +639,63 @@ class EnhancedAiCoach {
     return '🌱 ${user.name.isNotEmpty ? user.name : '새싹절약러'}님, 절약 여정을 함께 시작해요!';
   }
 
+  /// 통화 포맷 헬퍼 메서드 (천 단위 콤마 포함)
   String _formatCurrency(double amount) {
-    if (amount >= 10000) {
-      return '${(amount / 10000).toStringAsFixed(1)}만원';
+    final intAmount = amount.toInt();
+
+    if (intAmount >= 10000) {
+      // 1만원 이상: "1,234만원"
+      final man = intAmount ~/ 10000;
+      final rest = intAmount % 10000;
+      if (rest == 0) {
+        return '${NumberFormatter.formatNumber(man)}만원';
+      } else {
+        // 나머지가 있으면 천 단위까지 표시
+        return '${NumberFormatter.formatNumber(man)}만 ${NumberFormatter.formatNumber(rest)}원';
+      }
+    } else if (intAmount >= 1000) {
+      // 1천원 이상 1만원 미만: "5,000원"
+      return '${NumberFormatter.formatNumber(intAmount)}원';
+    } else {
+      // 1천원 미만: "500원"
+      return '$intAmount원';
     }
-    return '${amount.toStringAsFixed(0)}원';
+  }
+
+  /// 말투 적용
+  String _applyTone(String message, CoachingStyle style) {
+    switch (style) {
+      case CoachingStyle.strict:
+        // 엄격: 명령형, 존댓말
+        return message
+            .replaceAll('해요', '하십시오')
+            .replaceAll('봐요', '보십시오')
+            .replaceAll('!', '.')
+            .replaceAll('~', '');
+
+      case CoachingStyle.kind:
+        // 친절: 그대로 (이미 친절한 톤)
+        return message;
+
+      case CoachingStyle.friendly:
+        // 친구처럼: 반말
+        return message
+            .replaceAll('해요', '해')
+            .replaceAll('봐요', '봐')
+            .replaceAll('하고 있어요', '하고 있어')
+            .replaceAll('있어요', '있어');
+
+      case CoachingStyle.motivational:
+        // 열정적: 강조 추가
+        if (!message.contains('🔥') && !message.contains('💪')) {
+          return '$message 💪';
+        }
+        return message;
+
+      case CoachingStyle.analytical:
+        // 냉철: 이모지 제거, 데이터 중심
+        return message.replaceAll(RegExp(r'[\u{1F300}-\u{1F9FF}]', unicode: true), '');
+    }
   }
 }
 
