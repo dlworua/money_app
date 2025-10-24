@@ -6,80 +6,83 @@ import '../../core/services/enhanced_ai_coach.dart';
 import '../../core/utils/number_formatter.dart';
 import '../viewmodels/providers.dart';
 
-/// AI 맞춤 조언 독립 페이지
-class AiCoachingPage extends ConsumerWidget {
-  const AiCoachingPage({super.key});
+class EnhancedAiCoachingDialog extends ConsumerWidget {
+  const EnhancedAiCoachingDialog({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('🤖 AI 절약 코치'),
-        backgroundColor: Colors.green.shade400,
-        foregroundColor: Colors.white,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
+    return Dialog.fullscreen(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('🤖 AI 절약 코치'),
+          backgroundColor: Colors.green.shade400,
+          foregroundColor: Colors.white,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+          ),
         ),
-      ),
-      body: FutureBuilder<ComprehensiveInsight>(
-        future: _generateInsight(ref),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoadingView();
-          }
-
-          if (snapshot.hasError) {
-            return _buildErrorView(snapshot.error.toString());
-          }
-
-          final insight = snapshot.data!;
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppTheme.spaceM),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeaderCard(insight),
-                const SizedBox(height: AppTheme.spaceM),
-                _buildMainAnalysisCard(insight),
-                const SizedBox(height: AppTheme.spaceM),
-                _buildStrategiesCard(insight),
-                const SizedBox(height: AppTheme.spaceM),
-                _buildActionableAdviceCard(insight),
-                if (insight.opportunities.isNotEmpty) ...[
+        body: FutureBuilder<ComprehensiveInsight>(
+          future: _generateInsight(ref),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildLoadingView();
+            }
+            
+            if (snapshot.hasError) {
+              return _buildErrorView(snapshot.error.toString());
+            }
+            
+            final insight = snapshot.data!;
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(AppTheme.spaceM),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeaderCard(insight),
                   const SizedBox(height: AppTheme.spaceM),
-                  _buildOpportunitiesCard(insight),
-                ],
-                if (insight.predictions['available'] == true) ...[
+                  _buildMainAnalysisCard(insight),
                   const SizedBox(height: AppTheme.spaceM),
-                  _buildPredictionsCard(insight),
+                  _buildStrategiesCard(insight),
+                  const SizedBox(height: AppTheme.spaceM),
+                  _buildActionableAdviceCard(insight),
+                  if (insight.opportunities.isNotEmpty) ...[
+                    const SizedBox(height: AppTheme.spaceM),
+                    _buildOpportunitiesCard(insight),
+                  ],
+                  if (insight.predictions['available'] == true) ...[
+                    const SizedBox(height: AppTheme.spaceM),
+                    _buildPredictionsCard(insight),
+                  ],
                 ],
-              ],
-            ),
-          );
-        },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
-
+  
   /// 🔄 실제 가계부 데이터를 로드하여 AI 인사이트 생성
   Future<ComprehensiveInsight> _generateInsight(WidgetRef ref) async {
     final state = ref.read(homeViewModelProvider);
     final coach = EnhancedAiCoach();
 
+    // state.user가 null일 경우를 처리
     final user = state.user;
     if (user == null) {
       throw Exception('사용자 정보를 찾을 수 없습니다');
     }
 
+    // 🎯 실제 거래 내역과 예산 데이터를 TransactionRepository에서 로드
     final transactionRepository = ref.read(transactionRepositoryProvider);
     final transactions = await transactionRepository.getTransactions();
     final budgets = await transactionRepository.getBudgets();
 
     return await coach.generateComprehensiveInsight(user, transactions, budgets);
   }
-
+  
   Widget _buildLoadingView() {
     return const Center(
       child: Column(
@@ -102,7 +105,7 @@ class AiCoachingPage extends ConsumerWidget {
       ),
     );
   }
-
+  
   Widget _buildErrorView(String error) {
     return Center(
       child: Column(
@@ -147,7 +150,7 @@ class AiCoachingPage extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppTheme.spaceS),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -172,7 +175,7 @@ class AiCoachingPage extends ConsumerWidget {
                 Text(
                   '신뢰도: ${insight.confidenceScore.toStringAsFixed(0)}%',
                   style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
                 if (insight.spendingAnalysis['isEmpty'] != true) ...[
@@ -180,7 +183,7 @@ class AiCoachingPage extends ConsumerWidget {
                   Text(
                     '${insight.behaviorPatterns.length}가지 패턴 발견',
                     style: AppTheme.bodySmall.copyWith(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -228,7 +231,7 @@ class AiCoachingPage extends ConsumerWidget {
               color: AppTheme.backgroundColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.green.shade400.withOpacity(0.1),
+                color: Colors.green.shade400.withValues(alpha: 0.1),
               ),
             ),
             child: Builder(
@@ -250,7 +253,7 @@ class AiCoachingPage extends ConsumerWidget {
 
   Widget _buildStrategiesCard(ComprehensiveInsight insight) {
     if (insight.strategies.isEmpty) return const SizedBox.shrink();
-
+    
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
@@ -286,7 +289,7 @@ class AiCoachingPage extends ConsumerWidget {
               color: Colors.green.shade50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.green.shade400.withOpacity(0.2),
+                color: Colors.green.shade400.withValues(alpha: 0.2),
               ),
             ),
             child: Column(
@@ -370,7 +373,7 @@ class AiCoachingPage extends ConsumerWidget {
 
   Widget _buildActionableAdviceCard(ComprehensiveInsight insight) {
     if (insight.actionableAdvice.isEmpty) return const SizedBox.shrink();
-
+    
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
@@ -403,7 +406,7 @@ class AiCoachingPage extends ConsumerWidget {
             margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
             padding: const EdgeInsets.all(AppTheme.spaceM),
             decoration: BoxDecoration(
-              color: AppTheme.successColor.withOpacity(0.05),
+              color: AppTheme.successColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -412,7 +415,7 @@ class AiCoachingPage extends ConsumerWidget {
                 Container(
                   margin: const EdgeInsets.only(top: 2),
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppTheme.successColor,
                     shape: BoxShape.circle,
                   ),
@@ -491,10 +494,10 @@ class AiCoachingPage extends ConsumerWidget {
             margin: const EdgeInsets.only(bottom: AppTheme.spaceS),
             padding: const EdgeInsets.all(AppTheme.spaceM),
             decoration: BoxDecoration(
-              color: AppTheme.warningColor.withOpacity(0.05),
+              color: AppTheme.warningColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppTheme.warningColor.withOpacity(0.2),
+                color: AppTheme.warningColor.withValues(alpha: 0.2),
               ),
             ),
             child: Column(
@@ -530,7 +533,7 @@ class AiCoachingPage extends ConsumerWidget {
 
   Widget _buildPredictionsCard(ComprehensiveInsight insight) {
     final predictions = insight.predictions;
-
+    
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceM),
       decoration: BoxDecoration(
@@ -559,7 +562,7 @@ class AiCoachingPage extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppTheme.spaceM),
-
+          
           // 목표 달성 확률
           if (predictions['goalAchievementProbability'] != null) ...[
             Container(
@@ -567,8 +570,8 @@ class AiCoachingPage extends ConsumerWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppTheme.successColor.withOpacity(0.1),
-                    AppTheme.successColor.withOpacity(0.05),
+                    AppTheme.successColor.withValues(alpha: 0.1),
+                    AppTheme.successColor.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -593,9 +596,9 @@ class AiCoachingPage extends ConsumerWidget {
               ),
             ),
           ],
-
+          
           // 위험 요소
-          if (predictions['riskFactors'] != null &&
+          if (predictions['riskFactors'] != null && 
               (predictions['riskFactors'] as List).isNotEmpty) ...[
             const SizedBox(height: AppTheme.spaceM),
             Text(
@@ -606,12 +609,12 @@ class AiCoachingPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppTheme.spaceS),
-            ...(predictions['riskFactors'] as List<String>).map((risk) =>
+            ...(predictions['riskFactors'] as List<String>).map((risk) => 
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.warning_amber_outlined,
                       size: 16,
                       color: AppTheme.errorColor,
