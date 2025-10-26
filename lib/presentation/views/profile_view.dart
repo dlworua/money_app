@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/number_formatter.dart';
 import '../viewmodels/providers.dart';
 import '../viewmodels/theme_viewmodel.dart';
+import '../providers/auth_provider.dart';
 import '../../data/models/transaction.dart';
 import '../../data/repositories/transaction_repository.dart';
 import '../dialogs/premium_dialog.dart';
@@ -1175,8 +1176,9 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             title: '로그아웃',
             subtitle: '다른 계정으로 로그인',
             iconColor: Colors.orange[700]!,
-            onTap: () {
-              // TODO: 로그아웃 기능 구현
+            onTap: () async {
+              final authRepo = ref.read(authRepositoryProvider);
+
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -1188,11 +1190,29 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       child: const Text('취소'),
                     ),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('로그아웃 기능 준비 중입니다')),
-                        );
+
+                        try {
+                          await authRepo.signOut();
+
+                          if (mounted) {
+                            // 로그인 화면으로 이동
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/login',
+                              (route) => false,
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('로그아웃 실패: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       },
                       child: const Text('로그아웃'),
                     ),
