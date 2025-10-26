@@ -49,3 +49,19 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Apple Auth
+authkey_*.p8
+
+# 🔒 보안: 민감한 키 파일들 (혹시 모를 실수 방지)
+# 참고: supabase_config.dart의 anon key는 공개 가능하지만
+# 만약 실수로 service_role_key를 넣었다면 차단됨
+**/service_role_key.dart
+**/secrets.dart
+**/.env.local
+**/.env.production
+
+# Google Services (Firebase/AdMob)
+# 이미 프로젝트에 포함되어 있으므로 추적 중
+# google-services.json
+# GoogleService-Info.plist

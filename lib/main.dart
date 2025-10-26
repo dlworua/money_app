@@ -2,14 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
+import 'core/config/supabase_config.dart';
 import 'presentation/views/main_navigation_view.dart';
+import 'presentation/views/login_view.dart';
 import 'presentation/viewmodels/theme_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Supabase 초기화
+  await Supabase.initialize(
+    url: SupabaseConfig.supabaseUrl,
+    anonKey: SupabaseConfig.supabaseAnonKey,
+  );
 
   // AdMob 초기화
   await MobileAds.instance.initialize();
@@ -47,7 +56,23 @@ class MyApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
-      home: const MainNavigationView(),
+      home: _buildInitialScreen(),
+      routes: {
+        '/login': (context) => const LoginView(),
+        '/home': (context) => const MainNavigationView(),
+      },
     );
+  }
+
+  /// 초기 화면 결정 (로그인 상태 확인)
+  Widget _buildInitialScreen() {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    // 로그인 상태면 메인 화면, 아니면 로그인 화면
+    if (user != null) {
+      return const MainNavigationView();
+    } else {
+      return const LoginView();
+    }
   }
 }
