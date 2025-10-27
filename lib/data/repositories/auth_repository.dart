@@ -21,6 +21,64 @@ class AuthRepository {
   /// 로그인 상태 Stream
   Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
 
+  /// 이메일/비밀번호로 회원가입
+  Future<AuthResponse> signUpWithEmail({
+    required String email,
+    required String password,
+    String? name,
+  }) async {
+    try {
+      LoggerService.info('📧 이메일 회원가입 시작: $email');
+
+      final response = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {'name': name ?? email.split('@')[0]}, // 이름이 없으면 이메일 앞부분 사용
+      );
+
+      LoggerService.info('✅ 이메일 회원가입 성공: ${response.user?.email}');
+      return response;
+    } catch (e) {
+      LoggerService.error('❌ 이메일 회원가입 실패', e);
+      rethrow;
+    }
+  }
+
+  /// 이메일/비밀번호로 로그인
+  Future<AuthResponse> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      LoggerService.info('📧 이메일 로그인 시작: $email');
+
+      final response = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      LoggerService.info('✅ 이메일 로그인 성공: ${response.user?.email}');
+      return response;
+    } catch (e) {
+      LoggerService.error('❌ 이메일 로그인 실패', e);
+      rethrow;
+    }
+  }
+
+  /// 비밀번호 재설정 이메일 전송
+  Future<void> resetPassword(String email) async {
+    try {
+      LoggerService.info('🔑 비밀번호 재설정 이메일 전송: $email');
+
+      await _supabase.auth.resetPasswordForEmail(email);
+
+      LoggerService.info('✅ 비밀번호 재설정 이메일 전송 완료');
+    } catch (e) {
+      LoggerService.error('❌ 비밀번호 재설정 이메일 전송 실패', e);
+      rethrow;
+    }
+  }
+
   /// Google 로그인
   Future<AuthResponse> signInWithGoogle() async {
     try {
@@ -77,6 +135,10 @@ class AuthRepository {
           AppleIDAuthorizationScopes.fullName,
         ],
         nonce: hashedNonce,
+        webAuthenticationOptions: WebAuthenticationOptions(
+          clientId: 'com.leejaegyum.moneyapp.web', // Supabase Service ID
+          redirectUri: Uri.parse('https://acitjrdfczlwtdwrtwgn.supabase.co/auth/v1/callback'),
+        ),
       );
 
       // 3. ID Token 확인
@@ -146,11 +208,40 @@ class AuthRepository {
 
   /// Google Client ID 가져오기 (플랫폼별)
   String? _getGoogleClientId() {
-    // TODO: Google Cloud Console에서 발급받은 Client ID 입력
-    // Android: xxx.apps.googleusercontent.com
-    // iOS: xxx.apps.googleusercontent.com
-    // Web: xxx.apps.googleusercontent.com
-    return null; // Supabase가 자동으로 처리
+    // Web OAuth Client ID (Android/iOS 모두 사용)
+    return '98800518977-durusa6dl9ncp4hoftg62k10t6su6col.apps.googleusercontent.com';
+  }
+
+  /// Google 계정 연동 (기존 계정에 추가)
+  ///
+  /// 사용자가 이미 로그인한 상태에서 추가 로그인 방식을 연결합니다.
+  /// 예: Apple로 가입 → 나중에 Google 연동
+  Future<AuthResponse> linkGoogleAccount() async {
+    try {
+      LoggerService.info('🔗 Google 계정 연동 시작');
+
+      // 간단한 방식: 재로그인으로 Supabase가 자동으로 같은 이메일 감지
+      return await signInWithGoogle();
+    } catch (e) {
+      LoggerService.error('❌ Google 계정 연동 실패', e);
+      rethrow;
+    }
+  }
+
+  /// Apple 계정 연동 (기존 계정에 추가)
+  ///
+  /// 사용자가 이미 로그인한 상태에서 추가 로그인 방식을 연결합니다.
+  /// 예: Google로 가입 → 나중에 Apple 연동
+  Future<AuthResponse> linkAppleAccount() async {
+    try {
+      LoggerService.info('🔗 Apple 계정 연동 시작');
+
+      // 간단한 방식: 재로그인으로 Supabase가 자동으로 같은 이메일 감지
+      return await signInWithApple();
+    } catch (e) {
+      LoggerService.error('❌ Apple 계정 연동 실패', e);
+      rethrow;
+    }
   }
 
   /// Nonce 생성 (Apple 로그인용 보안 토큰)

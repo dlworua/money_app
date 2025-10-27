@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:io' show Platform;
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/number_formatter.dart';
@@ -1170,6 +1172,17 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
           _buildDivider(),
 
+          // 계정 연동
+          _buildSettingItem(
+            icon: Icons.link,
+            title: '계정 연동',
+            subtitle: '다른 로그인 방식 추가',
+            iconColor: Colors.blue[700]!,
+            onTap: () {
+              _showLinkAccountDialog(context);
+            },
+          ),
+
           // 로그아웃
           _buildSettingItem(
             icon: Icons.logout,
@@ -1428,6 +1441,145 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     } catch (e) {
       // 광고 표시 오류 시 null 반환하여 광고 영역을 숨김
       return null;
+    }
+  }
+
+  /// 계정 연동 다이얼로그
+  void _showLinkAccountDialog(BuildContext context) {
+    final authRepo = ref.read(authRepositoryProvider);
+    final currentUser = Supabase.instance.client.auth.currentUser;
+
+    // 현재 연결된 provider 확인
+    final linkedProviders = currentUser?.appMetadata['providers'] as List? ?? [];
+    final hasGoogle = linkedProviders.contains('google');
+    final hasApple = linkedProviders.contains('apple');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('계정 연동'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              '다른 기기에서도 같은 계정으로 로그인하려면\n로그인 방식을 추가로 연결하세요.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 24),
+
+            // Google 연동 버튼
+            if (!hasGoogle)
+              ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await _linkGoogleAccount(context, authRepo);
+                },
+                icon: const Text('G', style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text('Google 계정 연결'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black87,
+                ),
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.check_circle, color: Colors.green),
+                title: const Text('Google 계정 연결됨'),
+                dense: true,
+              ),
+
+            const SizedBox(height: 8),
+
+            // Apple 연동 버튼 (iOS만)
+            if (Platform.isIOS) ...[
+              if (!hasApple)
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await _linkAppleAccount(context, authRepo);
+                  },
+                  icon: const Icon(Icons.apple),
+                  label: const Text('Apple 계정 연결'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                  ),
+                )
+              else
+                ListTile(
+                  leading: const Icon(Icons.check_circle, color: Colors.green),
+                  title: const Text('Apple 계정 연결됨'),
+                  dense: true,
+                ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('닫기'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Google 계정 연동
+  Future<void> _linkGoogleAccount(BuildContext context, authRepo) async {
+    try {
+      final response = await authRepo.linkGoogleAccount();
+      if (response.user != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Google 계정이 연결되었습니다\n같은 이메일을 사용하면 다른 기기에서도 로그인할 수 있습니다'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        String errorMsg = 'Google 계정 연결 실패';
+        if (e.toString().contains('취소') || e.toString().contains('CANCEL')) {
+          errorMsg = '연결이 취소되었습니다';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Apple 계정 연동
+  Future<void> _linkAppleAccount(BuildContext context, authRepo) async {
+    try {
+      final response = await authRepo.linkAppleAccount();
+      if (response.user != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Apple 계정이 연결되었습니다\n같은 이메일을 사용하면 다른 기기에서도 로그인할 수 있습니다'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        String errorMsg = 'Apple 계정 연결 실패';
+        if (e.toString().contains('취소') || e.toString().contains('CANCEL')) {
+          errorMsg = '연결이 취소되었습니다';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
     }
   }
 }

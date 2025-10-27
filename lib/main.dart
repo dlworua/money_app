@@ -8,7 +8,7 @@ import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/config/supabase_config.dart';
 import 'presentation/views/main_navigation_view.dart';
-import 'presentation/views/login_view.dart';
+import 'presentation/views/unified_login_view.dart';
 import 'presentation/viewmodels/theme_viewmodel.dart';
 
 void main() async {
@@ -18,6 +18,9 @@ void main() async {
   await Supabase.initialize(
     url: SupabaseConfig.supabaseUrl,
     anonKey: SupabaseConfig.supabaseAnonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce, // PKCE 플로우 사용
+    ),
   );
 
   // AdMob 초기화
@@ -58,7 +61,7 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       home: _buildInitialScreen(),
       routes: {
-        '/login': (context) => const LoginView(),
+        '/login': (context) => const UnifiedLoginView(),
         '/home': (context) => const MainNavigationView(),
       },
     );
@@ -72,7 +75,7 @@ class MyApp extends ConsumerWidget {
     if (user != null) {
       return const MainNavigationView();
     } else {
-      return const LoginView();
+      return const UnifiedLoginView();
     }
   }
 }

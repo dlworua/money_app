@@ -37,6 +37,7 @@ class SupabaseUserRepository {
   }
 
   /// Supabase에 사용자 프로필 생성 (최초 로그인 시)
+  /// RLS를 우회하는 Database Function 사용
   Future<void> createUserProfile({
     required String userId,
     required String name,
@@ -46,18 +47,12 @@ class SupabaseUserRepository {
     try {
       LoggerService.info('Supabase에 새 사용자 프로필 생성: $email');
 
-      await _supabase.from('users').insert({
-        'user_id': userId,
-        'name': name,
-        'email': email,
-        'photo_url': photoUrl,
-        'coins': 0,
-        'level': 1,
-        'total_savings': 0,
-        'monthly_goal': 100000,
-        'current_month_saved': 0,
-        'consecutive_days': 0,
-        'preferred_coaching_style': 'kind',
+      // Database Function 호출 (RLS 우회)
+      await _supabase.rpc('create_user_profile', params: {
+        'p_user_id': userId,
+        'p_name': name,
+        'p_email': email,
+        'p_photo_url': photoUrl,
       });
 
       LoggerService.info('✅ Supabase 사용자 프로필 생성 완료');

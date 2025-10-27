@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io' show Platform;
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/supabase_user_repository.dart';
 import '../../core/services/logger_service.dart';
-import 'dart:io' show Platform;
 
 /// 로그인 화면 - Google/Apple 소셜 로그인
 class LoginView extends ConsumerStatefulWidget {
@@ -50,10 +50,26 @@ class _LoginViewState extends ConsumerState<LoginView> {
       LoggerService.error('❌ Google 로그인 실패', e);
 
       if (mounted) {
+        // 사용자 친화적인 에러 메시지
+        String errorMessage = 'Google 로그인 실패';
+
+        if (e.toString().contains('PlatformException') ||
+            e.toString().contains('sign_in_failed')) {
+          errorMessage = '시뮬레이터에서는 소셜 로그인이 제한될 수 있습니다.\n실제 기기에서 테스트하거나 게스트로 계속하세요.';
+        } else if (e.toString().contains('취소') || e.toString().contains('CANCEL')) {
+          errorMessage = '로그인이 취소되었습니다';
+        } else if (e.toString().contains('network')) {
+          errorMessage = '네트워크 연결을 확인해주세요';
+        } else {
+          // 개발자를 위한 상세 에러 표시
+          errorMessage = 'Google 로그인 실패\n${e.toString().substring(0, e.toString().length > 100 ? 100 : e.toString().length)}';
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Google 로그인 실패: $e'),
-            backgroundColor: Colors.red,
+            content: Text(errorMessage),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 6),
           ),
         );
       }
@@ -96,10 +112,21 @@ class _LoginViewState extends ConsumerState<LoginView> {
       LoggerService.error('❌ Apple 로그인 실패', e);
 
       if (mounted) {
+        // 사용자 친화적인 에러 메시지
+        String errorMessage = 'Apple 로그인 실패';
+
+        if (e.toString().contains('1001') ||
+            e.toString().contains('CANCELED')) {
+          errorMessage = '로그인이 취소되었습니다';
+        } else if (e.toString().contains('1000')) {
+          errorMessage = '시뮬레이터에서는 Apple 로그인이 제한될 수 있습니다.\n실제 기기에서 테스트하거나 게스트로 계속하세요.';
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Apple 로그인 실패: $e'),
-            backgroundColor: Colors.red,
+            content: Text(errorMessage),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -162,12 +189,61 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
           const SizedBox(height: 64),
 
-          // Google 로그인 버튼
+          // 이메일 로그인 버튼 (기본)
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed('/email-login');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade400,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.email, size: 24),
+                SizedBox(width: 12),
+                Text(
+                  '이메일로 로그인',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // 구분선
+          Row(
+            children: [
+              Expanded(child: Divider(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  '또는',
+                  style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade600),
+                ),
+              ),
+              Expanded(child: Divider(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300)),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Google 로그인 버튼 (소셜 옵션)
           _buildGoogleSignInButton(),
 
           const SizedBox(height: 16),
 
-          // Apple 로그인 버튼 (iOS만)
+          // Apple 로그인 버튼 (iOS만, 소셜 옵션)
           if (Platform.isIOS) ...[
             _buildAppleSignInButton(),
             const SizedBox(height: 16),
