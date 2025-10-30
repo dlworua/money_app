@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/supabase_user_repository.dart';
 import '../../core/services/logger_service.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/terms_agreement_widget.dart';
+import '../../data/models/terms_agreement_model.dart';
 
 /// 이메일 로그인/회원가입 화면
 class EmailLoginView extends ConsumerStatefulWidget {
@@ -21,6 +23,12 @@ class _EmailLoginViewState extends ConsumerState<EmailLoginView> {
   bool _isLoading = false;
   bool _isSignUpMode = false; // false = 로그인, true = 회원가입
   bool _obscurePassword = true;
+
+  // 약관 동의 상태
+  bool _serviceTermsAgreed = false;
+  bool _privacyPolicyAgreed = false;
+  bool _marketingConsentAgreed = false;
+  bool _ageConfirmationAgreed = false;
 
   @override
   void dispose() {
@@ -78,6 +86,17 @@ class _EmailLoginViewState extends ConsumerState<EmailLoginView> {
   Future<void> _handleEmailSignUp() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // 필수 약관 동의 확인
+    if (!_serviceTermsAgreed || !_privacyPolicyAgreed || !_ageConfirmationAgreed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('필수 약관에 모두 동의해주세요'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -103,6 +122,19 @@ class _EmailLoginViewState extends ConsumerState<EmailLoginView> {
               : _nameController.text.trim(),
           email: user.email!,
         );
+
+        // 약관 동의 데이터 저장
+        final termsAgreement = TermsAgreementModel(
+          userId: user.id,
+          serviceTerms: _serviceTermsAgreed,
+          privacyPolicy: _privacyPolicyAgreed,
+          marketingConsent: _marketingConsentAgreed,
+          ageConfirmation: _ageConfirmationAgreed,
+          agreedAt: DateTime.now(),
+        );
+
+        // Supabase에 약관 동의 데이터 저장 (향후 구현)
+        // await supabaseUserRepo.saveTermsAgreement(termsAgreement);
 
         if (mounted) {
           // 이메일 인증 안내
@@ -324,6 +356,21 @@ class _EmailLoginViewState extends ConsumerState<EmailLoginView> {
                             child: const Text('비밀번호를 잊으셨나요?'),
                           ),
                         ),
+
+                      // 약관 동의 (회원가입 모드만)
+                      if (_isSignUpMode) ...[
+                        const SizedBox(height: 32),
+                        TermsAgreementWidget(
+                          onAgreementChanged: (serviceTerms, privacyPolicy, marketingConsent, ageConfirmation) {
+                            setState(() {
+                              _serviceTermsAgreed = serviceTerms;
+                              _privacyPolicyAgreed = privacyPolicy;
+                              _marketingConsentAgreed = marketingConsent;
+                              _ageConfirmationAgreed = ageConfirmation;
+                            });
+                          },
+                        ),
+                      ],
 
                       const SizedBox(height: 24),
 

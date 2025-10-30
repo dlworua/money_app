@@ -5,6 +5,8 @@ import '../../core/theme/app_theme.dart';
 import '../../core/services/enhanced_ai_coach.dart';
 import '../../core/utils/number_formatter.dart';
 import '../viewmodels/providers.dart';
+import '../../data/models/subscription_tier.dart';
+import '../widgets/subscription_lock_widget.dart';
 
 /// AI 맞춤 조언 독립 페이지
 class AiCoachingPage extends ConsumerWidget {
@@ -12,6 +14,9 @@ class AiCoachingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 사용자 요금제 확인 (임시로 Free 설정, 실제로는 사용자 데이터에서 가져옴)
+    final userTier = SubscriptionTier.free; // TODO: 실제 사용자 요금제로 교체
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('🤖 AI 절약 코치'),
@@ -23,43 +28,63 @@ class AiCoachingPage extends ConsumerWidget {
           statusBarBrightness: Brightness.dark,
         ),
       ),
-      body: FutureBuilder<ComprehensiveInsight>(
-        future: _generateInsight(ref),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoadingView();
-          }
+      body: userTier.canUseAiCoaching
+          ? FutureBuilder<ComprehensiveInsight>(
+              future: _generateInsight(ref),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildLoadingView();
+                }
 
-          if (snapshot.hasError) {
-            return _buildErrorView(snapshot.error.toString());
-          }
+                if (snapshot.hasError) {
+                  return _buildErrorView(snapshot.error.toString());
+                }
 
-          final insight = snapshot.data!;
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppTheme.spaceM),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeaderCard(insight),
-                const SizedBox(height: AppTheme.spaceM),
-                _buildMainAnalysisCard(insight),
-                const SizedBox(height: AppTheme.spaceM),
-                _buildStrategiesCard(insight),
-                const SizedBox(height: AppTheme.spaceM),
-                _buildActionableAdviceCard(insight),
-                if (insight.opportunities.isNotEmpty) ...[
-                  const SizedBox(height: AppTheme.spaceM),
-                  _buildOpportunitiesCard(insight),
-                ],
-                if (insight.predictions['available'] == true) ...[
-                  const SizedBox(height: AppTheme.spaceM),
-                  _buildPredictionsCard(insight),
-                ],
-              ],
-            ),
-          );
-        },
-      ),
+                final insight = snapshot.data!;
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppTheme.spaceM),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeaderCard(insight),
+                      const SizedBox(height: AppTheme.spaceM),
+                      _buildMainAnalysisCard(insight),
+                      const SizedBox(height: AppTheme.spaceM),
+                      _buildStrategiesCard(insight),
+                      const SizedBox(height: AppTheme.spaceM),
+                      _buildActionableAdviceCard(insight),
+                      if (insight.opportunities.isNotEmpty) ...[
+                        const SizedBox(height: AppTheme.spaceM),
+                        _buildOpportunitiesCard(insight),
+                      ],
+                      if (insight.predictions['available'] == true) ...[
+                        const SizedBox(height: AppTheme.spaceM),
+                        _buildPredictionsCard(insight),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            )
+          : _buildLockedView(context),
+    );
+  }
+
+  /// Free 요금제 사용자를 위한 잠금 화면
+  Widget _buildLockedView(BuildContext context) {
+    return SubscriptionLockWidget(
+      featureName: 'AI 절약 코치',
+      requiredTier: SubscriptionTier.pro,
+      onUpgradePressed: () {
+        // TODO: 요금제 업그레이드 페이지로 이동
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('요금제 페이지는 준비 중입니다'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      },
     );
   }
 
