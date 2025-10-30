@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/repositories/supabase_user_repository.dart';
+import '../../data/repositories/terms_agreement_repository.dart';
 import '../../core/services/logger_service.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/terms_agreement_widget.dart';
-import '../../data/models/terms_agreement_model.dart';
 
 /// 이메일 로그인/회원가입 화면
 class EmailLoginView extends ConsumerStatefulWidget {
@@ -113,6 +114,8 @@ class _EmailLoginViewState extends ConsumerState<EmailLoginView> {
 
       if (response.user != null) {
         final user = response.user!;
+        final supabase = Supabase.instance.client;
+        final termsRepo = TermsAgreementRepository(supabase);
 
         // Supabase에 사용자 프로필 생성
         await supabaseUserRepo.createUserProfile(
@@ -123,18 +126,14 @@ class _EmailLoginViewState extends ConsumerState<EmailLoginView> {
           email: user.email!,
         );
 
-        // 약관 동의 데이터 저장
-        final termsAgreement = TermsAgreementModel(
+        // Supabase에 약관 동의 데이터 저장
+        await termsRepo.saveAgreementOnSignup(
           userId: user.id,
           serviceTerms: _serviceTermsAgreed,
           privacyPolicy: _privacyPolicyAgreed,
           marketingConsent: _marketingConsentAgreed,
           ageConfirmation: _ageConfirmationAgreed,
-          agreedAt: DateTime.now(),
         );
-
-        // Supabase에 약관 동의 데이터 저장 (향후 구현)
-        // await supabaseUserRepo.saveTermsAgreement(termsAgreement);
 
         if (mounted) {
           // 이메일 인증 안내
