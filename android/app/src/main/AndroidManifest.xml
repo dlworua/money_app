@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 인앱 결제 권한 -->
+    <uses-permission android:name="com.android.vending.BILLING" />
+
     <application
         android:label="money_app"
         android:name="${applicationName}"
