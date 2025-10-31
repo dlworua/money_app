@@ -145,11 +145,11 @@ class MontLogoMountain extends StatelessWidget {
           SizedBox(width: size * 0.3),
           Text(
             'Mont',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.outfit(
               fontSize: size * 0.58,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               color: textColor,
-              letterSpacing: -0.5,
+              letterSpacing: 0.5,
               height: 1.0,
             ),
           ),
