@@ -14,6 +14,7 @@ import '../viewmodels/home_viewmodel.dart';
 import '../widgets/premium_card.dart';
 import '../widgets/premium_buttons.dart';
 import '../widgets/animated_expansion_card.dart';
+import '../widgets/mont_logo.dart';
 import '../dialogs/add_transaction_dialog.dart';
 import 'ai_coaching_page.dart';
 import 'account_book_view.dart';
@@ -158,22 +159,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
           child: Row(
             children: [
-              Container(
-                width: ResponsiveUtils.getResponsiveIconSize(context, 48),
-                height: ResponsiveUtils.getResponsiveIconSize(context, 48),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.green.shade400, Colors.teal.shade400],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: AppTheme.radiusMedium,
-                ),
-                child: Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: AppTheme.white(context),
-                  size: ResponsiveUtils.getResponsiveIconSize(context, 24),
-                ),
+              // 몬트 로고
+              MontLogo(
+                height: ResponsiveUtils.getResponsiveIconSize(context, 40),
+                showText: true,
               ),
               SizedBox(
                 width: ResponsiveUtils.getIPhone16PlusSpacing(
