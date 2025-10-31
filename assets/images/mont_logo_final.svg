@@ -1,0 +1,23 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 동전 외곽 -->
+  <circle cx="30" cy="30" r="21" stroke="#14B8A6" stroke-width="3.5" fill="none"/>
+
+  <!-- 산 모양 (M자 형태) -->
+  <path d="M 18 39 L 24 21 L 30 24.8 L 36 21 L 42 39"
+        stroke="#14B8A6"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"/>
+
+  <!-- 정상 점 -->
+  <circle cx="30" cy="24.8" r="2.5" fill="#14B8A6"/>
+
+  <!-- Mont 텍스트 (Outfit 느낌, 부드럽고 약간 굵게) -->
+  <text x="70" y="42"
+        font-family="system-ui, -apple-system, sans-serif"
+        font-size="32"
+        font-weight="550"
+        letter-spacing="0.5"
+        fill="#1F2937">Mont</text>
+</svg>

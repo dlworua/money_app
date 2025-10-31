@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:money_app/presentation/dialogs/premium_dialog.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/number_formatter.dart';
@@ -14,7 +15,6 @@ import '../viewmodels/home_viewmodel.dart';
 import '../widgets/premium_card.dart';
 import '../widgets/premium_buttons.dart';
 import '../widgets/animated_expansion_card.dart';
-import '../widgets/mont_logo_new.dart';
 import '../dialogs/add_transaction_dialog.dart';
 import 'ai_coaching_page.dart';
 import 'account_book_view.dart';
@@ -159,10 +159,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
           child: Row(
             children: [
-              // 몬트 로고 (산 + 동전 + Mont 텍스트)
-              MontLogoMountain(
-                size: ResponsiveUtils.getResponsiveIconSize(context, 48),
-                showText: true,
+              // 몬트 로고 (SVG)
+              SvgPicture.asset(
+                Theme.of(context).brightness == Brightness.dark
+                    ? 'assets/images/mont_logo_final_dark.svg'
+                    : 'assets/images/mont_logo_final.svg',
+                height: ResponsiveUtils.getResponsiveIconSize(context, 48),
               ),
               const Spacer(),
               if (user.isPremium)
