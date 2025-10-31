@@ -25,12 +25,6 @@
   <!-- 배경 -->
   <rect width="1024" height="1024" rx="180" fill="url(#bgGradient)"/>
 
-  <!-- 장식용 원 (배경 패턴) -->
-  <circle cx="200" cy="200" r="120" fill="white" opacity="0.05"/>
-  <circle cx="850" cy="150" r="80" fill="white" opacity="0.05"/>
-  <circle cx="900" cy="800" r="100" fill="white" opacity="0.05"/>
-  <circle cx="150" cy="850" r="90" fill="white" opacity="0.05"/>
-
   <!-- 동전 외곽 (중앙, 크게, 발광 효과) -->
   <circle cx="512" cy="512" r="340"
           stroke="white"
