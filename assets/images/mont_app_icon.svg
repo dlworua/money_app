@@ -28,14 +28,14 @@
           opacity="1"
           filter="url(#glow)"/>
 
-  <!-- 산 모양 (M자 형태) - 동그라미와 정확히 연결 -->
-  <!-- 원의 반지름 340 + 중심 512 기준으로 계산 -->
-  <!-- 왼쪽 끝: 대략 원과 만나는 지점, 오른쪽 끝: 대략 원과 만나는 지점 -->
-  <path d="M 232 652 L 370 310 L 512 385 L 654 310 L 792 652"
+  <!-- 산 모양 (M자 형태) - 동그라미와 완벽하게 연결 -->
+  <!-- stroke-width가 50이므로, 외곽선 중심까지 정확히 맞춤 -->
+  <!-- 원의 중심(512, 512), 반지름 340, 45도 각도 기준 계산 -->
+  <path d="M 220 652 L 370 310 L 512 385 L 654 310 L 804 652"
         stroke="white"
         stroke-width="50"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        stroke-linecap="butt"
+        stroke-linejoin="miter"
         fill="none"
         opacity="1"
         filter="url(#glow)"/>
@@ -45,11 +45,4 @@
           fill="white"
           opacity="1"
           filter="url(#glow)"/>
-
-  <!-- 정상 강조 링 -->
-  <circle cx="512" cy="385" r="60"
-          stroke="white"
-          stroke-width="4"
-          fill="none"
-          opacity="0.4"/>
 </svg>
