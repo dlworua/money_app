@@ -15,29 +15,41 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-
-    <!-- 그림자 효과 -->
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.25"/>
-    </filter>
   </defs>
 
   <!-- 배경 -->
   <rect width="1024" height="1024" rx="180" fill="url(#bgGradient)"/>
 
-  <!-- 산 모양 (M자 형태) - 동그라미와 자연스럽게 연결 -->
-  <path d="M 220 720 L 350 280 L 512 365 L 674 280 L 804 720"
+  <!-- 동전 외곽 (중앙, 크게, 발광 효과) -->
+  <circle cx="512" cy="512" r="340"
+          stroke="white"
+          stroke-width="50"
+          fill="none"
+          opacity="1"
+          filter="url(#glow)"/>
+
+  <!-- 산 모양 (M자 형태) - 동그라미와 정확히 연결 -->
+  <!-- 원의 반지름 340 + 중심 512 기준으로 계산 -->
+  <!-- 왼쪽 끝: 대략 원과 만나는 지점, 오른쪽 끝: 대략 원과 만나는 지점 -->
+  <path d="M 232 652 L 370 310 L 512 385 L 654 310 L 792 652"
         stroke="white"
-        stroke-width="75"
+        stroke-width="50"
         stroke-linecap="round"
         stroke-linejoin="round"
         fill="none"
-        opacity="0.98"
+        opacity="1"
         filter="url(#glow)"/>
 
-  <!-- 정상 점 (목표 지점) - 산과 자연스럽게 연결 -->
-  <circle cx="512" cy="365" r="50"
+  <!-- 정상 점 (목표 지점, 더 크고 발광) -->
+  <circle cx="512" cy="385" r="42"
           fill="white"
-          opacity="0.98"
+          opacity="1"
           filter="url(#glow)"/>
+
+  <!-- 정상 강조 링 -->
+  <circle cx="512" cy="385" r="60"
+          stroke="white"
+          stroke-width="4"
+          fill="none"
+          opacity="0.4"/>
 </svg>
