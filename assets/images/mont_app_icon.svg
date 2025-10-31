@@ -28,14 +28,12 @@
           opacity="1"
           filter="url(#glow)"/>
 
-  <!-- 산 모양 (M자 형태) - 동그라미와 완벽하게 연결 -->
-  <!-- stroke-width가 50이므로, 외곽선 중심까지 정확히 맞춤 -->
-  <!-- 원의 중심(512, 512), 반지름 340, 45도 각도 기준 계산 -->
-  <path d="M 220 652 L 370 310 L 512 385 L 654 310 L 804 652"
+  <!-- 산 모양 (M자 형태) - 라운드 처리 + 약간 아래로 이동 -->
+  <path d="M 220 672 L 370 320 L 512 395 L 654 320 L 804 672"
         stroke="white"
         stroke-width="50"
-        stroke-linecap="butt"
-        stroke-linejoin="miter"
+        stroke-linecap="round"
+        stroke-linejoin="round"
         fill="none"
         opacity="1"
         filter="url(#glow)"/>
