@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// 몬트(Mont) 로고 - 완전 새 디자인
 /// AI 절약 코칭 앱의 정체성을 표현
@@ -144,11 +145,11 @@ class MontLogoMountain extends StatelessWidget {
           SizedBox(width: size * 0.3),
           Text(
             'Mont',
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: size * 0.58,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: textColor,
-              letterSpacing: -1.2,
+              letterSpacing: -0.5,
               height: 1.0,
             ),
           ),

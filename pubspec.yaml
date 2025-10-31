@@ -55,6 +55,9 @@ dependencies:
 
   # 인앱 결제
   in_app_purchase: ^3.2.0
+
+  # Google Fonts (로고 폰트용)
+  google_fonts: ^6.2.1
   
 
 dev_dependencies:
