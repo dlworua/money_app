@@ -14,7 +14,7 @@ import '../viewmodels/home_viewmodel.dart';
 import '../widgets/premium_card.dart';
 import '../widgets/premium_buttons.dart';
 import '../widgets/animated_expansion_card.dart';
-import '../widgets/mont_logo.dart';
+import '../widgets/mont_logo_new.dart';
 import '../dialogs/add_transaction_dialog.dart';
 import 'ai_coaching_page.dart';
 import 'account_book_view.dart';
@@ -159,10 +159,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
           child: Row(
             children: [
-              // 몬트 로고
+              // 몬트 로고 (동전 + M)
               MontLogo(
-                height: ResponsiveUtils.getResponsiveIconSize(context, 40),
-                showText: true,
+                size: ResponsiveUtils.getResponsiveIconSize(context, 44),
               ),
               SizedBox(
                 width: ResponsiveUtils.getIPhone16PlusSpacing(
