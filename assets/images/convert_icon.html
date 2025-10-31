@@ -104,8 +104,8 @@
             <ul>
                 <li>강렬한 3색 그라데이션 (cyan → teal → emerald)</li>
                 <li>발광(glow) 효과로 생동감 추가</li>
-                <li>그림자 효과로 입체감 강화</li>
-                <li>깔끔한 배경에 로고 집중</li>
+                <li>동전 외곽 제거로 심플하고 깔끔한 디자인</li>
+                <li>산(M)과 정상이 자연스럽게 통합</li>
                 <li>더 굵고 선명한 로고</li>
             </ul>
         </div>
@@ -129,21 +129,19 @@
       <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
     </linearGradient>
     <filter id="glow">
-      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
     <filter id="shadow">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.25"/>
     </filter>
   </defs>
   <rect width="1024" height="1024" rx="180" fill="url(#bgGradient)"/>
-  <circle cx="512" cy="512" r="340" stroke="white" stroke-width="50" fill="none" opacity="1" filter="url(#glow)"/>
-  <path d="M 250 680 L 370 310 L 512 385 L 654 310 L 774 680" stroke="white" stroke-width="65" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="1" filter="url(#shadow)"/>
-  <circle cx="512" cy="385" r="42" fill="white" opacity="1" filter="url(#glow)"/>
-  <circle cx="512" cy="385" r="60" stroke="white" stroke-width="4" fill="none" opacity="0.4"/>
+  <path d="M 220 720 L 350 280 L 512 365 L 674 280 L 804 720" stroke="white" stroke-width="75" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.98" filter="url(#glow)"/>
+  <circle cx="512" cy="365" r="50" fill="white" opacity="0.98" filter="url(#glow)"/>
 </svg>`;
 
         function drawIcon(canvas, size) {

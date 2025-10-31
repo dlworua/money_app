@@ -9,7 +9,7 @@
 
     <!-- 발광 효과 -->
     <filter id="glow">
-      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -18,41 +18,26 @@
 
     <!-- 그림자 효과 -->
     <filter id="shadow">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.25"/>
     </filter>
   </defs>
 
   <!-- 배경 -->
   <rect width="1024" height="1024" rx="180" fill="url(#bgGradient)"/>
 
-  <!-- 동전 외곽 (중앙, 크게, 발광 효과) -->
-  <circle cx="512" cy="512" r="340"
-          stroke="white"
-          stroke-width="50"
-          fill="none"
-          opacity="1"
-          filter="url(#glow)"/>
-
-  <!-- 산 모양 (M자 형태, 굵고 선명하게) -->
-  <path d="M 250 680 L 370 310 L 512 385 L 654 310 L 774 680"
+  <!-- 산 모양 (M자 형태) - 동그라미와 자연스럽게 연결 -->
+  <path d="M 220 720 L 350 280 L 512 365 L 674 280 L 804 720"
         stroke="white"
-        stroke-width="65"
+        stroke-width="75"
         stroke-linecap="round"
         stroke-linejoin="round"
         fill="none"
-        opacity="1"
-        filter="url(#shadow)"/>
+        opacity="0.98"
+        filter="url(#glow)"/>
 
-  <!-- 정상 점 (목표 지점, 더 크고 발광) -->
-  <circle cx="512" cy="385" r="42"
+  <!-- 정상 점 (목표 지점) - 산과 자연스럽게 연결 -->
+  <circle cx="512" cy="365" r="50"
           fill="white"
-          opacity="1"
+          opacity="0.98"
           filter="url(#glow)"/>
-
-  <!-- 정상 강조 링 -->
-  <circle cx="512" cy="385" r="60"
-          stroke="white"
-          stroke-width="4"
-          fill="none"
-          opacity="0.4"/>
 </svg>
