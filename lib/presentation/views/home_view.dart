@@ -159,41 +159,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
           child: Row(
             children: [
-              // 몬트 로고 (동전 + M)
-              MontLogo(
-                size: ResponsiveUtils.getResponsiveIconSize(context, 44),
+              // 몬트 로고 (산 + 동전 + Mont 텍스트)
+              MontLogoMountain(
+                size: ResponsiveUtils.getResponsiveIconSize(context, 48),
+                showText: true,
               ),
-              SizedBox(
-                width: ResponsiveUtils.getIPhone16PlusSpacing(
-                  context,
-                  AppTheme.spaceM,
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '안녕하세요! 👋',
-                      style: AppTheme.getBodyMedium(context).copyWith(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white.withValues(alpha: 0.9)
-                            : AppTheme.onSurfaceColor.withValues(alpha: 0.7),
-                      ),
-                    ),
-                    Text(
-                      user.name.isNotEmpty ? user.name : '스마트 절약러',
-                      style: AppTheme.getHeadingSmall(context).copyWith(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : AppTheme.onSurfaceColor,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
+              const Spacer(),
               if (user.isPremium)
                 Container(
                   padding: ResponsiveUtils.getResponsivePaddingCustom(

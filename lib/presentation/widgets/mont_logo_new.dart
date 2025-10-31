@@ -116,17 +116,46 @@ class MontLogoMinimal extends StatelessWidget {
   }
 }
 
-/// 옵션 3: 산 + 동전 조합 (절약으로 목표 달성)
+/// 옵션 3: 산 + 동전 조합 (절약으로 목표 달성) + Mont 텍스트
 class MontLogoMountain extends StatelessWidget {
   final double size;
+  final bool showText;
 
   const MontLogoMountain({
     super.key,
     this.size = 44,
+    this.showText = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF1F2937);
+
+    if (showText) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CustomPaint(
+            size: Size(size, size),
+            painter: _MountainCoinPainter(),
+          ),
+          SizedBox(width: size * 0.3),
+          Text(
+            'Mont',
+            style: TextStyle(
+              fontSize: size * 0.58,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+              letterSpacing: -1.2,
+              height: 1.0,
+            ),
+          ),
+        ],
+      );
+    }
+
     return CustomPaint(
       size: Size(size, size),
       painter: _MountainCoinPainter(),
