@@ -2,15 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Mont 아이콘 비교 - 4가지 버전</title>
+    <title>Mont 아이콘 비교 - 7가지 버전</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-family: 'SF Pro Display', -apple-system, system-ui;
             background: linear-gradient(135deg, #f0f9ff, #e0f2fe, #dbeafe);
             padding: 40px 20px;
             min-height: 100vh;
@@ -33,21 +29,21 @@
             font-weight: 400;
         }
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-bottom: 50px;
         }
         .card {
             background: white;
-            border-radius: 24px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 25px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s;
             cursor: pointer;
         }
         .card:hover {
@@ -59,23 +55,24 @@
             box-shadow: 0 8px 30px rgba(20, 184, 166, 0.3);
         }
         .card-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: #14B8A6;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
         }
         .card-desc {
-            font-size: 14px;
+            font-size: 13px;
             color: #94a3b8;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             text-align: center;
-            min-height: 40px;
+            min-height: 36px;
+            line-height: 1.4;
         }
         canvas {
             width: 100%;
             height: auto;
-            border-radius: 16px;
+            border-radius: 14px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         .download-section {
@@ -100,224 +97,92 @@
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
             box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
         }
         .download-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4);
         }
-        .download-btn:active {
-            transform: translateY(0);
-        }
         .badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 5px 10px;
             background: #fef3c7;
             color: #92400e;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 8px;
+        }
+        .badge.new {
+            background: #dbeafe;
+            color: #1e40af;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🎨 Mont 아이콘 비교</h1>
-        <p class="subtitle">마음에 드는 디자인을 선택하세요</p>
+        <p class="subtitle">로고와 조화로운 부드러운 디자인 추가 ✨</p>
     </div>
 
     <div class="container">
         <div class="grid">
             <div class="card selected" data-version="original">
-                <div class="card-title">버전 1: 오리지널</div>
-                <div class="card-desc">텍스트 없이 로고만<br>심플하고 깔끔한 디자인</div>
+                <div class="card-title">오리지널</div>
+                <div class="card-desc">텍스트 없이 로고만<br>심플하고 깔끔</div>
                 <canvas id="canvas-original" width="256" height="256"></canvas>
-                <div class="badge">현재 버전</div>
+                <div class="badge">현재</div>
+            </div>
+
+            <div class="card" data-version="v4">
+                <div class="card-title">하모니</div>
+                <div class="card-desc">원 안에 Mont<br>로고와 조화로운 배치</div>
+                <canvas id="canvas-v4" width="256" height="256"></canvas>
+                <div class="badge new">NEW</div>
+            </div>
+
+            <div class="card" data-version="v5">
+                <div class="card-title">소프트</div>
+                <div class="card-desc">원 아래 mont<br>부드러운 분위기</div>
+                <canvas id="canvas-v5" width="256" height="256"></canvas>
+                <div class="badge new">NEW</div>
+            </div>
+
+            <div class="card" data-version="v6">
+                <div class="card-title">밸런스드</div>
+                <div class="card-desc">원 안 mont + 발광<br>완벽한 균형</div>
+                <canvas id="canvas-v6" width="256" height="256"></canvas>
+                <div class="badge new">NEW</div>
             </div>
 
             <div class="card" data-version="v1">
-                <div class="card-title">버전 2: 클래식</div>
-                <div class="card-desc">하단에 mont 텍스트<br>우아하고 정돈된 느낌</div>
+                <div class="card-title">클래식</div>
+                <div class="card-desc">하단 mont<br>우아하고 정돈된</div>
                 <canvas id="canvas-v1" width="256" height="256"></canvas>
             </div>
 
             <div class="card" data-version="v2">
-                <div class="card-title">버전 3: 컴팩트</div>
-                <div class="card-desc">원 안쪽 하단에 텍스트<br>통합되고 균형잡힌 디자인</div>
+                <div class="card-title">컴팩트</div>
+                <div class="card-desc">원 안쪽 mont<br>통합 디자인</div>
                 <canvas id="canvas-v2" width="256" height="256"></canvas>
             </div>
 
             <div class="card" data-version="v3">
-                <div class="card-title">버전 4: 엘레강스</div>
-                <div class="card-desc">얇은 폰트 + Mont 표기<br>프리미엄 럭셔리 느낌</div>
+                <div class="card-title">엘레강스</div>
+                <div class="card-desc">얇은 Mont<br>프리미엄 느낌</div>
                 <canvas id="canvas-v3" width="256" height="256"></canvas>
             </div>
         </div>
 
         <div class="download-section">
-            <div class="selected-title">선택된 버전: <span id="selected-name">오리지널</span></div>
+            <div class="selected-title">선택: <span id="selected-name">오리지널</span></div>
             <button class="download-btn" onclick="downloadSelected()">📥 1024x1024 PNG 다운로드</button>
         </div>
     </div>
 
     <canvas id="full-canvas" width="1024" height="1024" style="display:none;"></canvas>
 
-    <script>
-        const svgs = {
-            original: `<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#14B8A6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="1024" height="1024" rx="180" fill="url(#bgGradient)"/>
-  <circle cx="512" cy="512" r="340" stroke="white" stroke-width="50" fill="none" opacity="1" filter="url(#glow)"/>
-  <path d="M 220 672 L 370 320 L 512 395 L 654 320 L 804 672" stroke="white" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="1" filter="url(#glow)"/>
-  <circle cx="512" cy="395" r="42" fill="white" opacity="1" filter="url(#glow)"/>
-</svg>`,
-
-            v1: `<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#14B8A6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
-    </linearGradient>
-    <filter id="glow1">
-      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="1024" height="1024" rx="180" fill="url(#bg1)"/>
-  <circle cx="512" cy="420" r="280" stroke="white" stroke-width="42" fill="none" opacity="0.98" filter="url(#glow1)"/>
-  <path d="M 270 580 L 380 250 L 512 315 L 644 250 L 754 580" stroke="white" stroke-width="42" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.98" filter="url(#glow1)"/>
-  <circle cx="512" cy="315" r="35" fill="white" opacity="0.98" filter="url(#glow1)"/>
-  <text x="512" y="830" font-family="SF Pro Display, -apple-system, system-ui" font-size="105" font-weight="400" letter-spacing="10" fill="white" text-anchor="middle" opacity="0.90">mont</text>
-</svg>`,
-
-            v2: `<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#14B8A6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
-    </linearGradient>
-    <filter id="glow2">
-      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="1024" height="1024" rx="180" fill="url(#bg2)"/>
-  <circle cx="512" cy="450" r="320" stroke="white" stroke-width="45" fill="none" opacity="1" filter="url(#glow2)"/>
-  <path d="M 230 620 L 360 270 L 512 345 L 664 270 L 794 620" stroke="white" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="1" filter="url(#glow2)"/>
-  <circle cx="512" cy="345" r="38" fill="white" opacity="1" filter="url(#glow2)"/>
-  <text x="512" y="730" font-family="SF Pro Display, -apple-system, system-ui" font-size="95" font-weight="300" letter-spacing="12" fill="white" text-anchor="middle" opacity="0.88">mont</text>
-</svg>`,
-
-            v3: `<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#14B8A6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
-    </linearGradient>
-    <filter id="glow3">
-      <feGaussianBlur stdDeviation="9" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="1024" height="1024" rx="180" fill="url(#bg3)"/>
-  <circle cx="512" cy="400" r="260" stroke="white" stroke-width="40" fill="none" opacity="0.95" filter="url(#glow3)"/>
-  <path d="M 290 550 L 400 240 L 512 300 L 624 240 L 734 550" stroke="white" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95" filter="url(#glow3)"/>
-  <circle cx="512" cy="300" r="32" fill="white" opacity="0.95" filter="url(#glow3)"/>
-  <text x="512" y="780" font-family="SF Pro Display, -apple-system, system-ui" font-size="120" font-weight="200" letter-spacing="18" fill="white" fill-opacity="0.85" text-anchor="middle">Mont</text>
-</svg>`
-        };
-
-        const versionNames = {
-            original: '오리지널',
-            v1: '클래식',
-            v2: '컴팩트',
-            v3: '엘레강스'
-        };
-
-        let selectedVersion = 'original';
-
-        function drawIcon(canvasId, svgCode, size) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            const blob = new Blob([svgCode], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-
-            img.onload = function() {
-                ctx.clearRect(0, 0, size, size);
-                ctx.drawImage(img, 0, 0, size, size);
-                URL.revokeObjectURL(url);
-            };
-
-            img.src = url;
-        }
-
-        // 미리보기 그리기
-        drawIcon('canvas-original', svgs.original, 256);
-        drawIcon('canvas-v1', svgs.v1, 256);
-        drawIcon('canvas-v2', svgs.v2, 256);
-        drawIcon('canvas-v3', svgs.v3, 256);
-
-        // 카드 클릭 이벤트
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedVersion = this.dataset.version;
-                document.getElementById('selected-name').textContent = versionNames[selectedVersion];
-            });
-        });
-
-        function downloadSelected() {
-            const canvas = document.getElementById('full-canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            const blob = new Blob([svgs[selectedVersion]], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-
-            img.onload = function() {
-                ctx.clearRect(0, 0, 1024, 1024);
-                ctx.drawImage(img, 0, 0, 1024, 1024);
-
-                canvas.toBlob(function(blob) {
-                    const link = document.createElement('a');
-                    link.download = 'mont_icon_' + selectedVersion + '.png';
-                    link.href = URL.createObjectURL(blob);
-                    link.click();
-                }, 'image/png');
-
-                URL.revokeObjectURL(url);
-            };
-
-            img.src = url;
-        }
-    </script>
+    <script src="icon_compare_data.js"></script>
 </body>
 </html>
