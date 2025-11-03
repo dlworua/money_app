@@ -5,42 +5,22 @@
       <stop offset="50%" style="stop-color:#14B8A6;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
     </linearGradient>
-    <filter id="glow7">
-      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
   </defs>
 
   <!-- 배경 -->
   <rect width="1024" height="1024" rx="180" fill="url(#bg7)"/>
 
-  <!-- 오리지널 로고 (0.85배 축소, 위로 이동) -->
-  <!-- 원: r=289 (340*0.85) -->
-  <circle cx="512" cy="435" r="289" stroke="white" stroke-width="42.5" fill="none" opacity="1" filter="url(#glow7)"/>
+  <!-- 오리지널 로고 (0.85배 축소, 선명하게) -->
+  <circle cx="512" cy="435" r="289" stroke="white" stroke-width="42.5" fill="none"/>
+  <path d="M 260 579 L 384 297 L 512 360 L 640 297 L 764 579" stroke="white" stroke-width="42.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="512" cy="360" r="35.7" fill="white"/>
 
-  <!-- 산 모양 (0.85배 축소, M 끝점이 원과 정확히 만나도록) -->
-  <path d="M 260 579 L 384 297 L 512 360 L 640 297 L 764 579"
-        stroke="white"
-        stroke-width="42.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        fill="none"
-        opacity="1"
-        filter="url(#glow7)"/>
-
-  <!-- 정상 점 (0.85배 축소) -->
-  <circle cx="512" cy="360" r="35.7" fill="white" opacity="1" filter="url(#glow7)"/>
-
-  <!-- 엘레강스 텍스트 (더 굵고 크게, 눈에 띄게) -->
+  <!-- Mont 텍스트 (선명하게) -->
   <text x="512" y="880"
         font-family="SF Pro Display, -apple-system, system-ui"
         font-size="140"
         font-weight="300"
         letter-spacing="20"
         fill="white"
-        fill-opacity="0.88"
         text-anchor="middle">Mont</text>
 </svg>
