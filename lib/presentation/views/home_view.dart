@@ -140,57 +140,43 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Widget _buildAppBar(BuildContext context, UserModel user) {
     return SliverAppBar(
-      expandedHeight: 120,
-      floating: true,
+      floating: false,
       pinned: false,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          padding: EdgeInsets.fromLTRB(
-            ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM),
-            kToolbarHeight +
-                ResponsiveUtils.getIPhone16PlusSpacing(
-                  context,
-                  AppTheme.spaceM,
-                ),
-            ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM),
-            ResponsiveUtils.getIPhone16PlusSpacing(context, AppTheme.spaceM),
+      toolbarHeight: kToolbarHeight,
+      title: Row(
+        children: [
+          // 몬트 로고 (SVG)
+          SvgPicture.asset(
+            Theme.of(context).brightness == Brightness.dark
+                ? 'assets/images/mont_logo_final_dark.svg'
+                : 'assets/images/mont_logo_final.svg',
+            height: ResponsiveUtils.getResponsiveIconSize(context, 40),
           ),
-          child: Row(
-            children: [
-              // 몬트 로고 (SVG)
-              SvgPicture.asset(
-                Theme.of(context).brightness == Brightness.dark
-                    ? 'assets/images/mont_logo_final_dark.svg'
-                    : 'assets/images/mont_logo_final.svg',
-                height: ResponsiveUtils.getResponsiveIconSize(context, 48),
+          const Spacer(),
+          if (user.isPremium)
+            Container(
+              padding: ResponsiveUtils.getResponsivePaddingCustom(
+                context,
+                horizontal: AppTheme.spaceS,
+                vertical: AppTheme.spaceXS,
               ),
-              const Spacer(),
-              if (user.isPremium)
-                Container(
-                  padding: ResponsiveUtils.getResponsivePaddingCustom(
-                    context,
-                    horizontal: AppTheme.spaceS,
-                    vertical: AppTheme.spaceXS,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.successGradient,
-                    borderRadius: BorderRadius.circular(
-                      ResponsiveUtils.getResponsiveSize(context, 20),
-                    ),
-                  ),
-                  child: Text(
-                    '프리미엄',
-                    style: AppTheme.getBodySmall(context).copyWith(
-                      color: AppTheme.white(context),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+              decoration: BoxDecoration(
+                gradient: AppTheme.successGradient,
+                borderRadius: BorderRadius.circular(
+                  ResponsiveUtils.getResponsiveSize(context, 20),
                 ),
-            ],
-          ),
-        ),
+              ),
+              child: Text(
+                '프리미엄',
+                style: AppTheme.getBodySmall(context).copyWith(
+                  color: AppTheme.white(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
