@@ -6,7 +6,7 @@
       <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
     </linearGradient>
     <filter id="glow7">
-      <feGaussianBlur stdDeviation="9" result="coloredBlur"/>
+      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -17,18 +17,30 @@
   <!-- 배경 -->
   <rect width="1024" height="1024" rx="180" fill="url(#bg7)"/>
 
-  <!-- 오리지널 로고 (위로 이동, 약간 작게) -->
-  <circle cx="512" cy="450" r="300" stroke="white" stroke-width="46" fill="none" opacity="1" filter="url(#glow7)"/>
-  <path d="M 245 600 L 380 270 L 512 340 L 644 270 L 779 600" stroke="white" stroke-width="46" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="1" filter="url(#glow7)"/>
-  <circle cx="512" cy="340" r="38" fill="white" opacity="1" filter="url(#glow7)"/>
+  <!-- 오리지널 로고 (0.85배 축소, 위로 이동) -->
+  <!-- 원: r=289 (340*0.85) -->
+  <circle cx="512" cy="435" r="289" stroke="white" stroke-width="42.5" fill="none" opacity="1" filter="url(#glow7)"/>
 
-  <!-- 엘레강스 텍스트 (하단) -->
-  <text x="512" y="860"
+  <!-- 산 모양 (0.85배 축소, M 끝점이 원과 정확히 만나도록) -->
+  <path d="M 260 579 L 384 297 L 512 360 L 640 297 L 764 579"
+        stroke="white"
+        stroke-width="42.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        opacity="1"
+        filter="url(#glow7)"/>
+
+  <!-- 정상 점 (0.85배 축소) -->
+  <circle cx="512" cy="360" r="35.7" fill="white" opacity="1" filter="url(#glow7)"/>
+
+  <!-- 엘레강스 텍스트 (더 굵고 크게, 눈에 띄게) -->
+  <text x="512" y="880"
         font-family="SF Pro Display, -apple-system, system-ui"
-        font-size="120"
-        font-weight="200"
-        letter-spacing="18"
+        font-size="140"
+        font-weight="300"
+        letter-spacing="20"
         fill="white"
-        fill-opacity="0.85"
+        fill-opacity="0.88"
         text-anchor="middle">Mont</text>
 </svg>
