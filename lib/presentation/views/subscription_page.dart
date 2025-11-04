@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/subscription_tier.dart';
 import '../viewmodels/providers.dart';
 
-/// 요금제 선택 페이지 (넷플릭스 스타일)
+/// 요금제 선택 페이지 (iOS 스타일)
 class SubscriptionPage extends ConsumerStatefulWidget {
   const SubscriptionPage({super.key});
 
@@ -23,12 +23,12 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         : SubscriptionTier.free;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F7), // iOS 배경색
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF5F5F7),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: const Icon(Icons.close, color: Colors.black87, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -36,24 +36,26 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         children: [
           // 헤더
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  '요금제를 선택하세요',
+                  '요금제',
                   style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
-                  '언제든지 변경하거나 해지할 수 있습니다',
+                  '나에게 맞는 플랜을 선택하세요',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     color: Colors.grey[600],
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
@@ -62,7 +64,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
           // 요금제 탭
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
                 Expanded(
@@ -72,7 +74,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                     isCurrentPlan: currentTier == SubscriptionTier.free,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   child: _buildPlanTab(
                     tier: SubscriptionTier.pro,
@@ -81,7 +83,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                     badge: '인기',
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   child: _buildPlanTab(
                     tier: SubscriptionTier.premium,
@@ -94,12 +96,12 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // 기능 비교표
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _buildComparisonTable(),
             ),
           ),
@@ -111,7 +113,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 요금제 탭
+  /// 요금제 탭 (iOS 스타일)
   Widget _buildPlanTab({
     required SubscriptionTier tier,
     required int index,
@@ -123,74 +125,82 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
     return GestureDetector(
       onTap: () => setState(() => _selectedPlanIndex = index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  colors: [baseColor, baseColor.withOpacity(0.8)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: isSelected ? null : Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(color: baseColor, width: 2)
-              : Border.all(color: Colors.transparent),
+          color: isSelected ? baseColor : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: baseColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
         ),
         child: Column(
           children: [
             if (badge != null && !isCurrentPlan)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : baseColor,
-                  borderRadius: BorderRadius.circular(4),
+                  color: isSelected ? Colors.white.withOpacity(0.9) : baseColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   badge,
                   style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? baseColor : Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? baseColor : baseColor,
                   ),
                 ),
               )
             else if (isCurrentPlan)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Colors.green[600],
-                  borderRadius: BorderRadius.circular(4),
+                  color: isSelected ? Colors.white.withOpacity(0.9) : Colors.green[50],
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   '사용중',
                   style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.green[600] : Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? Colors.green[700] : Colors.green[700],
                   ),
                 ),
               )
             else
-              const SizedBox(height: 16),
-            const SizedBox(height: 8),
+              const SizedBox(height: 19),
+            const SizedBox(height: 6),
             Text(
               tier.displayName,
               style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: isSelected ? Colors.white : Colors.black87,
+                letterSpacing: -0.3,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               tier.price == 0 ? '무료' : '₩${_formatPrice(tier.price)}',
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white.withValues(alpha: 0.9) : Colors.grey[600],
+                fontWeight: FontWeight.w500,
+                color: isSelected ? Colors.white.withOpacity(0.85) : Colors.grey[600],
               ),
             ),
           ],
@@ -199,7 +209,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 기능 비교표 (넷플릭스 스타일)
+  /// 기능 비교표 (iOS 스타일)
   Widget _buildComparisonTable() {
     final selectedTier = SubscriptionTier.values[_selectedPlanIndex];
 
@@ -207,21 +217,21 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       children: [
         // 거래 기록
         _buildFeatureRow(
-          icon: Icons.receipt_long,
+          icon: Icons.receipt_long_outlined,
           title: '거래 기록',
           values: ['월 100회', '무제한', '무제한'],
         ),
 
         // 광고
         _buildFeatureRow(
-          icon: Icons.block,
+          icon: Icons.block_outlined,
           title: '광고',
-          values: ['모든 탭', '게임만 표시', '완전 제거'],
+          values: ['모든 탭', '게임만', '완전 제거'],
         ),
 
         // 리워드
         _buildFeatureRow(
-          icon: Icons.card_giftcard,
+          icon: Icons.card_giftcard_outlined,
           title: '리워드 배율',
           values: ['1배', '2배', '3배'],
           details: ['1/20', '2/40', '4/60'],
@@ -229,93 +239,113 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
         // AI 코칭
         _buildFeatureRow(
-          icon: Icons.psychology,
+          icon: Icons.psychology_outlined,
           title: 'AI 코칭',
-          values: ['사용불가', '기본 모델', '프리미엄'],
-          details: ['-', '말투변경 불가', '맞춤조언'],
+          values: ['사용불가', '기본', '프리미엄'],
+          details: ['-', '말투변경 ✕', '맞춤조언 ✓'],
         ),
 
         // 예산/목표
         _buildFeatureRow(
-          icon: Icons.savings,
-          title: '예산 및 절약목표',
+          icon: Icons.savings_outlined,
+          title: '예산/목표',
           values: ['각 10회', '각 50회', '무제한'],
         ),
 
         // 게임 티켓
         _buildFeatureRow(
-          icon: Icons.confirmation_number,
-          title: '게임 티켓 대기',
+          icon: Icons.confirmation_number_outlined,
+          title: '티켓 대기',
           values: ['30분', '30분', '5분'],
         ),
 
         // 소비 분석
         _buildFeatureRow(
-          icon: Icons.analytics,
-          title: '이번달 소비분석',
-          values: ['가능', '가능', '가능'],
+          icon: Icons.analytics_outlined,
+          title: '소비분석',
+          values: ['✓', '✓', '✓'],
         ),
 
         // 고급 통계
         _buildFeatureRow(
-          icon: Icons.bar_chart,
+          icon: Icons.bar_chart_outlined,
           title: '고급 통계',
-          values: ['가능', '가능', '가능'],
+          values: ['✓', '✓', '✓'],
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
         // 선택된 플랜 요약
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: _getPrimaryColor(selectedTier).withOpacity(0.1),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: _getPrimaryColor(selectedTier).withOpacity(0.3),
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(
-                    _getTierIcon(selectedTier),
-                    color: _getPrimaryColor(selectedTier),
-                    size: 24,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${selectedTier.displayName} 플랜',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: _getPrimaryColor(selectedTier).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      _getTierIcon(selectedTier),
                       color: _getPrimaryColor(selectedTier),
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${selectedTier.displayName} 플랜 혜택',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               ...selectedTier.features.map(
                 (feature) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.check,
-                        size: 16,
-                        color: _getPrimaryColor(selectedTier),
+                      Container(
+                        margin: const EdgeInsets.only(top: 2),
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: _getPrimaryColor(selectedTier).withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check,
+                          size: 14,
+                          color: _getPrimaryColor(selectedTier),
+                        ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           feature,
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[800],
-                            height: 1.4,
+                            fontSize: 13,
+                            color: Colors.grey[700],
+                            height: 1.5,
                           ),
                         ),
                       ),
@@ -330,7 +360,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 기능 행
+  /// 기능 행 (iOS 스타일)
   Widget _buildFeatureRow({
     required IconData icon,
     required String title,
@@ -338,11 +368,18 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     List<String>? details,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,9 +391,10 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.grey[800],
+                  letterSpacing: -0.2,
                 ),
               ),
             ],
@@ -380,7 +418,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 기능 값
+  /// 기능 값 (iOS 스타일)
   Widget _buildFeatureValue(
     String value,
     String? detail,
@@ -390,25 +428,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     final color = isSelected ? _getPrimaryColor(tier) : Colors.grey[700]!;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       child: Column(
         children: [
           Text(
             value,
             style: TextStyle(
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               color: color,
+              letterSpacing: -0.2,
             ),
             textAlign: TextAlign.center,
           ),
           if (detail != null) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
             Text(
               detail,
               style: TextStyle(
                 fontSize: 10,
                 color: color.withOpacity(0.7),
+                fontWeight: FontWeight.w400,
               ),
               textAlign: TextAlign.center,
             ),
@@ -418,22 +458,21 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 하단 버튼 바
+  /// 하단 버튼 바 (iOS 스타일)
   Widget _buildBottomBar(BuildContext context, SubscriptionTier currentTier) {
     final selectedTier = SubscriptionTier.values[_selectedPlanIndex];
     final isCurrentPlan = selectedTier == currentTier;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+        color: const Color(0xFFF5F5F7),
+        border: Border(
+          top: BorderSide(
+            color: Colors.black.withOpacity(0.08),
+            width: 0.5,
           ),
-        ],
+        ),
       ),
       child: SafeArea(
         child: Column(
@@ -442,35 +481,41 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             if (!isCurrentPlan) ...[
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: () => _handleSubscribe(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _getPrimaryColor(selectedTier),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(13),
                     ),
                     elevation: 0,
+                    padding: EdgeInsets.zero,
                   ),
-                  child: Text(
-                    selectedTier.price == 0
-                        ? 'Free 플랜으로 변경'
-                        : '월 ₩${_formatPrice(selectedTier.price)}로 시작하기',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                  child: Center(
+                    child: Text(
+                      selectedTier.price == 0
+                          ? 'Free 플랜으로 변경'
+                          : '월 ₩${_formatPrice(selectedTier.price)}로 시작하기',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.3,
+                        height: 1.0,
+                      ),
                     ),
                   ),
                 ),
               ),
               if (selectedTier.price > 0) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
-                  '7일 무료 체험 • 언제든지 해지 가능',
+                  '7일 무료 체험 · 언제든 해지 가능',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 12,
                     color: Colors.grey[600],
+                    fontWeight: FontWeight.w400,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -478,23 +523,24 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             ] else ...[
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green[200]!),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(13),
+                  border: Border.all(color: Colors.green[300]!, width: 1.5),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green[600], size: 20),
-                    const SizedBox(width: 8),
+                    Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 22),
+                    const SizedBox(width: 10),
                     Text(
-                      '현재 사용 중인 플랜입니다',
+                      '현재 사용 중',
                       style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.green[900],
+                        fontSize: 15,
+                        color: Colors.green[700],
                         fontWeight: FontWeight.w600,
+                        letterSpacing: -0.3,
                       ),
                     ),
                   ],
@@ -511,11 +557,11 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   IconData _getTierIcon(SubscriptionTier tier) {
     switch (tier) {
       case SubscriptionTier.free:
-        return Icons.person_outline;
+        return Icons.person_outline_rounded;
       case SubscriptionTier.pro:
-        return Icons.star_outline;
+        return Icons.star_outline_rounded;
       case SubscriptionTier.premium:
-        return Icons.workspace_premium;
+        return Icons.workspace_premium_outlined;
     }
   }
 
@@ -525,9 +571,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
       case SubscriptionTier.free:
         return Colors.grey[700]!;
       case SubscriptionTier.pro:
-        return Colors.blue[600]!;
+        return const Color(0xFF007AFF); // iOS 파란색
       case SubscriptionTier.premium:
-        return Colors.amber[600]!;
+        return const Color(0xFFFF9500); // iOS 오렌지색
     }
   }
 
@@ -546,18 +592,33 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('${selectedTier.displayName} 플랜 구독'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text(
+          '${selectedTier.displayName} 플랜 구독',
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         content: Text(
           selectedTier.price == 0
               ? 'Free 플랜으로 변경하시겠습니까?\n\n유료 플랜의 혜택이 해제됩니다.'
               : '${selectedTier.displayName} 플랜(₩${_formatPrice(selectedTier.price)}/월)을 구독하시겠습니까?\n\n7일 무료 체험 후 자동 결제됩니다.',
+          style: const TextStyle(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+            child: Text(
+              '취소',
+              style: TextStyle(
+                color: _getPrimaryColor(selectedTier),
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
               // TODO: 실제 구독 처리 로직
               Navigator.pop(context); // 확인 다이얼로그 닫기
@@ -574,10 +635,14 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _getPrimaryColor(selectedTier),
+            child: Text(
+              selectedTier.price == 0 ? '변경하기' : '구독하기',
+              style: TextStyle(
+                color: _getPrimaryColor(selectedTier),
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: Text(selectedTier.price == 0 ? '변경하기' : '구독하기'),
           ),
         ],
       ),
