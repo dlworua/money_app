@@ -726,12 +726,12 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                       ],
                     ),
                     if (_pointsToUse > 0) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.grey[900] : Colors.grey[50],
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Column(
                           children: [
@@ -741,27 +741,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                                 Text(
                                   '플랜 가격',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                                   ),
                                 ),
                                 Text(
                                   '₩${_formatPrice(tierPrice)}',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   '포인트 할인',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: const Color(0xFFFF9500),
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -769,21 +769,21 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                                 Text(
                                   '-₩${_formatPrice(_pointsToUse)}',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: const Color(0xFFFF9500),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
                             ),
-                            Divider(height: 12, color: isDark ? Colors.grey[800] : Colors.grey[300]),
+                            Divider(height: 16, color: isDark ? Colors.grey[800] : Colors.grey[300]),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   '최종 결제 금액',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: textColor,
                                   ),
@@ -791,7 +791,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                                 Text(
                                   finalPrice == 0 ? '무료' : '₩${_formatPrice(finalPrice)}',
                                   style: TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     color: _getPrimaryColor(selectedTier),
                                   ),
