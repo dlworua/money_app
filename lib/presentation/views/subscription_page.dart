@@ -575,11 +575,11 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             // 포인트 사용 섹션 (유료 플랜 & 현재 사용중이 아닐 때만)
             if (!isCurrentPlan && tierPrice > 0) ...[
               Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: cardColor,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.06),
                   ),
@@ -591,14 +591,14 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                       children: [
                         Icon(
                           Icons.monetization_on_outlined,
-                          size: 20,
+                          size: 18,
                           color: const Color(0xFFFF9500),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Text(
                           '포인트 사용',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: textColor,
                             letterSpacing: -0.3,
@@ -615,27 +615,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 10),
                     if (availablePoints == 0) ...[
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.grey[900] : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.info_outline,
-                              size: 18,
+                              size: 16,
                               color: isDark ? Colors.grey[500] : Colors.grey[600],
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 '보유한 포인트가 없습니다. 게임으로 포인트를 획득하세요!',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   color: isDark ? Colors.grey[400] : Colors.grey[600],
                                 ),
                               ),
@@ -662,17 +662,17 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                               },
                             ),
                           ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFF9500).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             '${_formatPrice(_pointsToUse)}P',
                             style: const TextStyle(
-                              fontSize: 13,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFFF9500),
                             ),
@@ -680,7 +680,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -691,14 +691,14 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                             });
                           },
                           style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Text(
                             '초기화',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               color: isDark ? Colors.grey[400] : Colors.grey[600],
                             ),
                           ),
@@ -710,14 +710,14 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                             });
                           },
                           style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: const Text(
                             '전액 사용',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               color: Color(0xFFFF9500),
                               fontWeight: FontWeight.w600,
                             ),
@@ -726,12 +726,12 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                       ],
                     ),
                     if (_pointsToUse > 0) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.grey[900] : Colors.grey[50],
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
                           children: [
@@ -741,27 +741,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                                 Text(
                                   '플랜 가격',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                                   ),
                                 ),
                                 Text(
                                   '₩${_formatPrice(tierPrice)}',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     color: isDark ? Colors.grey[400] : Colors.grey[600],
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   '포인트 할인',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     color: const Color(0xFFFF9500),
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -769,21 +769,21 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                                 Text(
                                   '-₩${_formatPrice(_pointsToUse)}',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     color: const Color(0xFFFF9500),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
                             ),
-                            Divider(height: 16, color: isDark ? Colors.grey[800] : Colors.grey[300]),
+                            Divider(height: 12, color: isDark ? Colors.grey[800] : Colors.grey[300]),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   '최종 결제 금액',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: textColor,
                                   ),
@@ -791,7 +791,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                                 Text(
                                   finalPrice == 0 ? '무료' : '₩${_formatPrice(finalPrice)}',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     color: _getPrimaryColor(selectedTier),
                                   ),
