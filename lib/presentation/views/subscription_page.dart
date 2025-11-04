@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/subscription_tier.dart';
 import '../viewmodels/providers.dart';
 
-/// 요금제 선택 페이지 (iOS 스타일)
+/// 요금제 선택 페이지 (iOS 스타일 + 다크모드)
 class SubscriptionPage extends ConsumerStatefulWidget {
   const SubscriptionPage({super.key});
 
@@ -22,13 +22,19 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         ? SubscriptionTier.premium
         : SubscriptionTier.free;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF000000) : const Color(0xFFF5F5F7);
+    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final secondaryTextColor = isDark ? Colors.grey[400]! : Colors.grey[600]!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7), // iOS 배경색
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F7),
+        backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87, size: 28),
+          icon: Icon(Icons.close, color: textColor, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -40,12 +46,12 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '요금제',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: textColor,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -54,7 +60,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   '나에게 맞는 플랜을 선택하세요',
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.grey[600],
+                    color: secondaryTextColor,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -72,6 +78,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                     tier: SubscriptionTier.free,
                     index: 0,
                     isCurrentPlan: currentTier == SubscriptionTier.free,
+                    isDark: isDark,
+                    cardColor: cardColor,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -81,6 +89,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                     index: 1,
                     isCurrentPlan: currentTier == SubscriptionTier.pro,
                     badge: '인기',
+                    isDark: isDark,
+                    cardColor: cardColor,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -90,6 +100,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                     index: 2,
                     isCurrentPlan: currentTier == SubscriptionTier.premium,
                     badge: '추천',
+                    isDark: isDark,
+                    cardColor: cardColor,
                   ),
                 ),
               ],
@@ -102,22 +114,24 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildComparisonTable(),
+              child: _buildComparisonTable(isDark, cardColor, textColor, secondaryTextColor),
             ),
           ),
 
           // 하단 버튼
-          _buildBottomBar(context, currentTier),
+          _buildBottomBar(context, currentTier, isDark, backgroundColor, cardColor, textColor),
         ],
       ),
     );
   }
 
-  /// 요금제 탭 (iOS 스타일)
+  /// 요금제 탭 (다크모드 대응)
   Widget _buildPlanTab({
     required SubscriptionTier tier,
     required int index,
     required bool isCurrentPlan,
+    required bool isDark,
+    required Color cardColor,
     String? badge,
   }) {
     final isSelected = _selectedPlanIndex == index;
@@ -130,23 +144,25 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
-          color: isSelected ? baseColor : Colors.white,
+          color: isSelected ? baseColor : cardColor,
           borderRadius: BorderRadius.circular(14),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: baseColor.withOpacity(0.3),
+                    color: baseColor.withOpacity(isDark ? 0.2 : 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+              : isDark
+                  ? []
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
         ),
         child: Column(
           children: [
@@ -154,7 +170,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white.withOpacity(0.9) : baseColor.withOpacity(0.15),
+                  color: isSelected
+                      ? Colors.white.withOpacity(0.9)
+                      : baseColor.withOpacity(isDark ? 0.3 : 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -162,7 +180,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: isSelected ? baseColor : baseColor,
+                    color: isSelected ? baseColor : (isDark ? Colors.white : baseColor),
                   ),
                 ),
               )
@@ -170,7 +188,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white.withOpacity(0.9) : Colors.green[50],
+                  color: isSelected
+                      ? Colors.white.withOpacity(0.9)
+                      : (isDark ? Colors.green[900]!.withOpacity(0.4) : Colors.green[50]),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -178,7 +198,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.green[700] : Colors.green[700],
+                    color: isSelected
+                        ? Colors.green[700]
+                        : (isDark ? Colors.green[400] : Colors.green[700]),
                   ),
                 ),
               )
@@ -190,7 +212,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : Colors.black87,
+                color: isSelected ? Colors.white : (isDark ? Colors.white : Colors.black87),
                 letterSpacing: -0.3,
               ),
             ),
@@ -200,7 +222,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white.withOpacity(0.85) : Colors.grey[600],
+                color: isSelected
+                    ? Colors.white.withOpacity(0.85)
+                    : (isDark ? Colors.grey[400] : Colors.grey[600]),
               ),
             ),
           ],
@@ -209,8 +233,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 기능 비교표 (iOS 스타일)
-  Widget _buildComparisonTable() {
+  /// 기능 비교표 (다크모드 대응)
+  Widget _buildComparisonTable(bool isDark, Color cardColor, Color textColor, Color secondaryTextColor) {
     final selectedTier = SubscriptionTier.values[_selectedPlanIndex];
 
     return Column(
@@ -220,6 +244,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           icon: Icons.receipt_long_outlined,
           title: '거래 기록',
           values: ['월 100회', '무제한', '무제한'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         // 광고
@@ -227,6 +254,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           icon: Icons.block_outlined,
           title: '광고',
           values: ['모든 탭', '게임만', '완전 제거'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         // 리워드
@@ -235,6 +265,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           title: '리워드 배율',
           values: ['1배', '2배', '3배'],
           details: ['1/20', '2/40', '4/60'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         // AI 코칭
@@ -243,6 +276,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           title: 'AI 코칭',
           values: ['사용불가', '기본', '프리미엄'],
           details: ['-', '말투변경 ✕', '맞춤조언 ✓'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         // 예산/목표
@@ -250,6 +286,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           icon: Icons.savings_outlined,
           title: '예산/목표',
           values: ['각 10회', '각 50회', '무제한'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         // 게임 티켓
@@ -257,6 +296,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           icon: Icons.confirmation_number_outlined,
           title: '티켓 대기',
           values: ['30분', '30분', '5분'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         // 소비 분석
@@ -264,6 +306,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           icon: Icons.analytics_outlined,
           title: '소비분석',
           values: ['✓', '✓', '✓'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         // 고급 통계
@@ -271,6 +316,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           icon: Icons.bar_chart_outlined,
           title: '고급 통계',
           values: ['✓', '✓', '✓'],
+          isDark: isDark,
+          cardColor: cardColor,
+          textColor: textColor,
         ),
 
         const SizedBox(height: 16),
@@ -279,15 +327,17 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cardColor,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            boxShadow: isDark
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,7 +347,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: _getPrimaryColor(selectedTier).withOpacity(0.1),
+                      color: _getPrimaryColor(selectedTier).withOpacity(isDark ? 0.2 : 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -312,7 +362,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: textColor,
                       letterSpacing: -0.3,
                     ),
                   ),
@@ -329,7 +379,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                         margin: const EdgeInsets.only(top: 2),
                         padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
-                          color: _getPrimaryColor(selectedTier).withOpacity(0.15),
+                          color: _getPrimaryColor(selectedTier).withOpacity(isDark ? 0.2 : 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -344,7 +394,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                           feature,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[700],
+                            color: secondaryTextColor,
                             height: 1.5,
                           ),
                         ),
@@ -360,40 +410,45 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 기능 행 (iOS 스타일)
+  /// 기능 행 (다크모드 대응)
   Widget _buildFeatureRow({
     required IconData icon,
     required String title,
     required List<String> values,
+    required bool isDark,
+    required Color cardColor,
+    required Color textColor,
     List<String>? details,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: Colors.grey[700]),
+              Icon(icon, size: 18, color: isDark ? Colors.grey[400] : Colors.grey[700]),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
+                  color: textColor,
                   letterSpacing: -0.2,
                 ),
               ),
@@ -409,6 +464,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   details?[index],
                   SubscriptionTier.values[index],
                   _selectedPlanIndex == index,
+                  isDark,
                 ),
               ),
             ),
@@ -418,14 +474,17 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 기능 값 (iOS 스타일)
+  /// 기능 값 (다크모드 대응)
   Widget _buildFeatureValue(
     String value,
     String? detail,
     SubscriptionTier tier,
     bool isSelected,
+    bool isDark,
   ) {
-    final color = isSelected ? _getPrimaryColor(tier) : Colors.grey[700]!;
+    final color = isSelected
+        ? _getPrimaryColor(tier)
+        : (isDark ? Colors.grey[400]! : Colors.grey[700]!);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
@@ -458,18 +517,25 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 하단 버튼 바 (iOS 스타일)
-  Widget _buildBottomBar(BuildContext context, SubscriptionTier currentTier) {
+  /// 하단 버튼 바 (다크모드 대응)
+  Widget _buildBottomBar(
+    BuildContext context,
+    SubscriptionTier currentTier,
+    bool isDark,
+    Color backgroundColor,
+    Color cardColor,
+    Color textColor,
+  ) {
     final selectedTier = SubscriptionTier.values[_selectedPlanIndex];
     final isCurrentPlan = selectedTier == currentTier;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F7),
+        color: backgroundColor,
         border: Border(
           top: BorderSide(
-            color: Colors.black.withOpacity(0.08),
+            color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.08),
             width: 0.5,
           ),
         ),
@@ -514,7 +580,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   '7일 무료 체험 · 언제든 해지 가능',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
                     fontWeight: FontWeight.w400,
                   ),
                   textAlign: TextAlign.center,
@@ -525,20 +591,27 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardColor,
                   borderRadius: BorderRadius.circular(13),
-                  border: Border.all(color: Colors.green[300]!, width: 1.5),
+                  border: Border.all(
+                    color: isDark ? Colors.green[700]! : Colors.green[300]!,
+                    width: 1.5,
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 22),
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: isDark ? Colors.green[400] : Colors.green[600],
+                      size: 22,
+                    ),
                     const SizedBox(width: 10),
                     Text(
                       '현재 사용 중',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.green[700],
+                        color: isDark ? Colors.green[400] : Colors.green[700],
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.3,
                       ),
