@@ -14,6 +14,7 @@ class SubscriptionPage extends ConsumerStatefulWidget {
 
 class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   int _selectedPlanIndex = 1; // 기본값 Pro
+  int _pointsToUse = 0; // 사용할 포인트
 
   @override
   Widget build(BuildContext context) {
@@ -517,7 +518,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     );
   }
 
-  /// 하단 버튼 바 (다크모드 대응)
+  /// 하단 버튼 바 (다크모드 대응 + 포인트 결제)
   Widget _buildBottomBar(
     BuildContext context,
     SubscriptionTier currentTier,
@@ -528,6 +529,11 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   ) {
     final selectedTier = SubscriptionTier.values[_selectedPlanIndex];
     final isCurrentPlan = selectedTier == currentTier;
+    final user = ref.watch(homeViewModelProvider).user;
+    final availablePoints = user?.coins ?? 0;
+    final tierPrice = selectedTier.price;
+    final maxPointsUsable = tierPrice > 0 ? (availablePoints > tierPrice ? tierPrice : availablePoints) : 0;
+    final finalPrice = tierPrice - _pointsToUse;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -544,6 +550,212 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // 포인트 사용 섹션 (유료 플랜 & 현재 사용중이 아닐 때만)
+            if (!isCurrentPlan && tierPrice > 0 && availablePoints > 0) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.06),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.monetization_on_outlined,
+                          size: 20,
+                          color: const Color(0xFFFF9500),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '포인트 사용',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '보유 ${_formatPrice(availablePoints)}P',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFFF9500),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            value: _pointsToUse.toDouble(),
+                            min: 0,
+                            max: maxPointsUsable.toDouble(),
+                            divisions: maxPointsUsable > 0 ? maxPointsUsable ~/ 100 : 1,
+                            activeColor: const Color(0xFFFF9500),
+                            inactiveColor: isDark ? Colors.grey[700] : Colors.grey[300],
+                            onChanged: (value) {
+                              setState(() {
+                                _pointsToUse = (value ~/ 100) * 100; // 100원 단위
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF9500).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${_formatPrice(_pointsToUse)}P',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFF9500),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _pointsToUse = 0;
+                            });
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            '초기화',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _pointsToUse = maxPointsUsable;
+                            });
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            '전액 사용',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFFF9500),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_pointsToUse > 0) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[900] : Colors.grey[50],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '플랜 가격',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  ),
+                                ),
+                                Text(
+                                  '₩${_formatPrice(tierPrice)}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '포인트 할인',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: const Color(0xFFFF9500),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  '-₩${_formatPrice(_pointsToUse)}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: const Color(0xFFFF9500),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Divider(height: 16, color: isDark ? Colors.grey[800] : Colors.grey[300]),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '최종 결제 금액',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: textColor,
+                                  ),
+                                ),
+                                Text(
+                                  finalPrice == 0 ? '무료' : '₩${_formatPrice(finalPrice)}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: _getPrimaryColor(selectedTier),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+
             if (!isCurrentPlan) ...[
               SizedBox(
                 width: double.infinity,
@@ -563,7 +775,9 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                     child: Text(
                       selectedTier.price == 0
                           ? 'Free 플랜으로 변경'
-                          : '월 ₩${_formatPrice(selectedTier.price)}로 시작하기',
+                          : finalPrice == 0
+                              ? '포인트로 구독하기'
+                              : '월 ₩${_formatPrice(finalPrice)}${_pointsToUse > 0 ? ' (포인트 할인)' : ''}로 시작하기',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -661,6 +875,22 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   /// 구독하기
   void _handleSubscribe(BuildContext context) {
     final selectedTier = SubscriptionTier.values[_selectedPlanIndex];
+    final tierPrice = selectedTier.price;
+    final finalPrice = tierPrice - _pointsToUse;
+
+    String contentText;
+    if (selectedTier.price == 0) {
+      contentText = 'Free 플랜으로 변경하시겠습니까?\n\n유료 플랜의 혜택이 해제됩니다.';
+    } else if (_pointsToUse > 0) {
+      contentText = '${selectedTier.displayName} 플랜을 구독하시겠습니까?\n\n'
+          '플랜 가격: ₩${_formatPrice(tierPrice)}\n'
+          '포인트 할인: -₩${_formatPrice(_pointsToUse)}\n'
+          '최종 결제: ${finalPrice == 0 ? '무료 (포인트 전액 결제)' : '₩${_formatPrice(finalPrice)}'}\n\n'
+          '${finalPrice > 0 ? '7일 무료 체험 후 자동 결제됩니다.\n' : ''}'
+          '포인트는 즉시 차감되며, 절약 거래로 추가됩니다.';
+    } else {
+      contentText = '${selectedTier.displayName} 플랜(₩${_formatPrice(tierPrice)}/월)을 구독하시겠습니까?\n\n7일 무료 체험 후 자동 결제됩니다.';
+    }
 
     showDialog(
       context: context,
@@ -674,10 +904,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           ),
         ),
         content: Text(
-          selectedTier.price == 0
-              ? 'Free 플랜으로 변경하시겠습니까?\n\n유료 플랜의 혜택이 해제됩니다.'
-              : '${selectedTier.displayName} 플랜(₩${_formatPrice(selectedTier.price)}/월)을 구독하시겠습니까?\n\n7일 무료 체험 후 자동 결제됩니다.',
-          style: const TextStyle(fontSize: 14),
+          contentText,
+          style: const TextStyle(fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
