@@ -12,7 +12,7 @@ import '../viewmodels/theme_viewmodel.dart';
 import '../providers/auth_provider.dart';
 import '../../data/models/transaction.dart';
 import '../../data/repositories/transaction_repository.dart';
-import '../dialogs/premium_dialog.dart';
+import '../dialogs/subscription_dialog.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});
@@ -1162,10 +1162,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 : '광고 제거 및 3배 포인트',
             iconColor: Colors.amber[700]!,
             onTap: () {
-              // 프리미엄 다이얼로그 표시
+              // 요금제 다이얼로그 표시
               showDialog(
                 context: context,
-                builder: (context) => const PremiumDialog(),
+                builder: (context) => const SubscriptionDialog(),
               );
             },
           ),
