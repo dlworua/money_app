@@ -1162,12 +1162,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                 : '광고 제거 및 3배 포인트',
             iconColor: Colors.amber[700]!,
             onTap: () {
-              // 요금제 페이지로 이동
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SubscriptionPage(),
-                ),
+              // 요금제 페이지를 전체 화면 모달로 표시
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => const SubscriptionPage(),
               );
             },
           ),

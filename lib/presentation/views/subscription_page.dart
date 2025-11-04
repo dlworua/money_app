@@ -31,45 +31,63 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.close, color: textColor, size: 28),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
-        children: [
-          // 헤더
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '요금제',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                    letterSpacing: -0.5,
-                  ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 헤더 (스와이프 다운으로 닫기)
+            GestureDetector(
+              onVerticalDragEnd: (details) {
+                if (details.primaryVelocity! > 300) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+                child: Column(
+                  children: [
+                    // 스와이프 인디케이터
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[700] : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // 제목
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '요금제',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: textColor,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '나에게 맞는 플랜을 선택하세요',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: secondaryTextColor,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  '나에게 맞는 플랜을 선택하세요',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: secondaryTextColor,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
 
-          // 요금제 탭
+            // 요금제 탭
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -122,6 +140,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           // 하단 버튼
           _buildBottomBar(context, currentTier, isDark, backgroundColor, cardColor, textColor),
         ],
+        ),
       ),
     );
   }
@@ -139,7 +158,10 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
     final baseColor = _getPrimaryColor(tier);
 
     return GestureDetector(
-      onTap: () => setState(() => _selectedPlanIndex = index),
+      onTap: () => setState(() {
+        _selectedPlanIndex = index;
+        _pointsToUse = 0; // 플랜 변경 시 포인트 사용량 초기화
+      }),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
@@ -551,7 +573,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // 포인트 사용 섹션 (유료 플랜 & 현재 사용중이 아닐 때만)
-            if (!isCurrentPlan && tierPrice > 0 && availablePoints > 0) ...[
+            if (!isCurrentPlan && tierPrice > 0) ...[
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
@@ -594,23 +616,52 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Slider(
-                            value: _pointsToUse.toDouble(),
-                            min: 0,
-                            max: maxPointsUsable.toDouble(),
-                            divisions: maxPointsUsable > 0 ? maxPointsUsable ~/ 100 : 1,
-                            activeColor: const Color(0xFFFF9500),
-                            inactiveColor: isDark ? Colors.grey[700] : Colors.grey[300],
-                            onChanged: (value) {
-                              setState(() {
-                                _pointsToUse = (value ~/ 100) * 100; // 100원 단위
-                              });
-                            },
-                          ),
+                    if (availablePoints == 0) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[900] : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(10),
                         ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 18,
+                              color: isDark ? Colors.grey[500] : Colors.grey[600],
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '보유한 포인트가 없습니다. 게임으로 포인트를 획득하세요!',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (availablePoints > 0) ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: _pointsToUse.toDouble(),
+                              min: 0,
+                              max: maxPointsUsable.toDouble(),
+                              divisions: maxPointsUsable >= 100 ? maxPointsUsable ~/ 100 : 1,
+                              activeColor: const Color(0xFFFF9500),
+                              inactiveColor: isDark ? Colors.grey[700] : Colors.grey[300],
+                              onChanged: (value) {
+                                setState(() {
+                                  _pointsToUse = (value ~/ 100) * 100; // 100원 단위
+                                });
+                              },
+                            ),
+                          ),
                         const SizedBox(width: 12),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -752,6 +803,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                       ),
                     ],
                   ],
+                ],
                 ),
               ),
             ],
@@ -800,7 +852,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
                   textAlign: TextAlign.center,
                 ),
               ],
-            ] else ...[
+            ],
+            if (isCurrentPlan) ...[
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
