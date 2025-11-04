@@ -1183,6 +1183,8 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             },
           ),
 
+          _buildDivider(),
+
           // 로그아웃
           _buildSettingItem(
             icon: Icons.logout,
