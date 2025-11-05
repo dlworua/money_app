@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:money_app/presentation/dialogs/premium_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -13,7 +12,6 @@ import '../../data/models/transaction.dart';
 import '../viewmodels/providers.dart';
 import '../viewmodels/home_viewmodel.dart';
 import '../widgets/premium_card.dart';
-import '../widgets/premium_buttons.dart';
 import '../widgets/animated_expansion_card.dart';
 import '../dialogs/add_transaction_dialog.dart';
 import 'ai_coaching_page.dart';
@@ -121,16 +119,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
               ),
 
-              // 프리미엄 배너 (비프리미엄 사용자만)
-              if (!user.isPremium) ...[
-                _buildPremiumBanner(context),
-                SizedBox(
-                  height: ResponsiveUtils.getIPhone16PlusSpacing(
-                    context,
-                    AppTheme.spaceXL,
-                  ),
+              // 프리미엄 배너 제거됨 - 프로필 탭에서 구독 관리
+              SizedBox(
+                height: ResponsiveUtils.getIPhone16PlusSpacing(
+                  context,
+                  AppTheme.spaceXL,
                 ),
-              ],
+              ),
             ]),
           ),
         ),
@@ -152,7 +147,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             Theme.of(context).brightness == Brightness.dark
                 ? 'assets/images/mont_logo_final_dark.svg'
                 : 'assets/images/mont_logo_final.svg',
-            height: ResponsiveUtils.getResponsiveIconSize(context, 40),
+            height: ResponsiveUtils.getResponsiveIconSize(context, 48),
           ),
           const Spacer(),
           if (user.isPremium)
@@ -1227,58 +1222,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
     } else {
       return '${date.month}월 ${date.day}일';
     }
-  }
-
-  Widget _buildPremiumBanner(BuildContext context) {
-    return GradientCard(
-      gradient: const LinearGradient(
-        colors: [Color(0xFFFFB800), Color(0xFFFF8C00)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.workspace_premium_rounded,
-                color: AppTheme.white(context),
-                size: 28,
-              ),
-              const SizedBox(width: AppTheme.spaceS),
-              Text(
-                '프리미엄으로 업그레이드',
-                style: AppTheme.headingSmall.copyWith(
-                  color: AppTheme.white(context),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTheme.spaceS),
-          Text(
-            '• 광고 제거\n• 3배 빠른 포인트 적립\n• 무제한 절약 기록\n• 고급 통계 분석',
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.white(context).withValues(alpha: 0.9),
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: AppTheme.spaceM),
-          PremiumButton(
-            text: '프리미엄 시작하기',
-            type: ButtonType.secondary,
-            onPressed: () {
-              // TODO: 프리미엄 업그레이드
-              showDialog(
-                context: context,
-                builder: (context) => const PremiumDialog(),
-              );
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   Widget? _buildBottomAd(dynamic state) {
