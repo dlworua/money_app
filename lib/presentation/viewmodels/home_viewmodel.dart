@@ -7,6 +7,7 @@ import '../../core/services/logger_service.dart';
 import '../../core/services/ai_coaching_service.dart';
 import '../../core/enums/coaching_style.dart';
 import '../../data/models/user_model.dart';
+import '../../data/models/subscription_tier.dart';
 import '../../data/models/ai_coaching_insight.dart';
 import '../../data/models/saving_record.dart';
 import '../../data/models/transaction.dart';
@@ -1309,7 +1310,9 @@ class HomeViewModel extends StateNotifier<HomeState> {
     if (user == null) return;
 
     try {
-      final updatedUser = user.copyWith(isPremium: !user.isPremium);
+      // 프리미엄 토글: Free ↔ Premium
+      final newTier = user.isPremium ? SubscriptionTier.free : SubscriptionTier.premium;
+      final updatedUser = user.copyWith(subscriptionTier: newTier);
       await _userService.saveUser(updatedUser);
       state = state.copyWith(user: updatedUser);
 

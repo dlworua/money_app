@@ -4,6 +4,7 @@ import '../../core/enums/subscription_plan.dart';
 import '../../core/exceptions/app_exceptions.dart';
 import '../../core/services/logger_service.dart';
 import '../../data/models/user_model.dart';
+import '../../data/models/subscription_tier.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../domain/services/ai_coaching_service.dart';
 import 'streak_service.dart';
@@ -127,7 +128,7 @@ class UserService {
     final endDate = now.add(Duration(days: subscriptionPlan.days));
     
     final updatedUser = user.copyWith(
-      isPremium: true,
+      subscriptionTier: SubscriptionTier.premium,
       premiumStartDate: now,
       premiumEndDate: endDate,
       subscriptionPlan: planId,

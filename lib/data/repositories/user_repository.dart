@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
+import '../models/subscription_tier.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/enums/achievement_type.dart';
 import '../../core/exceptions/app_exceptions.dart';
@@ -28,7 +29,7 @@ class UserRepository {
         name: 'Guest User',
         email: 'guest@example.com',
         coins: 0,
-        isPremium: false,
+        subscriptionTier: SubscriptionTier.free,
         savingRecordsThisMonth: 0,
         level: 1,
         experience: 0,
