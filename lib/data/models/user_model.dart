@@ -1,6 +1,7 @@
 import 'saving_record.dart';
 import 'ai_coaching_insight.dart';
 import 'point_history.dart';
+import 'subscription_tier.dart';
 import '../../core/enums/coaching_style.dart';
 
 class UserModel {
@@ -8,7 +9,7 @@ class UserModel {
   final String name;
   final String email;
   final int coins; // 기본 포인트 (필드명은 호환성 유지)
-  final bool isPremium;
+  final SubscriptionTier subscriptionTier; // 구독 등급
   final DateTime? lastAdWatchedAt;
 
   // 💎 프리미엄 구독 관련 필드들
@@ -56,12 +57,15 @@ class UserModel {
   final bool enableWeeklyReview; // 주간 리뷰 활성화
   final Map<String, dynamic> coachingPreferences; // 코칭 개인화 설정
 
+  /// isPremium - 구독 등급이 Premium인지 확인 (하위 호환성)
+  bool get isPremium => subscriptionTier == SubscriptionTier.premium;
+
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     this.coins = 0,
-    this.isPremium = false,
+    this.subscriptionTier = SubscriptionTier.free,
     this.lastAdWatchedAt,
     // 💎 프리미엄 구독 필드들
     this.premiumStartDate,
@@ -109,7 +113,7 @@ class UserModel {
     String? name,
     String? email,
     int? coins,
-    bool? isPremium,
+    SubscriptionTier? subscriptionTier,
     DateTime? lastAdWatchedAt,
     DateTime? premiumStartDate,
     DateTime? premiumEndDate,
@@ -151,7 +155,7 @@ class UserModel {
       name: name ?? this.name,
       email: email ?? this.email,
       coins: coins ?? this.coins,
-      isPremium: isPremium ?? this.isPremium,
+      subscriptionTier: subscriptionTier ?? this.subscriptionTier,
       lastAdWatchedAt: lastAdWatchedAt ?? this.lastAdWatchedAt,
       premiumStartDate: premiumStartDate ?? this.premiumStartDate,
       premiumEndDate: premiumEndDate ?? this.premiumEndDate,
@@ -199,7 +203,7 @@ class UserModel {
       'name': name,
       'email': email,
       'coins': coins,
-      'isPremium': isPremium,
+      'subscriptionTier': subscriptionTier.name,
       'lastAdWatchedAt': lastAdWatchedAt?.toIso8601String(),
       'premiumStartDate': premiumStartDate?.toIso8601String(),
       'premiumEndDate': premiumEndDate?.toIso8601String(),
@@ -247,7 +251,10 @@ class UserModel {
       name: json['name'] as String,
       email: json['email'] as String,
       coins: json['coins'] as int? ?? 0,
-      isPremium: json['isPremium'] as bool? ?? false,
+      subscriptionTier: SubscriptionTier.values.firstWhere(
+        (tier) => tier.name == json['subscriptionTier'],
+        orElse: () => SubscriptionTier.free,
+      ),
       lastAdWatchedAt: json['lastAdWatchedAt'] != null
           ? DateTime.parse(json['lastAdWatchedAt'] as String)
           : null,

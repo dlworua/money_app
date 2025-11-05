@@ -11,6 +11,7 @@ import '../viewmodels/providers.dart';
 import '../viewmodels/theme_viewmodel.dart';
 import '../providers/auth_provider.dart';
 import '../../data/models/transaction.dart';
+import '../../data/models/subscription_tier.dart';
 import '../../data/repositories/transaction_repository.dart';
 import 'subscription_page.dart';
 
@@ -1151,15 +1152,20 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
           _buildDivider(),
 
-          // 프리미엄
+          // 요금제
           _buildSettingItem(
-            icon: user?.isPremium == true
+            icon: (user?.subscriptionTier == SubscriptionTier.premium ||
+                   user?.subscriptionTier == SubscriptionTier.pro)
                 ? Icons.workspace_premium
                 : Icons.workspace_premium_outlined,
-            title: user?.isPremium == true ? '프리미엄 관리' : '프리미엄 가입',
-            subtitle: user?.isPremium == true
-                ? '프리미엄 혜택 확인 및 해지'
-                : '광고 제거 및 3배 포인트',
+            title: (user?.subscriptionTier == SubscriptionTier.premium ||
+                   user?.subscriptionTier == SubscriptionTier.pro)
+                ? '요금제 관리'
+                : '요금제 선택',
+            subtitle: (user?.subscriptionTier == SubscriptionTier.premium ||
+                   user?.subscriptionTier == SubscriptionTier.pro)
+                ? '구독 혜택 확인 및 변경'
+                : '더 많은 혜택을 누리세요',
             iconColor: Colors.amber[700]!,
             onTap: () {
               // 요금제 페이지를 전체 화면 모달로 표시

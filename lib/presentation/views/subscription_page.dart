@@ -19,9 +19,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(homeViewModelProvider).user;
-    final currentTier = user?.isPremium == true
-        ? SubscriptionTier.premium
-        : SubscriptionTier.free;
+    final currentTier = user?.subscriptionTier ?? SubscriptionTier.free;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? const Color(0xFF000000) : const Color(0xFFF5F5F7);
